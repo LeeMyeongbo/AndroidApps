@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.reminder.wifi_reminder.CheckableLinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/checkable_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingVertical="8dp"
+    android:background="@drawable/routine_background_night"
+    android:descendantFocusability="blocksDescendants">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/checkbox"
+            android:theme="@style/Custom_CheckBox_night"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:clickable="false"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_marginStart="10dp"
+            android:layout_weight="0.09"
+            android:background="#00000000"/>
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.91"
+            android:paddingVertical="8dp"
+            android:paddingHorizontal="15dp"
+            android:textSize="27sp"
+            android:textColor="@color/white"
+            android:layout_gravity="center" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/g_m_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#AFAFAF"
+        android:textSize="12sp"
+        android:paddingHorizontal="15dp"
+        android:layout_gravity="center"/>
+
+</com.reminder.wifi_reminder.CheckableLinearLayout>
