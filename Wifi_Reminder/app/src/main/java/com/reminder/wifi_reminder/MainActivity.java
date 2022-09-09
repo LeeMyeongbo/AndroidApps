@@ -40,6 +40,7 @@ import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -158,23 +159,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             routine_list = new DaoAsyncTask(rd.routine_dao(), "GET_ALL").execute().get();
             int criteria = sp.getInt("criteria", 1);
-            boolean asc = sp.getBoolean("form", false);                 // 기본값은 생성 날짜 내림차순으로 함
+            boolean asc = sp.getBoolean("form", false);              // 기본값은 생성 날짜 내림차순으로 함
 
-            if (criteria == 0) {                                                            // 루틴 이름 기준으로
+            if (criteria == 0) {                                                  // 루틴 이름 기준으로
                 if (asc)
-                    routine_list.sort((o1, o2) -> o1.name.compareTo(o2.name));              // 오름차순 정렬
+                    routine_list.sort(Comparator.comparing(o -> o.name));         // 오름차순 정렬
                 else
-                    routine_list.sort((o1, o2) -> o2.name.compareTo(o1.name));              // 내림차순 정렬
-            } else if (criteria == 1) {                                                     // 생성 날짜 기준으로
+                    routine_list.sort((o1, o2) -> o2.name.compareTo(o1.name));    // 내림차순 정렬
+            } else if (criteria == 1) {                                           // 생성 날짜 기준으로
                 if (asc)
-                    routine_list.sort((o1, o2) -> o1.g_date.compareTo(o2.g_date));          // 오름차순 정렬
+                    routine_list.sort(Comparator.comparing(o -> o.g_date));       // 오름차순 정렬
                 else
-                    routine_list.sort((o1, o2) -> o2.g_date.compareTo(o1.g_date));          // 내림차순 정렬
-            } else {                                                                        // 수정 날짜 기준으로
+                    routine_list.sort((o1, o2) -> o2.g_date.compareTo(o1.g_date)); // 내림차순 정렬
+            } else {                                                               // 수정 날짜 기준으로
                 if (asc)
-                    routine_list.sort((o1, o2) -> o1.m_date.compareTo(o2.m_date));          // 오름차순 정렬
+                    routine_list.sort(Comparator.comparing(o -> o.m_date));        // 오름차순 정렬
                 else
-                    routine_list.sort((o1, o2) -> o2.m_date.compareTo(o1.m_date));          // 내림차순 정렬
+                    routine_list.sort((o1, o2) -> o2.m_date.compareTo(o1.m_date)); // 내림차순 정렬
             }
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
