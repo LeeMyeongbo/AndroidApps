@@ -1,6 +1,9 @@
 package com.getting.newsalarm;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -25,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private TextToSpeech tts;
     private RequestQueue queue;
     private EditText keywordText;
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,14 @@ public class MainActivity extends AppCompatActivity {
         // 해당 url 로부터 뉴스기사(Json 형태) 응답 요청
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
             response -> {       // 성공적으로 응답 받아왔을 경우
-                StringBuilder printOut = new StringBuilder();
+
+                // 배경음악 재생!
+                mediaPlayer = MediaPlayer.create(this, R.raw.morningkiss);
+                mediaPlayer.setVolume(0.13f, 0.13f);
+                mediaPlayer.setLooping(true);
+                mediaPlayer.start();
+
+                speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", "start");
 
                 // Json 형식이 아닌 데이터를 처리할 수도 있으므로 예외 처리 필요
                 try {
@@ -62,21 +73,18 @@ public class MainActivity extends AppCompatActivity {
 
                         // json 형식의 기사에서 "title"에 해당하는 부분 가지고 옴
                         String title = articleObject.getString("title").replaceAll("([(<&](.*?)[;>)])", "");
-                        printOut.append(i + 1).append("번 뉴스기사입니다. ").append(title).append(".");
-                        Log.d("News", title + '\n');
+                        speakTTS((i + 1) + "번 뉴스기사입니다. " + title, "title");
 
                         // "description"에 해당하는 부분도 가지고 옴
                         String des = articleObject.getString("description").replaceAll("([(<&](.*?)[;>)])", "");
-                        printOut.append("기사 내용입니다. ").append(des).append("...");
-                        Log.d("News", des + '\n');
+                        speakTTS("기사 내용입니다. " + des, "content");
                     }
-                    tts.speak(printOut, TextToSpeech.QUEUE_FLUSH, null, "articles");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }, error -> {       // 에러났을 경우
                 Log.e("error", error.getMessage(), error);
-                tts.speak("서버 통신 오류가 발생했습니다.", TextToSpeech.QUEUE_FLUSH, null, "error");
+                speakTTS("서버 통신 오류가 발생했습니다.", "error");
             }
         ) {
             @Override
@@ -98,8 +106,14 @@ public class MainActivity extends AppCompatActivity {
                 tts.setLanguage(Locale.KOREAN);
             }
         });
-        tts.setPitch(0.95f);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        tts.setPitch(1.0f);
         tts.setSpeechRate(0.85f);
+    }
+
+    public void speakTTS(String txt, String utterance) {
+        tts.speak(txt, TextToSpeech.QUEUE_ADD, null, utterance);
+        tts.playSilentUtterance(500L, TextToSpeech.QUEUE_ADD, "silence");
     }
 
     public void destroyTTS() {
@@ -107,6 +121,9 @@ public class MainActivity extends AppCompatActivity {
             tts.stop();
             tts.shutdown();
             tts = null;
+
+            mediaPlayer.stop();
+            mediaPlayer.release();
         }
     }
 
