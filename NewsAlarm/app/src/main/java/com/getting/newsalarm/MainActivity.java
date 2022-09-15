@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private Bundle bundle;
     private Handler handler;
+    private int news_num;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,15 +57,14 @@ public class MainActivity extends AppCompatActivity {
         keywordText = findViewById(R.id.keywordText);
         queue = Volley.newRequestQueue(this);      // requestQueue 생성
 
-        final int[] num = {0};
         handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
-                num[0]++;
+                news_num++;
                 String title = msg.getData().getString("title");
                 String[] contents = msg.getData().getStringArray("content");
 
-                speakTTS(num[0] + "번 뉴스입니다.", "announce", 1);
+                speakTTS(news_num + "번 뉴스입니다.", "announce", 1);
                 speakTTS(title, "title", 1);
                 speakTTS("기사 내용입니다.", "contentReady", 1);
                 for (String content : contents)
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         createTTS();
 
         String keyword = keywordText.getText().toString();
-        String url = "https://openapi.naver.com/v1/search/news?query=" + keyword + "&display=15";
+        String url = "https://openapi.naver.com/v1/search/news?query=" + keyword + "&display=20";
 
         // 해당 url 로부터 뉴스기사(Json 형태) 응답 요청
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
@@ -96,11 +96,12 @@ public class MainActivity extends AppCompatActivity {
                     int length = arrayArticles.length();
                     Set<JSONObject> jsonObjects = new HashSet<>();
 
-                    // 같은 기사가 중복되는 경우도 있어서 HashSet 으로 중복 제거 + 네이버 뉴스 기사만 들고 옴
+                    // 같은 기사가 중복되는 경우도 있어서 HashSet 으로 중복 제거 + 네이버 뉴스 기사만 들고 옴(한 5개 까지)
                     for (int i = 0; i < length; i++) {
                         JSONObject articleObject = arrayArticles.getJSONObject(i);
-                        if (articleObject.getString("link").contains("naver"))
+                        if (articleObject.getString("link").contains("news.naver.com"))
                             jsonObjects.add(articleObject);
+                        if (jsonObjects.size() == 5) break;
                     }
 
                     new Thread() {
@@ -210,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
 
             mediaPlayer.stop();
             mediaPlayer.release();
+            news_num = 0;
         }
     }
 
