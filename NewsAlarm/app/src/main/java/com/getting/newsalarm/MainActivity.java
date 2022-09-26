@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -82,93 +81,28 @@ public class MainActivity extends AppCompatActivity {
         // 해당 url 로부터 뉴스기사(Json 형태) 응답 요청
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
             response -> {       // 성공적으로 응답 받아왔을 경우
-                // 배경음악 재생!
-                mediaPlayer = MediaPlayer.create(this, R.raw.morningkiss);
-                mediaPlayer.setVolume(0.1f, 0.1f);
-                mediaPlayer.setLooping(true);
-                mediaPlayer.start();
-
+                playBackgroundMusic();
                 speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", "start", 1);
-                // Json 형식이 아닌 데이터를 처리할 수도 있으므로 예외 처리 필요
-                try {
-                    JSONObject jsonObject = new JSONObject(response);
-                    JSONArray arrayArticles = jsonObject.getJSONArray("items");
-                    int length = arrayArticles.length();
-                    Set<JSONObject> jsonObjects = new HashSet<>();
 
-                    // 같은 기사가 중복되는 경우도 있어서 HashSet 으로 중복 제거 + 네이버 뉴스 기사만 들고 옴(한 5개 까지)
-                    for (int i = 0; i < length; i++) {
-                        JSONObject articleObject = arrayArticles.getJSONObject(i);
-                        if (articleObject.getString("link").contains("news.naver.com"))
-                            jsonObjects.add(articleObject);
-                        if (jsonObjects.size() == 5) break;
-                    }
+                Set<JSONObject> jsonObjects = convert2JSONSet(response);
+                new Thread() {
+                    @Override
+                    public void run() {
+                        for (JSONObject j : jsonObjects) {
+                            String title = getArticleTitle(j);
+                            String[] contents = getArticleBody(j);
 
-                    new Thread() {
-                        @Override
-                        public void run() {
-                            for (JSONObject j : jsonObjects) {
-                                try {
-                                    // json 형식의 기사에서 "title"에 해당하는 부분 가지고 오면서 [], (), <>, &;로 싸여져 있는 부분 제거
-                                    String title = j.getString("title");
-                                    title = title.replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
-
-                                    // "link"에 해당하는 부분도 가져와서 html 파싱, 기사 부분만 크롤링해 옴
-                                    String link = j.getString("link");
-                                    Document doc = Jsoup.connect(link).get();
-                                    Element e = doc.selectFirst("#dic_area");
-                                    if (e == null)
-                                        e = doc.selectFirst("#articeBody");
-                                    if (e == null)
-                                        e = doc.selectFirst("#newsEndContents");
-
-                                    int num = Objects.requireNonNull(e).childrenSize();
-
-                                    // 자식 요소 중 태그가 <font>, <span>, <b>가 아니거나 class="end_photo_org"인 경우 모두 제거
-                                    for (int i = num - 1; i >= 0; i--) {
-                                        String tag = e.child(i).tagName();
-                                        if ((!tag.equals("font") && !tag.equals("span") && !tag.equals("b"))
-                                            || e.child(i).className().equals("end_photo_org"))
-                                            e.child(i).remove();
-                                    }
-
-                                    // 기사 본문에서 [], (), <>, &;로 싸여져 있는 부분 제거
-                                    String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
-
-                                    // #, ※, ▶, ⓒ 등의 특수문자가 오면 그 뒤의 내용은 필요없어서 잘라냄
-                                    int idx = content.indexOf('#');
-                                    if (idx == -1)
-                                        idx = content.indexOf('※');
-                                    if (idx == -1)
-                                        idx = content.indexOf('▶');
-                                    if (idx == -1)
-                                        idx = content.indexOf('ⓒ');
-                                    if (idx != -1)
-                                        content = content.substring(0, idx);
-
-                                    // handler 로 제목 전송
-                                    bundle.putString("title", title);
-
-                                    // 본문도 전송하는데 4000자 넘어가면 음성 출력 안되니까 1000자 단위로 끊어서 전송
-                                    int send = content.length() / 1000;
-                                    String[] contents = new String[send + 1];
-                                    for (int i = 0; i <= send; i++) {
-                                        int l = Integer.min(1000 * i + 1000, content.length());
-                                        contents[i] = content.substring(i * 1000, l);
-                                    }
-                                    bundle.putStringArray("content", contents);
-                                    Message msg = handler.obtainMessage();
-                                    msg.setData(bundle);
-                                    handler.sendMessage(msg);
-                                } catch (IOException | JSONException e) {
-                                    e.printStackTrace();
-                                }
+                            // handler 로 제목 및 본문 전송
+                            if (title != null && contents != null) {
+                                bundle.putString("title", title);
+                                bundle.putStringArray("content", contents);
+                                Message msg = handler.obtainMessage();
+                                msg.setData(bundle);
+                                handler.sendMessage(msg);
                             }
                         }
-                    }.start();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+                    }
+                }.start();
             }, error -> {       // 에러났을 경우
                 speakTTS("서버 통신 오류가 발생했습니다.", "error", 0);
             }
@@ -177,13 +111,124 @@ public class MainActivity extends AppCompatActivity {
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
                 params.put("X-Naver-Client-Id", "77ZHNWgvaXOrqCOeo3s5");
-                params.put("X-Naver-Client-Secret", "x_SI3JImaI");
+                params.put("X-Naver-Client-Secret", "secret!");
 
                 return params;
             }
         };
         stringRequest.setShouldCache(false);
         queue.add(stringRequest);
+    }
+
+    public void playBackgroundMusic() {         // 배경음악 재생!
+        mediaPlayer = MediaPlayer.create(this, R.raw.morningkiss);
+        mediaPlayer.setVolume(0.1f, 0.1f);
+        mediaPlayer.setLooping(true);
+        mediaPlayer.start();
+    }
+
+    // JSON 이외의 데이터를 처리할 수도 있으므로 예외 처리 필요
+    public Set<JSONObject> convert2JSONSet(String response) {
+        try {
+            JSONObject jsonObject = new JSONObject(response);
+            JSONArray arrayArticles = jsonObject.getJSONArray("items");
+            int length = arrayArticles.length();
+            Set<JSONObject> jsonObjects = new HashSet<>();
+
+            // 같은 기사가 중복되는 경우도 있어서 HashSet 으로 중복 제거 + 네이버 뉴스 기사만 들고 옴(한 5개 까지)
+            for (int i = 0; i < length; i++) {
+                JSONObject articleObject = arrayArticles.getJSONObject(i);
+                if (articleObject.getString("link").contains("news.naver.com"))
+                    jsonObjects.add(articleObject);
+                if (jsonObjects.size() == 5) break;
+            }
+
+            return jsonObjects;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return new HashSet<>();
+    }
+
+    public String getArticleTitle(JSONObject j) {
+        try {
+            // json 형식의 기사에서 "title"에 해당하는 부분 가지고 오면서 [], (), <>, &;로 싸여져 있는 부분 제거
+            return j.getString("title").replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
+        } catch (JSONException | NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public String[] getArticleBody(JSONObject j) {
+        try {
+            // "link"에 해당하는 부분도 가져와서 html 파싱, 기사 부분만 크롤링해 옴
+            String content = modifyContent(crawlPassage(j.getString("link")));
+
+            // 본문이 너무 길 수도 있으니 line 별로 끊어서 전송
+            int line = 1000;
+            int send = content.length() / line;
+            String[] contents = new String[send + 1];
+            for (int i = 0; i <= send; i++) {
+                int l = Integer.min(line * i + line, content.length());
+                contents[i] = content.substring(i * line, l);
+            }
+
+            return contents;
+        } catch (JSONException | NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Element crawlPassage(String link) {
+        try {
+            Document doc = Jsoup.connect(link).get();
+            Element e = doc.selectFirst("#dic_area");
+            if (e == null)
+                e = doc.selectFirst("#articeBody");
+            if (e == null)
+                e = doc.selectFirst("#newsEndContents");
+
+            int num = e.childrenSize();
+
+            // 자식 요소 중 태그가 <font>, <span>, <b>가 아니거나 class="end_photo_org"인 경우 모두 제거
+            for (int i = num - 1; i >= 0; i--) {
+                String tag = e.child(i).tagName();
+                if ((!tag.equals("font") && !tag.equals("span") && !tag.equals("b"))
+                    || e.child(i).className().equals("end_photo_org"))
+                    e.child(i).remove();
+            }
+
+            return e;
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public String modifyContent(Element e) {
+        if (e == null) return null;
+
+        // 기사 본문에서 [], (), <>, &;로 싸여져 있는 부분 제거
+        String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
+
+        // #, ※, ▶, ⓒ 등의 특수문자가 오면 그 뒤의 내용은 필요없어서 잘라냄
+        int idx = content.indexOf('#');
+        if (idx == -1)
+            idx = content.indexOf('※');
+        if (idx == -1)
+            idx = content.indexOf('▶');
+        if (idx == -1)
+            idx = content.indexOf('ⓒ');
+        if (idx != -1)
+            content = content.substring(0, idx);
+
+        return content;
     }
 
     public void createTTS() {
