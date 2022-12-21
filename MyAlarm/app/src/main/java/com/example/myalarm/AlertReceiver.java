@@ -1,8 +1,8 @@
-package com.getting.newsalarm;
+package com.example.myalarm;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,10 +10,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.widget.Button;
-
 import android.speech.tts.TextToSpeech;
-import android.widget.EditText;
+
+import androidx.annotation.NonNull;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -34,28 +33,18 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class MainActivity extends AppCompatActivity {
+public class AlertReceiver extends BroadcastReceiver {
     private TextToSpeech tts;
     private RequestQueue queue;
-    private EditText keywordText;
     private MediaPlayer mediaPlayer;
     private Bundle bundle;
     private Handler handler;
     private int news_num;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        Button readButton = findViewById(R.id.readButton);
-        readButton.setOnClickListener((e) -> getNews());
-        Button stopButton = findViewById(R.id.stopButton);
-        stopButton.setOnClickListener((e) -> destroyTTS());
-
+    public void onReceive(Context context, Intent intent) {
         bundle = new Bundle();
-        keywordText = findViewById(R.id.keywordText);
-        queue = Volley.newRequestQueue(this);      // requestQueue 생성
+        queue = Volley.newRequestQueue(context.getApplicationContext());      // requestQueue 생성
 
         handler = new Handler(Looper.getMainLooper()) {
             @Override
@@ -71,17 +60,18 @@ public class MainActivity extends AppCompatActivity {
                     speakTTS(content, 0);
             }
         };
+        getNews(context);
     }
 
-    public void getNews() {
-        createTTS();
+    public void getNews(Context context) {
+        createTTS(context);
 
-        String keyword = keywordText.getText().toString();
+        String keyword = "코로나";
         String url = "https://openapi.naver.com/v1/search/news?query=" + keyword + "&display=20";
 
         // 해당 url 로부터 뉴스기사(Json 형태) 응답 요청
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {  // 성공적으로 응답 받아왔을 경우
-            playBackgroundMusic();
+            playBackgroundMusic(context);
             speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
 
             Set<JSONObject> jsonObjects = convert2JSONSet(response);
@@ -119,11 +109,11 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    public void playBackgroundMusic() {         // 배경음악 재생!
+    public void playBackgroundMusic(Context context) {         // 배경음악 재생!
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
         try {
-            mediaPlayer.setDataSource(this, Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.morningkiss));
+            mediaPlayer.setDataSource(context, Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.morningkiss));
             mediaPlayer.prepare();
         } catch (IOException e) {
             e.printStackTrace();
@@ -237,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
         return content;
     }
 
-    public void createTTS() {
-        tts = new TextToSpeech(this, status -> {
+    public void createTTS(Context context) {
+        tts = new TextToSpeech(context, status -> {
             if (status != TextToSpeech.ERROR) {
                 tts.setLanguage(Locale.KOREAN);
             }
@@ -265,11 +255,5 @@ public class MainActivity extends AppCompatActivity {
             mediaPlayer.release();
             news_num = 0;
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        destroyTTS();
-        super.onDestroy();
     }
 }
