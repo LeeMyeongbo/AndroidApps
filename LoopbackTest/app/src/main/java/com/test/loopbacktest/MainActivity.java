@@ -17,7 +17,7 @@ import androidx.core.app.ActivityCompat;
 public class MainActivity extends AppCompatActivity implements RadioGroup.OnCheckedChangeListener {
 
     private static final String CLASS_NAME = "MainActivity";
-    private Thread audioTaskThread;
+    private Thread loopbackTaskThread;
     private boolean isRecording;
 
     @Override
@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         initUI();
     }
 
-    void requestPermission() {
+    private void requestPermission() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
             != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.RECORD_AUDIO}, 1);
@@ -43,30 +43,38 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
 
     @Override
     public void onCheckedChanged(RadioGroup radioGroup, int i) {
-        int checkedId = radioGroup.getCheckedRadioButtonId();
-        if (checkedId == R.id.radioButtonRecordOn) {
+        if (radioGroup.getCheckedRadioButtonId() == R.id.radioButtonRecordOn) {
             if (!isRecording) {
-                Log.d(CLASS_NAME, "start Loopback thread..");
-                isRecording = true;
-                if (audioTaskThread == null) {
-                    audioTaskThread = new Thread(new AudioTask());
-                    audioTaskThread.start();
-                }
+                Log.d(CLASS_NAME, "create Loopback thread..");
+                startLoopback();
             }
         } else {
             if (isRecording) {
-                isRecording = false;
-                if (audioTaskThread != null) {
-                    audioTaskThread.interrupt();
-                    audioTaskThread = null;
-                }
+                Log.d(CLASS_NAME, "destroy Loopback thread..");
+                stopLoopback();
             }
         }
     }
 
-    static class AudioTask implements Runnable {
+    private void startLoopback() {
+        isRecording = true;
+        if (loopbackTaskThread == null) {
+            loopbackTaskThread = new Thread(new LoopbackTask());
+            loopbackTaskThread.start();
+        }
+    }
 
-        private static final String CLASS_NAME = "AudioTask";
+    private void stopLoopback() {
+        isRecording = false;
+        if (loopbackTaskThread != null) {
+            loopbackTaskThread.interrupt();
+            loopbackTaskThread = null;
+        }
+    }
+
+    private static class LoopbackTask implements Runnable {
+
+        private static final String CLASS_NAME = "LoopbackTask";
         private final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
         private final int SAMPLE_RATE = 44100;
         private final int CHANNEL_TYPE = AudioFormat.CHANNEL_IN_STEREO;
@@ -80,11 +88,10 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         @Override
         public void run() {
             Log.d(CLASS_NAME, "Loopback Thread started..");
-            initLoopback();
+            prepareLoopbackTask();
 
             do {
-                int read = recordAudio();
-                playAudio(read);
+                playAudio(recordAudio());
             } while (!Thread.interrupted());
 
             Log.d(CLASS_NAME, "Loopback Thread stopped..");
@@ -94,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         }
 
         @SuppressLint("MissingPermission")
-        private void initLoopback() {
+        private void prepareLoopbackTask() {
             readData = new short[BUFFER_SIZE];
             audioRecorder = new AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_TYPE, AUDIO_FORMAT, BUFFER_SIZE);
             audioTracker = new AudioTrack(AudioManager.STREAM_MUSIC, SAMPLE_RATE, CHANNEL_TYPE, AUDIO_FORMAT,
