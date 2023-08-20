@@ -20,13 +20,13 @@ public class NotificationHelper extends ContextWrapper {
 
     public NotificationHelper(Context base) {
         super(base);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             createChannels();
-        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public void createChannels(){
+    public void createChannels() {
         NotificationChannel channel1 = new NotificationChannel(channel1ID,channel1Name, NotificationManager.IMPORTANCE_DEFAULT);
         channel1.enableLights(true);
         channel1.enableVibration(true);
@@ -45,28 +45,27 @@ public class NotificationHelper extends ContextWrapper {
     }
 
     public NotificationManager getManager() {
-        if (mManager == null){
+        if (mManager == null)
             mManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        }
 
         return mManager;
     }
 
-    public NotificationCompat.Builder getChannel1Notification(String title, String message){
+    public NotificationCompat.Builder getChannel1Notification(String title, String message) {
         return new NotificationCompat.Builder(getApplicationContext(), channel1ID)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.ic_one);
     }
 
-    public NotificationCompat.Builder getChannel2Notification(String title, String message){
+    public NotificationCompat.Builder getChannel2Notification(String title, String message) {
         return new NotificationCompat.Builder(getApplicationContext(), channel2ID)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setSmallIcon(R.drawable.ic_one);
     }
 
-    public NotificationCompat.Builder getChannelNotification(){
+    public NotificationCompat.Builder getChannelNotification() {
         return new NotificationCompat.Builder(getApplicationContext(), channel1ID)
                 .setSmallIcon(R.drawable.ic_one);
     }

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">LoopbackTest</string>
+    <string name="recordOn">녹음 켜기</string>
+    <string name="recordOff">녹음 끄기</string>
+</resources>
