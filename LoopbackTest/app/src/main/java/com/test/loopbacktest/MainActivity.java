@@ -2,6 +2,7 @@ package com.test.loopbacktest;
 
 import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.media.AudioAttributes;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -75,11 +76,13 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
     private static class LoopbackTask implements Runnable {
 
         private static final String CLASS_NAME = "LoopbackTask";
+        private final int STREAM_TYPE = AudioManager.STREAM_MUSIC;
         private final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
         private final int SAMPLE_RATE = 44100;
         private final int CHANNEL_TYPE = AudioFormat.CHANNEL_IN_STEREO;
         private final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
         private final int BUFFER_SIZE = AudioTrack.getMinBufferSize(SAMPLE_RATE, CHANNEL_TYPE, AUDIO_FORMAT) * 3;
+        private final int MODE_STREAM = AudioTrack.MODE_STREAM;
         private short[] readData;
         private boolean playStarted;
         private AudioRecord audioRecorder;
@@ -104,8 +107,18 @@ public class MainActivity extends AppCompatActivity implements RadioGroup.OnChec
         private void prepareLoopbackTask() {
             readData = new short[BUFFER_SIZE];
             audioRecorder = new AudioRecord(AUDIO_SOURCE, SAMPLE_RATE, CHANNEL_TYPE, AUDIO_FORMAT, BUFFER_SIZE);
-            audioTracker = new AudioTrack(AudioManager.STREAM_MUSIC, SAMPLE_RATE, CHANNEL_TYPE, AUDIO_FORMAT,
-                    BUFFER_SIZE, AudioTrack.MODE_STREAM);
+
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                .setLegacyStreamType(STREAM_TYPE)
+                .build();
+
+            AudioFormat audioFormat = new AudioFormat.Builder()
+                .setSampleRate(SAMPLE_RATE)
+                .setEncoding(AUDIO_FORMAT)
+                .setChannelMask(CHANNEL_TYPE)
+                .build();
+
+            audioTracker = new AudioTrack(audioAttributes, audioFormat, BUFFER_SIZE, MODE_STREAM, 0);
         }
 
         private void closeAudioTracker() {
