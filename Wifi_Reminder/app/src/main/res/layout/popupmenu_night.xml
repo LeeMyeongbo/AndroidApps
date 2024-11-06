@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/popup_menu"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:ignore="HardcodedText">
+
+    <TextView
+        android:id="@+id/set"
+        android:background="@drawable/popupmenu_up_night"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="start|center"
+        android:paddingHorizontal="8dp"
+        android:text="설정"
+        android:textColor="@color/white"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/edit"
+        android:background="@drawable/popupmenu_middle_night"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="start|center"
+        android:paddingHorizontal="8dp"
+        android:text="편집"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:layout_below="@+id/set"/>
+
+    <TextView
+        android:id="@+id/sort"
+        android:background="@drawable/popupmenu_down_night"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:gravity="start|center"
+        android:paddingHorizontal="8dp"
+        android:text="정렬하기"
+        android:textColor="@color/white"
+        android:textSize="17sp"
+        android:layout_below="@+id/edit"/>
+
+</RelativeLayout>

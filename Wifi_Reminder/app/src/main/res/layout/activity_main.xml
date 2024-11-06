@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    tools:ignore="HardcodedText">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="20dp">
+
+        <TextView
+            android:id="@+id/caution"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="원활한 앱 사용을 위해 '설정 -> 어플리케이션 정보 -> 배터리'에서 최적화 설정을 제외해 주세요."
+            android:textColor="@color/black"
+            android:visibility="visible"
+            android:layout_gravity="bottom" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:layout_marginHorizontal="20dp"
+        android:animateLayoutChanges="true"
+        android:orientation="horizontal">
+
+        <CheckBox
+            android:id="@+id/select_all"
+            android:theme="@style/Custom_CheckBox"
+            android:layout_width="0dp"
+            android:visibility="gone"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.09"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="10dp" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.91"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/search_Button"
+                android:src="@drawable/search"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:contentDescription="search"
+                android:background="@drawable/button_background"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/add_Button"
+                android:src="@drawable/add"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_background"
+                android:contentDescription="register"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/setting_Button" />
+
+            <ImageButton
+                android:id="@+id/setting_Button"
+                android:src="@drawable/setting"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:adjustViewBounds="true"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                android:background="@drawable/button_background"
+                android:contentDescription="search"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/checkable_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:choiceMode="multipleChoice"
+        android:layout_marginHorizontal="20dp"
+        android:scrollbars="none"
+        android:overScrollMode="never"
+        android:listSelector="#00000000"
+        android:divider="#00000000"/>
+
+    <Button
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        app:icon="@android:drawable/ic_popup_reminder"
+        app:iconSize="30dp"
+        app:strokeColor="@color/white"
+        app:strokeWidth="0.75dp"
+        app:backgroundTint="#EDEDED"
+        android:id="@+id/start_remind"
+        android:theme="@style/service_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remind 켜기"
+        android:textSize="15sp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:paddingHorizontal="120dp"
+        android:paddingVertical="10dp" />
+
+    <Button
+        app:icon="@android:drawable/ic_popup_reminder"
+        app:iconSize="30dp"
+        android:id="@+id/stop_remind"
+        android:theme="@style/service_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Remind 끄기"
+        android:textSize="15sp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:visibility="gone"
+        android:paddingHorizontal="120dp"
+        android:paddingVertical="10dp" />
+
+    <ImageButton
+        android:id="@+id/delete_Button"
+        android:src="@drawable/delete"
+        android:background="@drawable/delete_background"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        android:padding="5dp"
+        android:visibility="gone"
+        android:contentDescription="delete" />
+
+</LinearLayout>

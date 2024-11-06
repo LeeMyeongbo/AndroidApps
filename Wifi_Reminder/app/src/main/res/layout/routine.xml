@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="HardcodedText, SpUsage"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/cancel"
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:layout_marginEnd="120dp"
+            android:onClick="just_exit"
+            android:text="취소"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:textColor="#007105"
+            tools:ignore="ButtonStyle" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            style="@style/Widget.AppCompat.Button.Borderless.Colored"
+            android:id="@+id/save"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:layout_marginStart="120dp"
+            android:gravity="center"
+            android:onClick="save_and_exit"
+            android:text="저장"
+            android:textAlignment="center"
+            android:textSize="20dp"
+            android:textColor="#007105"
+            tools:ignore="ButtonStyle" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:id="@+id/linear"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name"
+                style="@style/Custom_TextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/Custom_TextInput"
+                android:layout_marginTop="15dp"
+                android:layout_marginHorizontal="27dp"
+                android:hint="제목을 입력해 주세요"
+                app:boxStrokeWidth="2dp"
+                app:boxStrokeWidthFocused="3dp"
+                app:hintEnabled="true"
+                app:hintAnimationEnabled="true"
+                app:counterEnabled="true"
+                app:counterMaxLength="20"
+                app:endIconMode="clear_text" >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:paddingStart="0dp"
+                    android:paddingEnd="0dp"
+                    android:maxLength="20"
+                    android:background="#00000000"
+                    android:textColor="@color/black"
+                    android:textSize="25dp"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/wifi_name"
+                android:theme="@style/Custom_unTouchTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginHorizontal="27dp"
+                app:helperText="연결된 wifi 이름"
+                app:boxStrokeWidth="2dp"
+                android:focusable="false"
+                android:clickable="false">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/wifi"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#00000000"
+                    android:gravity="start"
+                    android:paddingStart="0dp"
+                    android:paddingTop="2dp"
+                    android:paddingEnd="0dp"
+                    android:paddingBottom="5dp"
+                    android:textColor="@color/grey"
+                    android:textSize="25dp"
+                    android:focusable="false"
+                    android:clickable="false"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <RadioGroup
+                android:id="@+id/choice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                android:layout_marginTop="20dp">
+
+                <RadioButton
+                    android:id="@+id/sound"
+                    android:theme="@style/Custom_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="소리"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"
+                    android:textSize="23sp"
+                    android:layout_marginEnd="27dp"
+                    android:checked="true"/>
+
+                <RadioButton
+                    android:id="@+id/vibrate"
+                    android:theme="@style/Custom_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="진동"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"
+                    android:textSize="23sp"
+                    android:layout_marginEnd="27dp" />
+
+                <RadioButton
+                    android:id="@+id/mute"
+                    android:theme="@style/Custom_RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="무음"
+                    android:textColor="@color/black"
+                    android:layout_weight="1"
+                    android:textSize="23sp"/>
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/volume"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="음량"
+                android:textColor="@color/black"
+                android:textSize="27sp"
+                android:layout_marginHorizontal="27dp"
+                android:layout_marginTop="10dp" />
+
+            <SeekBar
+                android:id="@+id/volume_Seekbar"
+                android:theme="@style/Custom_SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="27dp"
+                android:layout_marginTop="10dp"/>
+
+            <TextView
+                android:id="@+id/gamma"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="밝기"
+                android:textColor="@color/black"
+                android:textSize="27sp"
+                android:layout_marginHorizontal="27dp"
+                android:layout_marginTop="20dp" />
+
+            <SeekBar
+                android:id="@+id/gamma_Seekbar"
+                android:theme="@style/Custom_SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="27dp"
+                android:layout_marginTop="10dp"
+                android:max="100" />
+
+            <TextView
+                android:id="@+id/warning"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginHorizontal="35dp"
+                android:text="경고 : 자동 밝기 설정을 켜놓은 상태에서는 밝기가 올바르게 설정되지 않을 수 있습니다."
+                android:textColor="@color/black" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginVertical="15dp"
+                android:baselineAligned="false">
+
+                <TextView
+                    android:id="@+id/title_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#00000000"
+                    android:gravity="start"
+                    android:layout_marginHorizontal="27dp"
+                    android:text="Todo List"
+                    android:textColor="@color/black"
+                    android:textSize="27sp"
+                    android:focusable="false"
+                    android:clickable="false" />
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/todo_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="-10dp"
+                android:layout_marginHorizontal="25dp"
+                android:background="@drawable/todo_list_layout"
+                android:minHeight="200dp"
+                android:hint="이곳에 할 일 목록을 입력하세요"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="12dp"
+                android:inputType="textMultiLine|textNoSuggestions"
+                android:gravity="top"
+                android:textColor="#3E226E"
+                tools:ignore="Autofill" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>
