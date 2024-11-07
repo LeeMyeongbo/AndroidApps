@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">NewsAlarm</string>
+    <string name="txt_no_alarm">알람이 없습니다</string>
+    <string name="txt_delete">삭제</string>
 </resources>

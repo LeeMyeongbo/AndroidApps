@@ -9,26 +9,25 @@
     tools:context=".MainActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tvNoAlarm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="알람이 없습니다"
+        android:text="@string/txt_no_alarm"
         android:textSize="30sp"
-        android:visibility="gone"
-        tools:ignore="HardcodedText" />
+        android:visibility="gone" />
 
     <ImageView
-        android:id="@+id/button_add"
+        android:id="@+id/btnAdd"
         android:layout_width="30dp"
         android:layout_height="30dp"
-        android:layout_toStartOf="@id/setting"
+        android:layout_toStartOf="@id/btnSetting"
         android:layout_marginEnd="15dp"
         app:srcCompat="@drawable/add"
         tools:ignore="ContentDescription" />
 
     <ImageView
-        android:id="@+id/setting"
+        android:id="@+id/btnSetting"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentEnd="true"
@@ -36,22 +35,20 @@
         tools:ignore="ContentDescription" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/alarm_list"
+        android:id="@+id/AlarmList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/button_add"
+        android:layout_below="@id/btnAdd"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="25dp"/>
 
     <Button
-        android:id="@+id/button_delete"
+        android:id="@+id/btnDelete"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="삭제"
-        android:visibility="gone"
-        tools:ignore="HardcodedText" />
-
+        android:text="@string/txt_delete"
+        android:visibility="gone" />
 
 </RelativeLayout>

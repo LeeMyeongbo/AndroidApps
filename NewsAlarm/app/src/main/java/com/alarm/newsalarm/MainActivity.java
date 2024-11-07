@@ -37,21 +37,21 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
             Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
             startActivity(intent);
         }
-        TextView mTextView =  findViewById(R.id.textView);
-        ImageView button = findViewById(R.id.button_add);
+        TextView mTextView =  findViewById(R.id.tvNoAlarm);
+        ImageView button = findViewById(R.id.btnAdd);
         button.setOnClickListener(v -> {
             DialogFragment timePicker = new TimePickerFragment();
             timePicker.show(getSupportFragmentManager(), "time picker");
         });
 
-        Button buttonCancelAlarm = findViewById(R.id.button_delete);
+        Button buttonCancelAlarm = findViewById(R.id.btnDelete);
         buttonCancelAlarm.setOnClickListener(v -> cancelAlarm());
 
         ArrayList<Pair<String, Boolean>> dataset = new ArrayList<>();
         for (int i = 0; i < 10; i++)
             dataset.add(new Pair<>("0" + i + ":00", i % 2 == 0));
 
-        RecyclerView alarm_listview = findViewById(R.id.alarm_list);
+        RecyclerView alarm_listview = findViewById(R.id.AlarmList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         alarm_listview.setLayoutManager(linearLayoutManager);
 
