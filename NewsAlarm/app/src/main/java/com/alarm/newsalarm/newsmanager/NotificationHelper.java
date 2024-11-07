@@ -1,10 +1,12 @@
-package com.alarm.newsalarm;
+package com.alarm.newsalarm.newsmanager;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.ContextWrapper;
+
+import com.alarm.newsalarm.R;
 
 public class NotificationHelper extends ContextWrapper {
 

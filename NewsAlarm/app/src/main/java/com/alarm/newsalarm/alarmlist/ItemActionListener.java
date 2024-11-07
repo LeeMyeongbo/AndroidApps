@@ -1,4 +1,4 @@
-package com.alarm.newsalarm;
+package com.alarm.newsalarm.alarmlist;
 
 public interface ItemActionListener {
 

@@ -1,4 +1,4 @@
-package com.alarm.newsalarm;
+package com.alarm.newsalarm.alarmlist;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.ItemTouchHelper;

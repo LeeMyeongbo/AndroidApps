@@ -1,4 +1,4 @@
-package com.alarm.newsalarm;
+package com.alarm.newsalarm.newsmanager;
 
 import android.content.Context;
 import android.media.AudioManager;
@@ -12,6 +12,7 @@ import android.speech.tts.TextToSpeech;
 
 import androidx.annotation.NonNull;
 
+import com.alarm.newsalarm.R;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
