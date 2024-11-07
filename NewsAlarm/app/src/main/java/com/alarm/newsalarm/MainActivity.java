@@ -11,7 +11,6 @@ import android.provider.Settings;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -19,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
             startActivity(intent);
         }
         TextView mTextView =  findViewById(R.id.tvNoAlarm);
-        ImageView button = findViewById(R.id.btnAdd);
+        MaterialButton button = findViewById(R.id.btnAdd);
         button.setOnClickListener(v -> {
             DialogFragment timePicker = new TimePickerFragment();
             timePicker.show(getSupportFragmentManager(), "time picker");

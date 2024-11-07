@@ -5,8 +5,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:padding="20dp"
+    android:padding="10dp"
     tools:context=".MainActivity">
+
+    <ImageButton
+        android:id="@+id/btnMenu"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:contentDescription="@string/imgBtnExp"
+        android:padding="10dp"
+        android:scaleType="fitCenter"
+        android:src="@drawable/menu"
+        android:background="@drawable/round_btn_effect" />
 
     <TextView
         android:id="@+id/tvNoAlarm"
@@ -17,30 +27,34 @@
         android:textSize="30sp"
         android:visibility="gone" />
 
-    <ImageView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnAdd"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_toStartOf="@id/btnSetting"
-        android:layout_marginEnd="15dp"
-        app:srcCompat="@drawable/add"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/btnSetting"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
-        android:layout_alignParentEnd="true"
-        app:srcCompat="@drawable/setting"
-        tools:ignore="ContentDescription" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnMenu"
+        android:paddingVertical="15dp"
+        android:layout_marginVertical="35dp"
+        android:layout_marginHorizontal="10dp"
+        android:backgroundTint="#ECFCFF"
+        android:text="@string/txt_add"
+        android:textColor="@color/purple_700"
+        android:textSize="18sp"
+        app:icon="@android:drawable/ic_lock_idle_alarm"
+        app:iconTint="@color/purple_700"
+        app:iconSize="20dp"
+        app:iconGravity="textStart"
+        app:strokeColor="@color/purple_700"
+        app:strokeWidth="1dp"
+        app:cornerRadius="12dp"
+        app:rippleColor="#97A3FF"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/AlarmList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnAdd"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="25dp"/>
+        android:layout_marginHorizontal="10dp"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:id="@+id/btnDelete"
