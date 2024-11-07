@@ -16,15 +16,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsAlarm">
         <activity
-            android:name="com.alarm.newsalarm.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+        <activity android:name=".AlarmSetterActivity" />
         <receiver android:name="com.alarm.newsalarm.AlertReceiver"/>
     </application>
 

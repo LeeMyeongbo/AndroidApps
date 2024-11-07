@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <TimePicker
+        android:id="@+id/timePicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ScrollView
+        style="@style/alarmSetterScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scrollbars="vertical"
+        android:scrollbarStyle="outsideOverlay"
+        android:paddingHorizontal="20dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
+
+            <com.google.android.material.button.MaterialButton
+                style="@style/iconButtonTheme"
+                android:id="@+id/datePicker"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:textColor="@color/black"
+                android:layout_gravity="end"
+                android:background="@android:color/transparent"
+                app:icon="@android:drawable/ic_menu_month"
+                app:iconGravity="top"
+                app:iconSize="30dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="15dp" >
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvSunday"
+                    android:text="@string/txt_sunday"
+                    android:textColor="@color/red" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvMonday"
+                    android:text="@string/txt_monday"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvTuesday"
+                    android:text="@string/txt_tuesday"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvWednesday"
+                    android:text="@string/txt_wednesday"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvThursday"
+                    android:text="@string/txt_thursday"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvFriday"
+                    android:text="@string/txt_friday"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    style="@style/WeekdayStyle"
+                    android:id="@+id/tvSaturday"
+                    android:text="@string/txt_saturday"
+                    android:textColor="@color/blue" />
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/etAlarmName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:autofillHints="name"
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:textSize="25sp"
+                android:hint="@string/txt_alarm_name" />
+
+            <EditText
+                android:id="@+id/etNewsTopic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:autofillHints="name"
+                android:inputType="text"
+                android:paddingHorizontal="10dp"
+                android:textSize="25sp"
+                android:hint="@string/txt_news_topic" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchBgm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="@string/txt_bgm"
+                android:textSize="25sp"
+                android:paddingStart="10dp"
+                tools:ignore="RtlSymmetry" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slideVolume"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tag="볼륨 크기"
+                android:paddingStart="10dp"
+                tools:ignore="RtlSymmetry" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/switchVib"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="25dp"
+                android:text="@string/txt_vib"
+                android:textSize="25sp"
+                android:paddingStart="10dp"
+                tools:ignore="RtlSymmetry" />
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slideVib"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:tag="진동 세기"
+                android:paddingStart="10dp"
+                tools:ignore="RtlSymmetry" />
+
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/buttonTheme"
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginVertical="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingVertical="10dp"
+            android:text="@string/txt_cancel"
+            android:textSize="25sp"
+            app:cornerRadius="20dp" />
+
+        <com.google.android.material.button.MaterialButton
+            style="@style/buttonTheme"
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginVertical="0dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:paddingVertical="10dp"
+            android:text="@string/txt_save"
+            android:textSize="25sp"
+            app:cornerRadius="20dp" />
+    </LinearLayout>
+</LinearLayout>

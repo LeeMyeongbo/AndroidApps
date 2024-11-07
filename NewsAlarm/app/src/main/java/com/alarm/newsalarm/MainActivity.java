@@ -47,8 +47,9 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
         TextView mTextView =  findViewById(R.id.tvNoAlarm);
         MaterialButton button = findViewById(R.id.btnAdd);
         button.setOnClickListener(v -> {
-            DialogFragment timePicker = new TimePickerFragment();
-            timePicker.show(getSupportFragmentManager(), "time picker");
+            Intent intent = new Intent();
+            intent.setClass(this, AlarmSetterActivity.class);
+            startActivity(intent);
         });
 
         ArrayList<Pair<String, Boolean>> dataset = new ArrayList<>();

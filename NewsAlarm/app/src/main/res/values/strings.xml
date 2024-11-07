@@ -4,4 +4,17 @@
     <string name="txt_delete">삭제</string>
     <string name="txt_add">알람 추가</string>
     <string name="imgBtnExp">drawer appears when clicked</string>
+    <string name="txt_sunday">일</string>
+    <string name="txt_monday">월</string>
+    <string name="txt_tuesday">화</string>
+    <string name="txt_wednesday">수</string>
+    <string name="txt_thursday">목</string>
+    <string name="txt_friday">금</string>
+    <string name="txt_saturday">토</string>
+    <string name="txt_alarm_name">알람 이름</string>
+    <string name="txt_bgm">알람 배경음</string>
+    <string name="txt_vib">진동</string>
+    <string name="txt_news_topic">관심 있는 뉴스 주제</string>
+    <string name="txt_cancel">취소</string>
+    <string name="txt_save">저장</string>
 </resources>
