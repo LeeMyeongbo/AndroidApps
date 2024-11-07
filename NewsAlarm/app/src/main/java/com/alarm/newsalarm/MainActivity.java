@@ -15,6 +15,7 @@ import android.widget.TimePicker;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -26,6 +27,8 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     private AlarmManager alarmManager;
+    private ItemTouchHelper helper;
+    private final ItemDragListener listenerImpl = viewHolder -> helper.startDrag(viewHolder);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +51,14 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
         for (int i = 0; i < 10; i++)
             dataset.add(new Pair<>("0" + i + ":00", i % 2 == 0));
 
+        AlarmlistAdapter adapter = new AlarmlistAdapter(dataset, listenerImpl);
         RecyclerView alarm_listview = findViewById(R.id.alarmList);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        alarm_listview.setLayoutManager(linearLayoutManager);
 
-        AlarmlistAdapter adapter = new AlarmlistAdapter(dataset);
+        alarm_listview.setLayoutManager(new LinearLayoutManager(this));
         alarm_listview.setAdapter(adapter);
+
+        helper = new ItemTouchHelper(new ItemTouchHelperCallback(adapter));
+        helper.attachToRecyclerView(alarm_listview);
 
         if (dataset.isEmpty()) {
             mTextView.setVisibility(View.VISIBLE);
