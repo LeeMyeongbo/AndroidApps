@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Pair;
 import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -45,14 +44,11 @@ public class MainActivity extends AppCompatActivity implements TimePickerDialog.
             timePicker.show(getSupportFragmentManager(), "time picker");
         });
 
-        Button buttonCancelAlarm = findViewById(R.id.btnDelete);
-        buttonCancelAlarm.setOnClickListener(v -> cancelAlarm());
-
         ArrayList<Pair<String, Boolean>> dataset = new ArrayList<>();
         for (int i = 0; i < 10; i++)
             dataset.add(new Pair<>("0" + i + ":00", i % 2 == 0));
 
-        RecyclerView alarm_listview = findViewById(R.id.AlarmList);
+        RecyclerView alarm_listview = findViewById(R.id.alarmList);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         alarm_listview.setLayoutManager(linearLayoutManager);
 

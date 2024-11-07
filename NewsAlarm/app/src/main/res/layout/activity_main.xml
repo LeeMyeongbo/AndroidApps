@@ -49,20 +49,11 @@
         app:rippleColor="#97A3FF"/>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/AlarmList"
+        android:id="@+id/alarmList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnAdd"
         android:layout_marginHorizontal="10dp"
         android:layout_centerHorizontal="true" />
-
-    <Button
-        android:id="@+id/btnDelete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="@string/txt_delete"
-        android:visibility="gone" />
 
 </RelativeLayout>
