@@ -10,6 +10,7 @@ public class AlertReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        /* TO DO : Start Alarm Service to run alarm */
         NewsNotification.getInstance().notifyNews(context);
     }
 }
