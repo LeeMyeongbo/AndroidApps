@@ -17,15 +17,6 @@
         android:padding="10dp"
         android:scaleType="fitCenter" />
 
-    <TextView
-        android:id="@+id/tvNoAlarm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/txt_no_alarm"
-        android:textSize="30sp"
-        android:visibility="gone" />
-
     <com.google.android.material.button.MaterialButton
         style="@style/buttonTheme"
         android:id="@+id/btnAdd"
