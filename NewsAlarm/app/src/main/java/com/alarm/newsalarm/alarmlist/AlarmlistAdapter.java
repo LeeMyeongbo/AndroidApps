@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -19,28 +20,45 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
         implements ItemActionListener {
 
     private final ArrayList<Pair<String, Boolean>> alarmList;
-    private final ItemDragListener listener;
+    private final OnItemDragListener dragListener;
+    private final OnItemClickListener clickListener;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView text;
         private final SwitchMaterial sm;
 
         @SuppressLint("ClickableViewAccessibility")
-        public ViewHolder(@NonNull View itemView, ItemDragListener listener) {
+        public ViewHolder(
+                @NonNull View itemView,
+                OnItemClickListener clickListener,
+                OnItemDragListener dragListener
+        ) {
             super(itemView);
             text = itemView.findViewById(R.id.timeText);
             sm = itemView.findViewById(R.id.alarm_switch);
 
+            itemView.setOnClickListener(v -> {
+                int curPos = getAdapterPosition();
+                if (curPos != RecyclerView.NO_POSITION) {
+                    clickListener.onItemClick(itemView, curPos);
+                }
+            });
+
             itemView.setOnLongClickListener(v -> {
-                listener.onStartDrag(this);
+                dragListener.onStartDrag(this);
                 return false;
             });
         }
     }
 
-    public AlarmlistAdapter(ArrayList<Pair<String, Boolean>> dataset, ItemDragListener listener) {
+    public AlarmlistAdapter(
+            ArrayList<Pair<String, Boolean>> dataset,
+            OnItemClickListener clickListener,
+            OnItemDragListener dragListener
+    ) {
         alarmList = dataset;
-        this.listener = listener;
+        this.clickListener = clickListener;
+        this.dragListener = dragListener;
     }
 
     @NonNull
@@ -50,7 +68,7 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
             .from(parent.getContext())
             .inflate(R.layout.alarm_listviewitem, parent, false);
 
-        return new ViewHolder(view, listener);
+        return new ViewHolder(view, clickListener, dragListener);
     }
 
     @Override

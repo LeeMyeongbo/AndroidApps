@@ -1,6 +1,6 @@
 package com.alarm.newsalarm.alarmlist;
 
-public interface ItemActionListener {
+interface ItemActionListener {
 
     void onItemMoved(int from, int to);
 
