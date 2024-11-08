@@ -4,19 +4,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     android:padding="10dp"
     tools:context=".MainActivity">
 
     <ImageButton
+        style="@style/newsAlarmMenuButtonStyle"
         android:id="@+id/btnMenu"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
         android:contentDescription="@string/imgBtnExp"
         android:padding="10dp"
-        android:scaleType="fitCenter"
-        android:src="@drawable/menu"
-        android:background="@drawable/round_btn_effect" />
+        android:scaleType="fitCenter" />
 
     <TextView
         android:id="@+id/tvNoAlarm"
@@ -28,31 +27,27 @@
         android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
+        style="@style/buttonTheme"
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnMenu"
         android:paddingVertical="15dp"
-        android:layout_marginVertical="35dp"
+        android:layout_marginTop="40dp"
         android:layout_marginHorizontal="10dp"
-        android:backgroundTint="#ECFCFF"
         android:text="@string/txt_add"
-        android:textColor="@color/purple_700"
         android:textSize="18sp"
         app:icon="@android:drawable/ic_lock_idle_alarm"
-        app:iconTint="@color/purple_700"
         app:iconSize="20dp"
         app:iconGravity="textStart"
-        app:strokeColor="@color/purple_700"
-        app:strokeWidth="1dp"
-        app:cornerRadius="12dp"
-        app:rippleColor="#97A3FF"/>
+        app:cornerRadius="12dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/alarmList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/btnAdd"
+        android:layout_marginTop="20dp"
         android:layout_marginHorizontal="10dp"
         android:layout_centerHorizontal="true" />
 

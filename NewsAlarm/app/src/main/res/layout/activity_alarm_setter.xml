@@ -32,7 +32,7 @@
                 android:layout_height="50dp"
                 android:textColor="@color/black"
                 android:layout_gravity="end"
-                android:background="@android:color/transparent"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 app:icon="@android:drawable/ic_menu_month"
                 app:iconGravity="top"
                 app:iconSize="30dp" />
@@ -44,43 +44,43 @@
                 android:layout_marginVertical="15dp" >
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvSunday"
                     android:text="@string/txt_sunday"
                     android:textColor="@color/red" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvMonday"
                     android:text="@string/txt_monday"
                     android:textColor="@color/black" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvTuesday"
                     android:text="@string/txt_tuesday"
                     android:textColor="@color/black" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvWednesday"
                     android:text="@string/txt_wednesday"
                     android:textColor="@color/black" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvThursday"
                     android:text="@string/txt_thursday"
                     android:textColor="@color/black" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvFriday"
                     android:text="@string/txt_friday"
                     android:textColor="@color/black" />
 
                 <TextView
-                    style="@style/WeekdayStyle"
+                    style="@style/weekdayStyle"
                     android:id="@+id/tvSaturday"
                     android:text="@string/txt_saturday"
                     android:textColor="@color/blue" />
@@ -157,12 +157,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginVertical="0dp"
+            android:layout_marginEnd="2.5dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:paddingVertical="10dp"
             android:text="@string/txt_cancel"
             android:textSize="25sp"
+            android:stateListAnimator="@null"
             app:cornerRadius="20dp" />
 
         <com.google.android.material.button.MaterialButton
@@ -171,12 +172,11 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginVertical="0dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
+            android:layout_marginStart="2.5dp"
             android:paddingVertical="10dp"
             android:text="@string/txt_save"
             android:textSize="25sp"
+            android:stateListAnimator="@null"
             app:cornerRadius="20dp" />
     </LinearLayout>
 </LinearLayout>
