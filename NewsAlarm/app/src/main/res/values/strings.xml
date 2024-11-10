@@ -17,4 +17,6 @@
     <string name="txt_news_topic">관심 있는 뉴스 주제</string>
     <string name="txt_cancel">취소</string>
     <string name="txt_save">저장</string>
+    <string name="choose_exact_date">특정 날짜로 고르기</string>
+    <string name="choose_periodic_week">요일 선택</string>
 </resources>

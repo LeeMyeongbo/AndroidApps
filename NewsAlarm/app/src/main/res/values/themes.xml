@@ -15,25 +15,10 @@
         <item name="android:timePickerStyle">@style/newsAlarmTimePickerStyle</item>
     </style>
 
-    <!-- Menu button style -->
-    <!-- link : https://icons8.com/icon/3096/menu -->
-    <style name="newsAlarmMenuButtonStyle">
-        <item name="android:src">@drawable/menu</item>
-        <item name="android:background">@drawable/round_btn_effect</item>
-    </style>
-
-    <!-- Alarm list item style -->
-    <style name="alarmListItemStyle">
-        <item name="android:background">@drawable/alarm_item_bg</item>
-    </style>
-
-    <!-- TimePicker style -->
-    <style name="newsAlarmTimePickerStyle"
-            parent="android:Widget.Material.Light.TimePicker">
+    <style name="newsAlarmTimePickerStyle" parent="android:Widget.Material.Light.TimePicker">
         <item name="android:timePickerMode">spinner</item>
     </style>
 
-    <!-- WeekDayPicker Style -->
     <style name="weekdayStyle">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
@@ -45,8 +30,20 @@
         <item name="android:textAlignment">center</item>
     </style>
 
+    <!-- Menu button style for light theme -->
+    <!-- https://icons8.com/icon/3096/menu -->
+    <style name="newsAlarmMenuButtonStyle">
+        <item name="android:src">@drawable/menu</item>
+        <item name="android:background">@drawable/round_btn_effect</item>
+    </style>
+
+    <!-- Alarm list item style for light theme-->
+    <style name="alarmListItemStyle">
+        <item name="android:background">@drawable/alarm_item_bg</item>
+    </style>
+
     <!-- common button style for light theme -->
-    <style name="buttonTheme">
+    <style name="buttonStyle">
         <item name="android:textColor">@color/black</item>
         <item name="backgroundTint">#E6E6E6</item>
         <item name="rippleColor">#646464</item>
@@ -54,12 +51,24 @@
     </style>
 
     <!-- common iconButton style for light theme -->
-    <style name="iconButtonTheme">
+    <style name="iconButtonStyle">
         <item name="iconTint">@color/black</item>
     </style>
 
     <!-- scrollView background for light theme -->
     <style name="alarmSetterScrollView">
         <item name="android:background">@drawable/alarm_setting_bg</item>
+    </style>
+
+    <!-- volume image for light theme -->
+    <!-- https://icons8.com/icon/2795/audio -->
+    <style name="VolumeSettingImageStyle">
+        <item name="android:src">@drawable/mute</item>
+    </style>
+
+    <!-- vibration image for light theme -->
+    <!-- https://icons8.com/icon/geZbgqn4CpwB/vibration -->
+    <style name="VibSettingImageStyle">
+        <item name="android:src">@drawable/vib_none</item>
     </style>
 </resources>

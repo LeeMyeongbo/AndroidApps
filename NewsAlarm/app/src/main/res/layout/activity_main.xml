@@ -18,7 +18,7 @@
         android:scaleType="fitCenter" />
 
     <com.google.android.material.button.MaterialButton
-        style="@style/buttonTheme"
+        style="@style/buttonStyle"
         android:id="@+id/btnAdd"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

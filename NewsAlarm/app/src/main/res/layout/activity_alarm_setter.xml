@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical">
 
     <TimePicker
         android:id="@+id/timePicker"
@@ -12,147 +12,235 @@
         android:layout_height="wrap_content" />
 
     <ScrollView
-        style="@style/alarmSetterScrollView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
         android:scrollbars="vertical"
-        android:scrollbarStyle="outsideOverlay"
-        android:paddingHorizontal="20dp">
+        android:scrollbarStyle="outsideOverlay">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
-
-            <com.google.android.material.button.MaterialButton
-                style="@style/iconButtonTheme"
-                android:id="@+id/datePicker"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:textColor="@color/black"
-                android:layout_gravity="end"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:icon="@android:drawable/ic_menu_month"
-                app:iconGravity="top"
-                app:iconSize="30dp" />
+            android:orientation="vertical">
 
             <LinearLayout
+                style="@style/alarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginVertical="15dp" >
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="50dp"
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:text="@string/choose_exact_date"
+                        android:textSize="25sp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        style="@style/iconButtonStyle"
+                        android:id="@+id/datePicker"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        app:icon="@android:drawable/ic_menu_month"
+                        app:iconGravity="end"
+                        app:iconSize="30dp" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?android:attr/listDivider" />
 
                 <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvSunday"
-                    android:text="@string/txt_sunday"
-                    android:textColor="@color/red" />
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:text="@string/choose_periodic_week"
+                    android:textSize="25sp" />
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvMonday"
-                    android:text="@string/txt_monday"
-                    android:textColor="@color/black" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginTop="15dp">
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvTuesday"
-                    android:text="@string/txt_tuesday"
-                    android:textColor="@color/black" />
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvSunday"
+                        android:text="@string/txt_sunday"
+                        android:textColor="@color/red" />
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvWednesday"
-                    android:text="@string/txt_wednesday"
-                    android:textColor="@color/black" />
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvMonday"
+                        android:text="@string/txt_monday"
+                        android:textColor="@color/black" />
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvThursday"
-                    android:text="@string/txt_thursday"
-                    android:textColor="@color/black" />
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvTuesday"
+                        android:text="@string/txt_tuesday"
+                        android:textColor="@color/black" />
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvFriday"
-                    android:text="@string/txt_friday"
-                    android:textColor="@color/black" />
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvWednesday"
+                        android:text="@string/txt_wednesday"
+                        android:textColor="@color/black" />
 
-                <TextView
-                    style="@style/weekdayStyle"
-                    android:id="@+id/tvSaturday"
-                    android:text="@string/txt_saturday"
-                    android:textColor="@color/blue" />
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvThursday"
+                        android:text="@string/txt_thursday"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvFriday"
+                        android:text="@string/txt_friday"
+                        android:textColor="@color/black" />
+
+                    <TextView
+                        style="@style/weekdayStyle"
+                        android:id="@+id/tvSaturday"
+                        android:text="@string/txt_saturday"
+                        android:textColor="@color/blue" />
+                </LinearLayout>
             </LinearLayout>
 
-            <EditText
-                android:id="@+id/etAlarmName"
+            <LinearLayout
+                style="@style/alarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:autofillHints="name"
-                android:inputType="text"
-                android:paddingHorizontal="10dp"
-                android:textSize="25sp"
-                android:hint="@string/txt_alarm_name" />
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="20dp">
 
-            <EditText
-                android:id="@+id/etNewsTopic"
+                <EditText
+                    android:id="@+id/etAlarmName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="name"
+                    android:inputType="text"
+                    android:paddingHorizontal="10dp"
+                    android:textSize="25sp"
+                    android:hint="@string/txt_alarm_name" />
+
+                <EditText
+                    android:id="@+id/etNewsTopic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="25dp"
+                    android:autofillHints="name"
+                    android:inputType="text"
+                    android:paddingHorizontal="10dp"
+                    android:textSize="25sp"
+                    android:hint="@string/txt_news_topic" />
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/alarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:autofillHints="name"
-                android:inputType="text"
-                android:paddingHorizontal="10dp"
-                android:textSize="25sp"
-                android:hint="@string/txt_news_topic" />
+                android:layout_marginTop="20dp"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="20dp">
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchBgm"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:text="@string/txt_bgm"
-                android:textSize="25sp"
-                android:paddingStart="10dp"
-                tools:ignore="RtlSymmetry" />
+                <TextView
+                    android:id="@+id/tvBgm"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txt_bgm"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="10dp" />
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slideVolume"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:tag="볼륨 크기"
-                android:paddingStart="10dp"
-                tools:ignore="RtlSymmetry" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp">
 
-            <androidx.appcompat.widget.SwitchCompat
-                android:id="@+id/switchVib"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="25dp"
-                android:text="@string/txt_vib"
-                android:textSize="25sp"
-                android:paddingStart="10dp"
-                tools:ignore="RtlSymmetry" />
+                    <ImageView
+                        style="@style/VolumeSettingImageStyle"
+                        android:id="@+id/volumeImg"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_gravity="center_vertical"
+                        tools:ignore="ContentDescription" />
 
-            <com.google.android.material.slider.Slider
-                android:id="@+id/slideVib"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:tag="진동 세기"
-                android:paddingStart="10dp"
-                tools:ignore="RtlSymmetry" />
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slideVolume"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:tag="볼륨 크기"
+                        android:valueFrom="0"
+                        android:valueTo="100"
+                        android:stepSize="10"
+                        app:trackHeight="12dp" />
+                </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="10dp"
+                    android:background="?android:attr/listDivider"/>
+
+                <TextView
+                    android:id="@+id/tvVib"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="@string/txt_vib"
+                    android:textSize="25sp"
+                    android:paddingHorizontal="10dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="15dp">
+
+                    <ImageView
+                        style="@style/VibSettingImageStyle"
+                        android:id="@+id/vibImg"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_gravity="center_vertical"
+                        tools:ignore="ContentDescription" />
+
+                    <com.google.android.material.slider.Slider
+                        android:id="@+id/slideVib"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:tag="진동 세기"
+                        android:valueFrom="0"
+                        android:valueTo="100"
+                        android:stepSize="10"
+                        app:trackHeight="12dp" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
-            style="@style/buttonTheme"
+            style="@style/buttonStyle"
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -167,7 +255,7 @@
             app:cornerRadius="20dp" />
 
         <com.google.android.material.button.MaterialButton
-            style="@style/buttonTheme"
+            style="@style/buttonStyle"
             android:id="@+id/btnSave"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
