@@ -13,10 +13,36 @@
         <item name="android:windowNoTitle">true</item>
         <item name="windowNoTitle">true</item>
         <item name="android:timePickerStyle">@style/newsAlarmTimePickerStyle</item>
+        <item name="android:datePickerDialogTheme">@style/newsAlarmDatePickerDialogStyle</item>
     </style>
 
     <style name="newsAlarmTimePickerStyle" parent="android:Widget.Material.TimePicker">
         <item name="android:timePickerMode">spinner</item>
+    </style>
+
+    <style name="newsAlarmDatePickerDialogStyle" parent="android:Theme.Material.Dialog">
+        <item name="android:textColorPrimaryInverse">@color/white</item>
+        <item name="android:textColorSecondaryInverse">@color/white</item>
+        <item name="android:colorAccent">#7186FF</item>
+        <item name="android:windowBackground">#140B3A</item>
+        <item name="android:datePickerStyle">@style/datePickerStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/dialogPositiveButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/dialogNegativeButtonStyle</item>
+    </style>
+
+    <style name="datePickerStyle" parent="@android:style/Widget.Material.DatePicker">
+        <item name="android:headerBackground">#00147A</item>
+        <item name="android:background">#140B3A</item>
+    </style>
+
+    <style name="dialogPositiveButtonStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="dialogNegativeButtonStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/red</item>
     </style>
 
     <style name="weekdayStyle">

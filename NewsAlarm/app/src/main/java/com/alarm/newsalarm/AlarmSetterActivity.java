@@ -1,10 +1,12 @@
 package com.alarm.newsalarm;
 
+import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,11 +22,13 @@ public class AlarmSetterActivity extends AppCompatActivity {
     };
     private final TextView[] tvWeek = new TextView[7];
     private TimePicker timePicker;
+    private DatePickerDialog dialog;
     private MaterialButton btnDateSelector;
     private EditText etAlarmName, etNewsTopic;
     private ImageView ivVolume, ivVib;
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
+    private int year, month, day;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class AlarmSetterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_alarm_setter);
 
         initUI();
+        initDatePickerDialog();
         setEvent();
     }
 
@@ -51,6 +56,17 @@ public class AlarmSetterActivity extends AppCompatActivity {
         btnCancel = findViewById(R.id.btnCancel);
     }
 
+    private void initDatePickerDialog() {
+        dialog = new DatePickerDialog(this);
+        dialog.setOnDateSetListener((view, year, month, day) -> {
+            this.year = year;
+            this.month = month + 1;
+            this.day = day;
+            Toast.makeText(this, this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
+                Toast.LENGTH_SHORT).show();
+        });
+    }
+
     private void setEvent() {
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> playSoundByValue(value));
@@ -60,7 +76,8 @@ public class AlarmSetterActivity extends AppCompatActivity {
     }
 
     private void openDatePicker() {
-        // open DatePicker Dialog (Calendar)
+        dialog.getDatePicker().setMinDate(System.currentTimeMillis() + 1000);
+        dialog.show();
     }
 
     private void playSoundByValue(float value) {
