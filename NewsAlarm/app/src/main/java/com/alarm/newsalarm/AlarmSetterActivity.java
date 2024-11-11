@@ -9,13 +9,10 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
-public class AlarmSetterActivity extends AppCompatActivity {
+public class AlarmSetterActivity extends BaseActivity {
 
     private static final int[] WEEK_IDS = {
         R.id.tvSunday, R.id.tvMonday, R.id.tvTuesday, R.id.tvWednesday,
@@ -31,8 +28,12 @@ public class AlarmSetterActivity extends AppCompatActivity {
     private MaterialButton btnSave, btnCancel;
     private int year, month, day;
 
+    public AlarmSetterActivity() {
+        super("AlarmSetterActivity");
+    }
+
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_setter);
 

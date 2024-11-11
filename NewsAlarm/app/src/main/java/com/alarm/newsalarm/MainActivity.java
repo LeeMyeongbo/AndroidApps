@@ -5,14 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,18 +21,20 @@ import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
-    private static final String CLASS_NAME = "MainActivity";
     private RecyclerView lvAlarmList;
     private AlarmManager alarmManager;
     private ItemTouchHelper helper;
     private long backKeyReleasedTime = -1;
     private long backKeyPressedTime = -1;
 
+    public MainActivity() {
+        super("MainActivity");
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(CLASS_NAME, "onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -98,36 +98,6 @@ public class MainActivity extends AppCompatActivity {
         /* TO DO : start SetterActivity with alarm data located in the 'position' */
         Toast.makeText(this, "clicked : " + (position + 1) + "번 째", Toast.LENGTH_SHORT).show();
         executeAlarmSetterActivity();
-    }
-
-    @Override
-    protected void onStart() {
-        Log.i(CLASS_NAME, "onStart");
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        Log.i(CLASS_NAME, "onResume");
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        Log.i(CLASS_NAME, "onPause");
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        Log.i(CLASS_NAME, "onStop");
-        super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        Log.i(CLASS_NAME, "onDestroy");
-        super.onDestroy();
     }
 
     @Override
