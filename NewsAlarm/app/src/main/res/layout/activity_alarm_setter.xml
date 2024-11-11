@@ -37,22 +37,22 @@
 
                     <TextView
                         android:layout_width="0dp"
-                        android:layout_height="50dp"
+                        android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/choose_exact_date"
                         android:textSize="25sp" />
 
-                    <com.google.android.material.button.MaterialButton
-                        style="@style/iconButtonStyle"
+                    <ImageButton
+                        style="@style/datePickerButtonStyle"
                         android:id="@+id/datePicker"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
                         android:layout_gravity="center_vertical"
+                        android:scaleType="fitCenter"
                         android:background="?attr/selectableItemBackgroundBorderless"
-                        app:icon="@android:drawable/ic_menu_month"
-                        app:iconGravity="end"
-                        app:iconSize="30dp" />
+                        tools:ignore="ContentDescription" />
                 </LinearLayout>
 
                 <View

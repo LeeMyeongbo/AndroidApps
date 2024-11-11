@@ -3,6 +3,7 @@ package com.alarm.newsalarm;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -23,7 +24,7 @@ public class AlarmSetterActivity extends AppCompatActivity {
     private final TextView[] tvWeek = new TextView[7];
     private TimePicker timePicker;
     private DatePickerDialog dialog;
-    private MaterialButton btnDateSelector;
+    private ImageButton btnDateSelector;
     private EditText etAlarmName, etNewsTopic;
     private ImageView ivVolume, ivVib;
     private Slider slVolume, slVib;
