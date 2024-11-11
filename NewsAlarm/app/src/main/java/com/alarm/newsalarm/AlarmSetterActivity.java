@@ -2,6 +2,7 @@ package com.alarm.newsalarm;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -12,12 +13,22 @@ import android.widget.Toast;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
+import java.util.Calendar;
+
 public class AlarmSetterActivity extends BaseActivity {
 
     private static final int[] WEEK_IDS = {
         R.id.tvSunday, R.id.tvMonday, R.id.tvTuesday, R.id.tvWednesday,
         R.id.tvThursday, R.id.tvFriday, R.id.tvSaturday
     };
+    private static final Calendar calendar = Calendar.getInstance();
+    private static final long possibleMaxDate;
+    static {
+        calendar.add(Calendar.MONTH, 1);
+        possibleMaxDate = calendar.getTimeInMillis();
+        calendar.add(Calendar.MONTH, -1);
+    }
+
     private final TextView[] tvWeek = new TextView[7];
     private TimePicker timePicker;
     private DatePickerDialog dialog;
@@ -26,10 +37,15 @@ public class AlarmSetterActivity extends BaseActivity {
     private ImageView ivVolume, ivVib;
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
+    private boolean isDateSelected = true;
     private int year, month, day;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
+
+        this.year = calendar.get(Calendar.YEAR);
+        this.month = calendar.get(Calendar.MONTH);
+        this.day = calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     @Override
@@ -60,13 +76,22 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void initDatePickerDialog() {
         dialog = new DatePickerDialog(this);
-        dialog.setOnDateSetListener((view, year, month, day) -> {
-            this.year = year;
-            this.month = month + 1;
-            this.day = day;
-            Toast.makeText(this, this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
+        dialog.setOnDateSetListener((v, year, month, day) -> saveSelectedDate(year, month, day));
+        dialog.setOnCancelListener(d -> resetToSelectedDate());
+    }
+
+    private void saveSelectedDate(int year, int month, int day) {
+        this.year = year;
+        this.month = month + 1;
+        this.day = day;
+        Log.d(CLASS_NAME, "saveSelectedDate$date selecting complete!");
+        Toast.makeText(this, this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
                 Toast.LENGTH_SHORT).show();
-        });
+    }
+
+    private void resetToSelectedDate() {
+        dialog.updateDate(year, month - 1, day);
+        Log.d(CLASS_NAME, "resetToSelectedDate$date selecting cancelled");
     }
 
     private void setEvent() {
@@ -78,7 +103,8 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void openDatePicker() {
-        dialog.getDatePicker().setMinDate(System.currentTimeMillis() + 1000);
+        dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+        dialog.getDatePicker().setMaxDate(possibleMaxDate);
         dialog.show();
     }
 
