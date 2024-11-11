@@ -160,7 +160,6 @@
                 android:paddingVertical="20dp">
 
                 <TextView
-                    android:id="@+id/tvBgm"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/txt_bgm"
@@ -199,7 +198,6 @@
                     android:background="?android:attr/listDivider"/>
 
                 <TextView
-                    android:id="@+id/tvVib"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
