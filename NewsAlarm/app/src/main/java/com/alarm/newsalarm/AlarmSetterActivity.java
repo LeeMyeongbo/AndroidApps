@@ -10,8 +10,8 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.alarm.newsalarm.samplePlayer.SampleSoundPlayer;
-import com.alarm.newsalarm.samplePlayer.SampleVibrator;
+import com.alarm.newsalarm.sampleplayer.SampleSoundPlayer;
+import com.alarm.newsalarm.sampleplayer.SampleVibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 

@@ -1,4 +1,4 @@
-package com.alarm.newsalarm.samplePlayer;
+package com.alarm.newsalarm.sampleplayer;
 
 import android.content.Context;
 import android.os.CombinedVibration;
