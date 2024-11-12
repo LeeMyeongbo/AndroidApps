@@ -16,10 +16,12 @@
         <item name="android:datePickerDialogTheme">@style/newsAlarmDatePickerDialogStyle</item>
     </style>
 
+    <!-- time picker style for dark theme -->
     <style name="newsAlarmTimePickerStyle" parent="android:Widget.Material.TimePicker">
         <item name="android:timePickerMode">spinner</item>
     </style>
 
+    <!-- date picker dialog style for dark theme -->
     <style name="newsAlarmDatePickerDialogStyle" parent="android:Theme.Material.Dialog">
         <item name="android:textColorPrimaryInverse">@color/white</item>
         <item name="android:textColorSecondaryInverse">@color/white</item>
@@ -43,17 +45,6 @@
     <style name="dialogNegativeButtonStyle"
         parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/red</item>
-    </style>
-
-    <style name="weekdayStyle">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_marginHorizontal">1dp</item>
-        <item name="android:background">#3C2058FF</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">20sp</item>
-        <item name="android:textAlignment">center</item>
     </style>
 
     <!-- DatePicker button style for dark theme -->
@@ -85,6 +76,19 @@
     <!-- scrollView background for dark theme -->
     <style name="alarmSetterScrollView">
         <item name="android:background">@drawable/alarm_setting_bg_dark</item>
+    </style>
+
+    <!-- weekDay checkbox for dark theme -->
+    <style name="weekDayCheckboxStyle">
+        <item name="android:background">@drawable/checkbox_week_custom_dark</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_marginHorizontal">1dp</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:button">@null</item>
     </style>
 
     <!-- volume image for dark theme -->

@@ -75,47 +75,42 @@
                     android:layout_marginHorizontal="10dp"
                     android:layout_marginTop="15dp">
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvSunday"
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbSunday"
                         android:text="@string/txt_sunday"
                         android:textColor="@color/red" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvMonday"
-                        android:text="@string/txt_monday"
-                        android:textColor="@color/black" />
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbMonday"
+                        android:text="@string/txt_monday" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvTuesday"
-                        android:text="@string/txt_tuesday"
-                        android:textColor="@color/black" />
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbTuesday"
+                        android:text="@string/txt_tuesday" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvWednesday"
-                        android:text="@string/txt_wednesday"
-                        android:textColor="@color/black" />
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbWednesday"
+                        android:text="@string/txt_wednesday" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvThursday"
-                        android:text="@string/txt_thursday"
-                        android:textColor="@color/black" />
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbThursday"
+                        android:text="@string/txt_thursday" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvFriday"
-                        android:text="@string/txt_friday"
-                        android:textColor="@color/black" />
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbFriday"
+                        android:text="@string/txt_friday" />
 
-                    <TextView
-                        style="@style/weekdayStyle"
-                        android:id="@+id/tvSaturday"
+                    <CheckBox
+                        style="@style/weekDayCheckboxStyle"
+                        android:id="@+id/cbSaturday"
                         android:text="@string/txt_saturday"
-                        android:textColor="@color/blue" />
+                        android:textColor="#4D4DFF" />
                 </LinearLayout>
             </LinearLayout>
 

@@ -3,10 +3,10 @@ package com.alarm.newsalarm;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -18,8 +18,8 @@ import java.util.Calendar;
 public class AlarmSetterActivity extends BaseActivity {
 
     private static final int[] WEEK_IDS = {
-        R.id.tvSunday, R.id.tvMonday, R.id.tvTuesday, R.id.tvWednesday,
-        R.id.tvThursday, R.id.tvFriday, R.id.tvSaturday
+        R.id.cbSunday, R.id.cbMonday, R.id.cbTuesday, R.id.cbWednesday,
+        R.id.cbThursday, R.id.cbFriday, R.id.cbSaturday
     };
     private static final Calendar calendar = Calendar.getInstance();
     private static final long possibleMaxDate;
@@ -29,7 +29,7 @@ public class AlarmSetterActivity extends BaseActivity {
         calendar.add(Calendar.MONTH, -1);
     }
 
-    private final TextView[] tvWeek = new TextView[7];
+    private final CheckBox[] cbWeekdays = new CheckBox[7];
     private TimePicker timePicker;
     private DatePickerDialog dialog;
     private ImageButton btnDateSelector;
@@ -38,6 +38,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
     private boolean isDateSelected = true;
+    private boolean isPeriodicByWeek;
     private int year, month, day;
 
     public AlarmSetterActivity() {
@@ -55,14 +56,14 @@ public class AlarmSetterActivity extends BaseActivity {
 
         initUI();
         initDatePickerDialog();
-        setEvent();
+        setEventListener();
     }
 
     private void initUI() {
         timePicker = findViewById(R.id.timePicker);
         btnDateSelector = findViewById(R.id.datePicker);
         for (int i = 0; i < 7; i++) {
-            tvWeek[i] = findViewById(WEEK_IDS[i]);
+            cbWeekdays[i] = findViewById(WEEK_IDS[i]);
         }
         etAlarmName = findViewById(R.id.etAlarmName);
         etNewsTopic = findViewById(R.id.etNewsTopic);
@@ -94,7 +95,7 @@ public class AlarmSetterActivity extends BaseActivity {
         Log.d(CLASS_NAME, "resetToSelectedDate$date selecting cancelled");
     }
 
-    private void setEvent() {
+    private void setEventListener() {
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> playSoundByValue(value));
         slVib.addOnChangeListener((slider, value, fromUser) -> vibrateByValue(value));
