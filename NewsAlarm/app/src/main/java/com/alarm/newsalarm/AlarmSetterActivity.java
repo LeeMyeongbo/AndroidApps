@@ -11,6 +11,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.alarm.newsalarm.samplePlayer.SampleSoundPlayer;
+import com.alarm.newsalarm.samplePlayer.SampleVibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
@@ -32,6 +33,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private final CheckBox[] cbWeekdays = new CheckBox[7];
     private SampleSoundPlayer soundPlayer;
+    private SampleVibrator vibrator;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
     private ImageButton btnDateSelector;
@@ -40,7 +42,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
     private int year, month, day;
-    private float alarmVolume;
+    private float alarmVolume, alarmVibration;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -59,6 +61,7 @@ public class AlarmSetterActivity extends BaseActivity {
         initDatePickerDialog();
         setEventListener();
         soundPlayer = new SampleSoundPlayer(this);
+        vibrator = new SampleVibrator(this);
     }
 
     private void initUI() {
@@ -143,11 +146,13 @@ public class AlarmSetterActivity extends BaseActivity {
     private void playSoundByValue(float value) {
         alarmVolume = value;
         soundPlayer.playSound(R.raw.ding_dong, value);
-        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
+        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + alarmVolume);
     }
 
     private void vibrateByValue(float value) {
-        // start vibration by value set by slVib
+        alarmVibration = value;
+        vibrator.vibrate((int) value * 51);
+        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + alarmVibration);
     }
 
     private void saveSetting() {
@@ -158,6 +163,7 @@ public class AlarmSetterActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         soundPlayer.release();
+        vibrator.cancel();
         super.onDestroy();
     }
 }
