@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.alarm.newsalarm.samplePlayer.SampleSoundPlayer;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
@@ -30,6 +31,7 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private final CheckBox[] cbWeekdays = new CheckBox[7];
+    private SampleSoundPlayer soundPlayer;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
     private ImageButton btnDateSelector;
@@ -38,6 +40,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
     private int year, month, day;
+    private float alarmVolume;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -55,6 +58,7 @@ public class AlarmSetterActivity extends BaseActivity {
         initUI();
         initDatePickerDialog();
         setEventListener();
+        soundPlayer = new SampleSoundPlayer(this);
     }
 
     private void initUI() {
@@ -137,7 +141,9 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void playSoundByValue(float value) {
-        // play sound by value set by slVolume
+        alarmVolume = value;
+        soundPlayer.playSound(R.raw.ding_dong, value);
+        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
     }
 
     private void vibrateByValue(float value) {
@@ -147,5 +153,11 @@ public class AlarmSetterActivity extends BaseActivity {
     private void saveSetting() {
         // save settings in Room and register Alarm
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        soundPlayer.release();
+        super.onDestroy();
     }
 }
