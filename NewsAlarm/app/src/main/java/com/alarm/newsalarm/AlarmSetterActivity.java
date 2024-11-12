@@ -37,8 +37,6 @@ public class AlarmSetterActivity extends BaseActivity {
     private ImageView ivVolume, ivVib;
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
-    private boolean isDateSelected = true;
-    private boolean isPeriodicByWeek;
     private int year, month, day;
 
     public AlarmSetterActivity() {
@@ -82,6 +80,7 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void saveSelectedDate(int year, int month, int day) {
+        revertWeekdayCheckBox();
         this.year = year;
         this.month = month + 1;
         this.day = day;
@@ -90,17 +89,45 @@ public class AlarmSetterActivity extends BaseActivity {
                 Toast.LENGTH_SHORT).show();
     }
 
+    private void revertWeekdayCheckBox() {
+        for (CheckBox weekday : cbWeekdays) {
+            weekday.setChecked(false);
+        }
+    }
+
     private void resetToSelectedDate() {
         dialog.updateDate(year, month - 1, day);
         Log.d(CLASS_NAME, "resetToSelectedDate$date selecting cancelled");
     }
 
     private void setEventListener() {
+        setWeekdayListeners();
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> playSoundByValue(value));
         slVib.addOnChangeListener((slider, value, fromUser) -> vibrateByValue(value));
         btnSave.setOnClickListener(v -> saveSetting());
         btnCancel.setOnClickListener(v -> finish());
+    }
+
+    private void setWeekdayListeners() {
+        for (int i = 0; i < 7; i++) {
+            cbWeekdays[i].setOnClickListener(v -> announceSelectedWeekday());
+        }
+    }
+
+    private void announceSelectedWeekday() {
+        StringBuilder sb = new StringBuilder("매 주 ");
+        boolean isSelected = false;
+        for (CheckBox weekday : cbWeekdays) {
+            if (weekday.isChecked()) {
+                isSelected = true;
+                sb.append(weekday.getText()).append(" ");
+            }
+        }
+        if (isSelected) {
+            sb.append("마다 알람이 울립니다.");
+            Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void openDatePicker() {
