@@ -38,11 +38,12 @@ public class AlarmSetterActivity extends BaseActivity {
     private DatePickerDialog dialog;
     private ImageButton btnDateSelector;
     private EditText etAlarmName, etNewsTopic;
-    private ImageView ivVolume, ivVib;
+    private ImageView ivVolumeMute, ivVolumeLow, ivVolumeMedium, ivVolumeHigh;
+    private ImageView ivVibNone, ivVibLow, ivVibMedium, ivVibHigh;
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
     private int year, month, day;
-    private float alarmVolume, alarmVibration;
+    private float volumeSize, vibIntensity;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -62,6 +63,10 @@ public class AlarmSetterActivity extends BaseActivity {
         setEventListener();
         soundPlayer = new SampleSoundPlayer(this);
         vibrator = new SampleVibrator(this);
+
+        // load saved settings from Room
+        displayVolumeImgByVolume(volumeSize);
+        displayVibImgByVibIntensity(vibIntensity);
     }
 
     private void initUI() {
@@ -72,12 +77,23 @@ public class AlarmSetterActivity extends BaseActivity {
         }
         etAlarmName = findViewById(R.id.etAlarmName);
         etNewsTopic = findViewById(R.id.etNewsTopic);
-        ivVolume = findViewById(R.id.volumeImg);
-        ivVib = findViewById(R.id.vibImg);
         slVolume = findViewById(R.id.slideVolume);
         slVib = findViewById(R.id.slideVib);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
+        initImageViews();
+    }
+
+    private void initImageViews() {
+        ivVolumeMute = findViewById(R.id.muteImg);
+        ivVolumeLow = findViewById(R.id.volumeLowImg);
+        ivVolumeMedium = findViewById(R.id.volumeMediumImg);
+        ivVolumeHigh = findViewById(R.id.volumeHighImg);
+
+        ivVibNone = findViewById(R.id.vibNoneImg);
+        ivVibLow = findViewById(R.id.vibLowImg);
+        ivVibMedium = findViewById(R.id.vibMediumImg);
+        ivVibHigh = findViewById(R.id.vibHighImg);
     }
 
     private void initDatePickerDialog() {
@@ -110,8 +126,14 @@ public class AlarmSetterActivity extends BaseActivity {
     private void setEventListener() {
         setWeekdayListeners();
         btnDateSelector.setOnClickListener(v -> openDatePicker());
-        slVolume.addOnChangeListener((slider, value, fromUser) -> playSoundByValue(value));
-        slVib.addOnChangeListener((slider, value, fromUser) -> vibrateByValue(value));
+        slVolume.addOnChangeListener((slider, value, fromUser) -> {
+            displayVolumeImgByVolume(value);
+            playSoundByValue(value);
+        });
+        slVib.addOnChangeListener((slider, value, fromUser) -> {
+            displayVibImgByVibIntensity(value);
+            vibrateByValue(value);
+        });
         btnSave.setOnClickListener(v -> saveSetting());
         btnCancel.setOnClickListener(v -> finish());
     }
@@ -144,20 +166,66 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void playSoundByValue(float value) {
-        alarmVolume = value;
+        volumeSize = value;
         soundPlayer.playSound(R.raw.ding_dong, value);
-        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + alarmVolume);
+        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + volumeSize);
     }
 
     private void vibrateByValue(float value) {
-        alarmVibration = value;
+        vibIntensity = value;
         vibrator.vibrate((int) value * 51);
-        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + alarmVibration);
+        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + vibIntensity);
     }
 
     private void saveSetting() {
         // save settings in Room and register Alarm
         finish();
+    }
+
+    private void displayVolumeImgByVolume(float volume) {
+        if (Float.compare(0f, volume) == 0) {
+            setInvisibleAllVolumeImg();
+            ivVolumeMute.setVisibility(ImageView.VISIBLE);
+        } else if (Float.compare(volume, 0f) > 0 && Float.compare(volume, 33f) <= 0) {
+            setInvisibleAllVolumeImg();
+            ivVolumeLow.setVisibility(ImageView.VISIBLE);
+        } else if (Float.compare(volume, 33f) > 0 && Float.compare(volume, 66f) <= 0) {
+            setInvisibleAllVolumeImg();
+            ivVolumeMedium.setVisibility(ImageView.VISIBLE);
+        } else {
+            setInvisibleAllVolumeImg();
+            ivVolumeHigh.setVisibility(ImageView.VISIBLE);
+        }
+    }
+
+    private void setInvisibleAllVolumeImg() {
+        ivVolumeMute.setVisibility(ImageView.INVISIBLE);
+        ivVolumeLow.setVisibility(ImageView.INVISIBLE);
+        ivVolumeMedium.setVisibility(ImageView.INVISIBLE);
+        ivVolumeHigh.setVisibility(ImageView.INVISIBLE);
+    }
+
+    private void displayVibImgByVibIntensity(float vib) {
+        if (Float.compare(vib, 0f) == 0) {
+            setInvisibleAllVibImg();
+            ivVibNone.setVisibility(ImageView.VISIBLE);
+        } else if (Float.compare(vib, 1f) == 0) {
+            setInvisibleAllVibImg();
+            ivVibLow.setVisibility(ImageView.VISIBLE);
+        } else if (Float.compare(vib, 1f) > 0 && Float.compare(vib, 4f) < 0) {
+            setInvisibleAllVibImg();
+            ivVibMedium.setVisibility(ImageView.VISIBLE);
+        } else {
+            setInvisibleAllVibImg();
+            ivVibHigh.setVisibility(ImageView.VISIBLE);
+        }
+    }
+
+    private void setInvisibleAllVibImg() {
+        ivVibNone.setVisibility(ImageView.INVISIBLE);
+        ivVibLow.setVisibility(ImageView.INVISIBLE);
+        ivVibMedium.setVisibility(ImageView.INVISIBLE);
+        ivVibHigh.setVisibility(ImageView.INVISIBLE);
     }
 
     @Override

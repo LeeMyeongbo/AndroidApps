@@ -91,15 +91,59 @@
         <item name="android:button">@null</item>
     </style>
 
-    <!-- volume image for dark theme -->
-    <!-- https://icons8.com/icon/2795/audio -->
-    <style name="VolumeSettingImageStyle">
-        <item name="android:src">@drawable/mute_dark</item>
+    <!-- image view in AlarmSetterActivity -->
+    <style name="AlarmSetterImageViewStyle">
+        <item name="android:layout_width">40dp</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_centerVertical">true</item>
     </style>
 
-    <!-- vibration image for dark theme -->
+    <!-- volume mute imageView for dark theme -->
+    <!-- https://icons8.com/icon/2795/audio -->
+    <style name="VolumeMuteImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/volume_mute_dark</item>
+    </style>
+
+    <!-- volume low imageView for dark theme -->
+    <!-- https://icons8.com/icon/2795/audio -->
+    <style name="VolumeLowImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/volume_low_dark</item>
+    </style>
+
+    <!-- volume medium imageView for dark theme -->
+    <!-- https://icons8.com/icon/2795/audio -->
+    <style name="VolumeMediumImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/volume_medium_dark</item>
+    </style>
+
+    <!-- volume high imageView for dark theme -->
+    <!-- https://icons8.com/icon/2795/audio -->
+    <style name="VolumeHighImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/volume_high_dark</item>
+    </style>
+
+    <!-- vibration non image for dark theme -->
     <!-- https://icons8.com/icon/geZbgqn4CpwB/vibration -->
-    <style name="VibSettingImageStyle">
+    <style name="VibNoneImageStyle" parent="AlarmSetterImageViewStyle">
         <item name="android:src">@drawable/vib_none_dark</item>
+    </style>
+
+    <!-- vibration low image for dark theme -->
+    <!-- https://icons8.com/icon/geZbgqn4CpwB/vibration -->
+    <style name="VibLowImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/vib_low_dark</item>
+    </style>
+
+    <!-- vibration medium image for dark theme -->
+    <!-- https://icons8.com/icon/geZbgqn4CpwB/vibration -->
+    <style name="VibMediumImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/vib_medium_dark</item>
+    </style>
+
+    <!-- vibration high image for dark theme -->
+    <!-- https://icons8.com/icon/geZbgqn4CpwB/vibration -->
+    <style name="VibHighImageStyle" parent="AlarmSetterImageViewStyle">
+        <item name="android:src">@drawable/vib_high_dark</item>
     </style>
 </resources>

@@ -161,30 +161,46 @@
                     android:textSize="25sp"
                     android:paddingHorizontal="10dp" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp">
 
                     <ImageView
-                        style="@style/VolumeSettingImageStyle"
-                        android:id="@+id/volumeImg"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_gravity="center_vertical"
+                        style="@style/VolumeMuteImageStyle"
+                        android:id="@+id/muteImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VolumeLowImageStyle"
+                        android:id="@+id/volumeLowImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VolumeMediumImageStyle"
+                        android:id="@+id/volumeMediumImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VolumeHighImageStyle"
+                        android:id="@+id/volumeHighImg"
+                        android:visibility="invisible"
                         tools:ignore="ContentDescription" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/slideVolume"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/muteImg"
                         android:tag="볼륨 크기"
                         android:valueFrom="0"
                         android:valueTo="100"
                         android:stepSize="10"
                         app:trackHeight="12dp" />
-                </LinearLayout>
+                </RelativeLayout>
 
                 <View
                     android:layout_width="match_parent"
@@ -200,30 +216,46 @@
                     android:textSize="25sp"
                     android:paddingHorizontal="10dp" />
 
-                <LinearLayout
+                <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="15dp">
 
                     <ImageView
-                        style="@style/VibSettingImageStyle"
-                        android:id="@+id/vibImg"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:layout_marginHorizontal="10dp"
-                        android:layout_gravity="center_vertical"
+                        style="@style/VibNoneImageStyle"
+                        android:id="@+id/vibNoneImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VibLowImageStyle"
+                        android:id="@+id/vibLowImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VibMediumImageStyle"
+                        android:id="@+id/vibMediumImg"
+                        android:visibility="invisible"
+                        tools:ignore="ContentDescription" />
+
+                    <ImageView
+                        style="@style/VibHighImageStyle"
+                        android:id="@+id/vibHighImg"
+                        android:visibility="invisible"
                         tools:ignore="ContentDescription" />
 
                     <com.google.android.material.slider.Slider
                         android:id="@+id/slideVib"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_toEndOf="@id/vibNoneImg"
                         android:tag="진동 세기"
                         android:valueFrom="0"
                         android:valueTo="5"
                         android:stepSize="1"
                         app:trackHeight="12dp" />
-                </LinearLayout>
+                </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
