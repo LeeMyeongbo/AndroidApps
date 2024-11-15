@@ -32,8 +32,8 @@ public class AlarmData implements Parcelable {
     @ColumnInfo(name = "WeekBit")
     private byte periodicWeekBit;
 
-    @ColumnInfo(name = "Hour")
-    private int periodicTimeInMin = -1;
+    @ColumnInfo(name = "Time")
+    private int timeInMin = -1;
 
     @ColumnInfo(name = "Active")
     private boolean isActive = true;
@@ -59,7 +59,7 @@ public class AlarmData implements Parcelable {
         vibIntensity = in.readInt();
         specificDateInMillis = in.readLong();
         periodicWeekBit = in.readByte();
-        periodicTimeInMin = in.readInt();
+        timeInMin = in.readInt();
         isActive = in.readBoolean();
     }
 
@@ -129,12 +129,12 @@ public class AlarmData implements Parcelable {
         return periodicWeekBit;
     }
 
-    public void setPeriodicTimeInMin(int periodicTimeInMin) {
-        this.periodicTimeInMin = periodicTimeInMin;
+    public void setTimeInMin(int timeInMin) {
+        this.timeInMin = timeInMin;
     }
 
-    public int getPeriodicTimeInMin() {
-        return periodicTimeInMin;
+    public int getTimeInMin() {
+        return timeInMin;
     }
 
     public void setActive(boolean isActive) {
@@ -159,7 +159,7 @@ public class AlarmData implements Parcelable {
         dest.writeInt(vibIntensity);
         dest.writeLong(specificDateInMillis);
         dest.writeByte(periodicWeekBit);
-        dest.writeInt(periodicTimeInMin);
+        dest.writeInt(timeInMin);
         dest.writeBoolean(isActive);
     }
 }
