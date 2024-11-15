@@ -6,6 +6,7 @@ import android.util.Log;
 import androidx.room.Room;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AlarmDatabaseUtil {
 
@@ -25,8 +26,8 @@ public class AlarmDatabaseUtil {
     }
 
     private static boolean isValid(AlarmData data) {
-        return isVolumeSizeValid(data) && isVibIntensityValid(data)
-            && isSpecificDateValid(data) && isTimeValid(data);
+        return isVolumeSizeValid(data) && isVibIntensityValid(data) && isTimeValid(data)
+                && (isSpecificDateValid(data) || data.getPeriodicWeekBit() > 0);
     }
 
     private static boolean isVolumeSizeValid(AlarmData data) {
@@ -67,7 +68,7 @@ public class AlarmDatabaseUtil {
 
     public static boolean insert(Context context, AlarmData data) {
         if (isValid(data)) {
-            getDB(context).alarmDataDao().insert(data);
+            new Thread(() -> getDB(context).alarmDataDao().insert(data)).start();
             return true;
         }
         Log.i(CLASS_NAME, "insert$alarm data insertion failed!");
@@ -76,7 +77,7 @@ public class AlarmDatabaseUtil {
 
     public static boolean update(Context context, AlarmData data) {
         if (isValid(data)) {
-            getDB(context).alarmDataDao().update(data);
+            new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
             return true;
         }
         Log.i(CLASS_NAME, "update$alarm data update failed!");
@@ -84,14 +85,25 @@ public class AlarmDatabaseUtil {
     }
 
     public static void delete(Context context, AlarmData data) {
-        getDB(context).alarmDataDao().delete(data);
+        new Thread(() -> getDB(context).alarmDataDao().delete(data)).start();
     }
 
     public static ArrayList<AlarmData> getAll(Context context) {
-        return new ArrayList<>(getDB(context).alarmDataDao().getAll());
+        AtomicReference<ArrayList<AlarmData>> alarmList = new AtomicReference<>();
+        Thread thread = new Thread(() ->
+            alarmList.set(new ArrayList<>(getDB(context).alarmDataDao().getAll()))
+        );
+        try {
+            thread.start();
+            thread.join();
+        } catch (InterruptedException e) {
+            Log.e(CLASS_NAME, "getAll$" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return alarmList.get();
     }
 
     public static void clear(Context context) {
-        getDB(context).alarmDataDao().clear();
+        new Thread(() -> getDB(context).alarmDataDao().clear()).start();
     }
 }

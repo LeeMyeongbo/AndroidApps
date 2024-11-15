@@ -1,6 +1,9 @@
 package com.alarm.newsalarm;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
@@ -10,13 +13,17 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.alarm.newsalarm.database.AlarmDatabase;
+import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.alarm.newsalarm.sampleplayer.SampleSoundPlayer;
 import com.alarm.newsalarm.sampleplayer.SampleVibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class AlarmSetterActivity extends BaseActivity {
 
@@ -33,6 +40,8 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private final CheckBox[] cbWeekdays = new CheckBox[7];
+    private AlarmData alarmData;
+    private SharedPreferences sharedPref;
     private SampleSoundPlayer soundPlayer;
     private SampleVibrator vibrator;
     private TimePicker timePicker;
@@ -44,7 +53,6 @@ public class AlarmSetterActivity extends BaseActivity {
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
     private int year, month, day;
-    private float volumeSize, vibIntensity;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -61,13 +69,14 @@ public class AlarmSetterActivity extends BaseActivity {
 
         initUI();
         initDatePickerDialog();
+        setViewsFromAlarmData();
         setEventListener();
         soundPlayer = new SampleSoundPlayer(this);
         vibrator = new SampleVibrator(this);
+        sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
-        // load saved settings from Room
-        displayVolumeImgByVolume(volumeSize);
-        displayVibImgByVibIntensity(vibIntensity);
+        displayVolumeImgByVolume(slVolume.getValue());
+        displayVibImgByVibIntensity(slVib.getValue());
     }
 
     private void initUI() {
@@ -106,11 +115,14 @@ public class AlarmSetterActivity extends BaseActivity {
     private void saveSelectedDate(int year, int month, int day) {
         revertWeekdayCheckBox();
         this.year = year;
-        this.month = month + 1;
+        this.month = month;
         this.day = day;
         Log.d(CLASS_NAME, "saveSelectedDate$date selecting complete!");
-        Toast.makeText(this, this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+            this,
+            this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
+            Toast.LENGTH_SHORT
+        ).show();
     }
 
     private void revertWeekdayCheckBox() {
@@ -120,12 +132,48 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void resetToSelectedDate() {
-        dialog.updateDate(year, month - 1, day);
+        dialog.updateDate(year, month, day);
         Log.d(CLASS_NAME, "resetToSelectedDate$date selecting cancelled");
     }
 
+    private void setViewsFromAlarmData() {
+        alarmData = getIntent().getParcelableExtra("alarmData", AlarmData.class);
+        if (alarmData == null) {
+            return;
+        }
+        timePicker.setHour(alarmData.getTimeInMin() / 60);
+        timePicker.setMinute(alarmData.getTimeInMin() % 60);
+
+        byte weekBit = alarmData.getPeriodicWeekBit();
+        if (weekBit > 0) {
+            setWeekCheckbox(weekBit);
+        } else {
+            setDatePickerDialog();
+        }
+        etAlarmName.setText(alarmData.getAlarmName());
+        etNewsTopic.setText(alarmData.getAlarmTopic());
+
+        slVolume.setValue(alarmData.getVolumeSize());
+        slVib.setValue(alarmData.getVibIntensity());
+    }
+
+    private void setWeekCheckbox(byte weekBit) {
+        for (int i = 0; i < 7; i++) {
+            cbWeekdays[i].setChecked((weekBit & (1 << i)) == (1 << i));
+        }
+    }
+
+    private void setDatePickerDialog() {
+        calendar.setTimeInMillis(alarmData.getSpecificDateInMillis());
+        dialog.updateDate(
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        );
+        calendar.setTimeInMillis(System.currentTimeMillis());
+    }
+
     private void setEventListener() {
-        setWeekdayListeners();
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
             displayVolumeImgByVolume(value);
@@ -139,27 +187,6 @@ public class AlarmSetterActivity extends BaseActivity {
         btnCancel.setOnClickListener(v -> finish());
     }
 
-    private void setWeekdayListeners() {
-        for (int i = 0; i < 7; i++) {
-            cbWeekdays[i].setOnClickListener(v -> announceSelectedWeekday());
-        }
-    }
-
-    private void announceSelectedWeekday() {
-        StringBuilder sb = new StringBuilder("매 주 ");
-        boolean isSelected = false;
-        for (CheckBox weekday : cbWeekdays) {
-            if (weekday.isChecked()) {
-                isSelected = true;
-                sb.append(weekday.getText()).append(" ");
-            }
-        }
-        if (isSelected) {
-            sb.append("마다 알람이 울립니다.");
-            Toast.makeText(this, sb.toString(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
     private void openDatePicker() {
         dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
         dialog.getDatePicker().setMaxDate(possibleMaxDate);
@@ -167,20 +194,13 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void playSoundByValue(float value) {
-        volumeSize = value;
         soundPlayer.playSound(R.raw.ding_dong, value);
-        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + volumeSize);
+        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
     }
 
     private void vibrateByValue(float value) {
-        vibIntensity = value;
         vibrator.vibrate((int) value * 51);
-        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + vibIntensity);
-    }
-
-    private void saveSetting() {
-        // save settings in Room and register Alarm
-        finish();
+        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + (int) value);
     }
 
     private void displayVolumeImgByVolume(float volume) {
@@ -227,6 +247,98 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibLow.setVisibility(ImageView.INVISIBLE);
         ivVibMedium.setVisibility(ImageView.INVISIBLE);
         ivVibHigh.setVisibility(ImageView.INVISIBLE);
+    }
+
+    private void saveSetting() {
+        if (alarmData == null) {
+            if (addNewAlarmData()) {
+                Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
+            } else {
+                Toast.makeText(this, "유효하지 않은 알람 데이터입니다..", Toast.LENGTH_SHORT).show();
+                Log.i(CLASS_NAME, "saveSetting$couldn't add new alarm data..");
+                return;
+            }
+        } else {
+            /* To Do : update existing alarm data */
+        }
+        finish();
+    }
+
+    private boolean addNewAlarmData() {
+        alarmData = new AlarmData(
+            getNewId(),
+            etAlarmName.getText().toString(),
+            etNewsTopic.getText().toString(),
+            slVolume.getValue(),
+            (int) slVib.getValue()
+        );
+        setAlarmTime();
+        if (!AlarmDatabaseUtil.insert(this, alarmData)) {
+            return false;
+        }
+        sendResultToMainActivity("addNewAlarmData");
+        return true;
+    }
+
+    private long getNewId() {
+        long curId = sharedPref.getLong("alarm_id", 0L);
+        sharedPref.edit().putLong("alarm_id", ++curId).apply();
+        return curId;
+    }
+
+    private void setAlarmTime() {
+        StringBuilder toastMessage = new StringBuilder("매주");
+        byte weekBit = getWeekBit(toastMessage);
+        if (weekBit > 0) {
+            toastMessage.append(" 마다 알람이 울립니다.");
+            Toast.makeText(this, toastMessage.toString(), Toast.LENGTH_LONG).show();
+            alarmData.setPeriodicWeekBit(weekBit);
+        } else {
+            alarmData.setSpecificDateInMillis(getDateInMillis());
+        }
+        alarmData.setTimeInMin(timePicker.getHour() * 60 + timePicker.getMinute());
+    }
+
+    private byte getWeekBit(StringBuilder toastMessage) {
+        byte weekBit = 0;
+        for (byte i = 0; i < 7; i++) {
+            if (cbWeekdays[i].isChecked()) {
+                toastMessage.append(" ").append(cbWeekdays[i].getText());
+                weekBit = (byte) (weekBit | (1 << i));
+            }
+        }
+        return weekBit;
+    }
+
+    private long getDateInMillis() {
+        setAlarmDateInCalendar();
+        long alarmDate = calendar.getTimeInMillis();
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("ko", "KR"));
+        String timeFormat = format.format(calendar.getTime());
+        Toast.makeText(this, timeFormat + "에 알람이 울립니다.", Toast.LENGTH_LONG).show();
+
+        calendar.setTime(new Date(System.currentTimeMillis()));
+        return alarmDate;
+    }
+
+    private void setAlarmDateInCalendar() {
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
+        calendar.set(Calendar.MINUTE, timePicker.getMinute());
+        calendar.set(Calendar.SECOND, 0);
+
+        if (System.currentTimeMillis() >= calendar.getTimeInMillis()) {
+            calendar.add(Calendar.DATE, 1);
+        }
+    }
+
+    private void sendResultToMainActivity(String extraName) {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra(extraName, alarmData);
+        setResult(RESULT_OK, resultIntent);
     }
 
     @Override

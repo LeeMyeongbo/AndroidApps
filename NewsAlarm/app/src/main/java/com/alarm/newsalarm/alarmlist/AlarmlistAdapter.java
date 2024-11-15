@@ -1,27 +1,30 @@
 package com.alarm.newsalarm.alarmlist;
 
 import android.annotation.SuppressLint;
-import android.util.Pair;
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alarm.newsalarm.R;
+import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.ViewHolder>
         implements ItemActionListener {
 
-    private final ArrayList<Pair<String, Boolean>> alarmList;
+    private final ArrayList<AlarmData> alarmList;
     private final OnItemDragListener dragListener;
     private final OnItemClickListener clickListener;
+    private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView text;
@@ -29,22 +32,20 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
 
         @SuppressLint("ClickableViewAccessibility")
         public ViewHolder(
-                @NonNull View itemView,
-                OnItemClickListener clickListener,
-                OnItemDragListener dragListener
+            @NonNull View view, OnItemClickListener clickListener, OnItemDragListener dragListener
         ) {
-            super(itemView);
-            text = itemView.findViewById(R.id.timeText);
-            sm = itemView.findViewById(R.id.alarm_switch);
+            super(view);
+            text = view.findViewById(R.id.timeText);
+            sm = view.findViewById(R.id.alarm_switch);
 
-            itemView.setOnClickListener(v -> {
+            view.setOnClickListener(v -> {
                 int curPos = getAdapterPosition();
                 if (curPos != RecyclerView.NO_POSITION) {
-                    clickListener.onItemClick(itemView, curPos);
+                    clickListener.onItemClick(view, curPos);
                 }
             });
 
-            itemView.setOnLongClickListener(v -> {
+            view.setOnLongClickListener(v -> {
                 dragListener.onStartDrag(this);
                 return false;
             });
@@ -52,11 +53,11 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
     }
 
     public AlarmlistAdapter(
-            ArrayList<Pair<String, Boolean>> dataset,
-            OnItemClickListener clickListener,
-            OnItemDragListener dragListener
+        ArrayList<AlarmData> dataset,
+        OnItemClickListener clickListener,
+        OnItemDragListener dragListener
     ) {
-        alarmList = dataset;
+        this.alarmList = dataset;
         this.clickListener = clickListener;
         this.dragListener = dragListener;
     }
@@ -64,8 +65,9 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
     @NonNull
     @Override
     public AlarmlistAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        context = parent.getContext();
         View view = LayoutInflater
-            .from(parent.getContext())
+            .from(context)
             .inflate(R.layout.alarm_listviewitem, parent, false);
 
         return new ViewHolder(view, clickListener, dragListener);
@@ -73,11 +75,13 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull AlarmlistAdapter.ViewHolder holder, int position) {
-        String text = alarmList.get(position).first;
-        boolean checked = alarmList.get(position).second;
+        AlarmData data = alarmList.get(position);
+        Locale locale = new Locale("ko", "KR");
+        int hour = data.getTimeInMin() / 60, minute = data.getTimeInMin() % 60;
+        String timeText = String.format(locale, "%02d:%02d", hour, minute);
 
-        holder.text.setText(text);
-        holder.sm.setChecked(checked);
+        holder.text.setText(timeText);
+        holder.sm.setChecked(data.isActive());
     }
 
     @Override
@@ -90,15 +94,20 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
         if (from == to) {
             return;
         }
-
-        Pair<String, Boolean> fromItem = alarmList.remove(from);
+        AlarmData fromItem = alarmList.remove(from);
         alarmList.add(to, fromItem);
+        /* To Do : update order in room also */
         notifyItemMoved(from, to);
     }
 
     @Override
     public void onItemSwiped(int position) {
-        alarmList.remove(position);
+        AlarmDatabaseUtil.delete(context, alarmList.remove(position));
         notifyItemRemoved(position);
+    }
+
+    public void addItem(AlarmData data) {
+        alarmList.add(data);
+        notifyItemInserted(alarmList.size() - 1);
     }
 }

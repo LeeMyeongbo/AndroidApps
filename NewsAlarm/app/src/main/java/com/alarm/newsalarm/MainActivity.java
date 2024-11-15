@@ -5,29 +5,67 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Pair;
 import android.view.KeyEvent;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.alarm.newsalarm.alarmlist.AlarmlistAdapter;
 import com.alarm.newsalarm.alarmlist.ItemTouchHelperCallback;
+import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends BaseActivity {
 
     private RecyclerView lvAlarmList;
     private AlarmManager alarmManager;
+    private AlarmlistAdapter adapter;
     private ItemTouchHelper helper;
+    private ArrayList<AlarmData> alarmDataList;
     private long backKeyReleasedTime = -1;
     private long backKeyPressedTime = -1;
+
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+        new ActivityResultContracts.StartActivityForResult(),
+        result -> {
+            if (result.getResultCode() != RESULT_OK) {
+                return;
+            }
+            if (appendNewAlarmData(result)) {
+                return;
+            }
+            updateExistingAlarmData(result);
+        }
+    );
+
+    private boolean appendNewAlarmData(ActivityResult result) {
+        AlarmData data = Objects.requireNonNull(result.getData())
+            .getParcelableExtra("addNewAlarmData", AlarmData.class);
+        if (data == null) {
+            return false;
+        }
+        adapter.addItem(data);
+        return true;
+    }
+
+    private void updateExistingAlarmData(ActivityResult result) {
+        AlarmData data = Objects.requireNonNull(result.getData())
+            .getParcelableExtra("updateAlarmData", AlarmData.class);
+        if (data == null) {
+            return;
+        }
+        /* To Do : update alarm data item */
+    }
 
     public MainActivity() {
         super("MainActivity");
@@ -46,21 +84,21 @@ public class MainActivity extends BaseActivity {
 
         initUI();
         requestExactAlarmPermission();
-        initAlarmListView(getStoredAlarmList());
+        alarmDataList = AlarmDatabaseUtil.getAll(this);
+        initAlarmListView();
     }
 
     private void initUI() {
         ImageButton btnMenu = findViewById(R.id.btnMenu);
         btnMenu.setOnClickListener(v -> { /* TO DO : Google Drawer */ });
         MaterialButton btnAdd = findViewById(R.id.btnAdd);
-        btnAdd.setOnClickListener(v -> executeAlarmSetterActivity());
+        btnAdd.setOnClickListener(v -> executeAlarmSetterActivity(new Intent()));
         lvAlarmList = findViewById(R.id.alarmList);
     }
 
-    private void executeAlarmSetterActivity() {
-        Intent intent = new Intent();
+    private void executeAlarmSetterActivity(Intent intent) {
         intent.setClass(this, AlarmSetterActivity.class);
-        startActivity(intent);
+        launcher.launch(intent);
     }
 
     private void requestExactAlarmPermission() {
@@ -70,20 +108,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @NonNull
-    private ArrayList<Pair<String, Boolean>> getStoredAlarmList() {
-        /* TO DO : load alarm list data from Room DB and show them into alarmListView
-           Below is temporary alarm list ^^ */
-        ArrayList<Pair<String, Boolean>> dataset = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            dataset.add(new Pair<>("0" + i + ":00", i % 2 == 0));
-        }
-        return dataset;
-    }
-
-    private void initAlarmListView(ArrayList<Pair<String, Boolean>> dataset) {
-        AlarmlistAdapter adapter = new AlarmlistAdapter(
-            dataset,
+    private void initAlarmListView() {
+        adapter = new AlarmlistAdapter(
+            alarmDataList,
             (view, position) -> executeAlarmSetterActivityWithData(position),
             viewHolder -> helper.startDrag(viewHolder)
         );
@@ -94,10 +121,10 @@ public class MainActivity extends BaseActivity {
         helper.attachToRecyclerView(lvAlarmList);
     }
 
-    private void executeAlarmSetterActivityWithData(int position) {
-        /* TO DO : start SetterActivity with alarm data located in the 'position' */
-        Toast.makeText(this, "clicked : " + (position + 1) + "번 째", Toast.LENGTH_SHORT).show();
-        executeAlarmSetterActivity();
+    private void executeAlarmSetterActivityWithData(int pos) {
+        Intent intent = new Intent();
+        intent.putExtra("alarmData", alarmDataList.get(pos));
+        executeAlarmSetterActivity(intent);
     }
 
     @Override
