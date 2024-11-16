@@ -43,9 +43,15 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvSunday"
+                android:id="@+id/tvSunUnselected"
+                android:text="@string/txt_sunday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvSunSelected"
                 android:text="@string/txt_sunday"
-                android:textColor="@color/red" />
+                android:textColor="@color/red"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -59,8 +65,14 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvMonday"
+                android:id="@+id/tvMonUnselected"
                 android:text="@string/txt_monday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvMonSelected"
+                android:text="@string/txt_monday"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -74,8 +86,14 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvTuesday"
+                android:id="@+id/tvTuesUnselected"
                 android:text="@string/txt_tuesday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvTuesSelected"
+                android:text="@string/txt_tuesday"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -89,8 +107,14 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvWednesday"
+                android:id="@+id/tvWednesUnselected"
                 android:text="@string/txt_wednesday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvWednesSelected"
+                android:text="@string/txt_wednesday"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -104,8 +128,14 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvThursday"
+                android:id="@+id/tvThursUnselected"
                 android:text="@string/txt_thursday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvThursSelected"
+                android:text="@string/txt_thursday"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -119,8 +149,14 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvFriday"
+                android:id="@+id/tvFriUnselected"
                 android:text="@string/txt_friday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvFriSelected"
+                android:text="@string/txt_friday"
+                android:visibility="gone" />
         </LinearLayout>
 
         <LinearLayout
@@ -134,9 +170,15 @@
 
             <TextView
                 style="@style/alarmListItemStyle.weekdayTextStyle"
-                android:id="@+id/tvSaturday"
+                android:id="@+id/tvSaturUnselected"
+                android:text="@string/txt_saturday" />
+
+            <TextView
+                style="@style/alarmListItemStyle.weekdayTextStyle.Selected"
+                android:id="@+id/tvSaturSelected"
                 android:text="@string/txt_saturday"
-                android:textColor="@color/blue"/>
+                android:textColor="@color/blue"
+                android:visibility="gone" />
         </LinearLayout>
 
         <com.google.android.material.switchmaterial.SwitchMaterial
