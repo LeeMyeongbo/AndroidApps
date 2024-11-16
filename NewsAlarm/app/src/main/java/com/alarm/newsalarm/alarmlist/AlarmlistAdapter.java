@@ -35,8 +35,8 @@ public class AlarmlistAdapter extends RecyclerView.Adapter<AlarmlistAdapter.View
             @NonNull View view, OnItemClickListener clickListener, OnItemDragListener dragListener
         ) {
             super(view);
-            text = view.findViewById(R.id.timeText);
-            sm = view.findViewById(R.id.alarm_switch);
+            text = view.findViewById(R.id.tvTime);
+            sm = view.findViewById(R.id.switchAlarm);
 
             view.setOnClickListener(v -> {
                 int curPos = getAdapterPosition();
