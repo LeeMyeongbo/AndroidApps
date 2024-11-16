@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/btnMenu"
         android:paddingVertical="15dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="80dp"
         android:layout_marginHorizontal="10dp"
         android:text="@string/txt_add"
         android:textSize="18sp"
