@@ -9,11 +9,19 @@
     android:paddingVertical="10dp">
 
     <TextView
-        android:id="@+id/tvDate"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/AlarmListItemStyle.TextStyle"
+        android:id="@+id/tvDateUnselected"
         android:layout_marginTop="10dp"
         android:paddingHorizontal="20dp"
+        android:textSize="15sp" />
+
+    <TextView
+        style="@style/AlarmListItemStyle.TextStyle.Selected"
+        android:id="@+id/tvDateSelected"
+        android:layout_marginTop="10dp"
+        android:paddingHorizontal="20dp"
+        android:visibility="gone"
+        android:textStyle="normal"
         android:textSize="15sp" />
 
     <RelativeLayout

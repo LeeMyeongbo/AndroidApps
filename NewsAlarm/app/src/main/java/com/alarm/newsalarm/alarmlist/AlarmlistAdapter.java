@@ -27,7 +27,6 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     private static final String[] WEEK = {"일", "월", "화", "수", "목", "금", "토"};
 
-    private final Locale locale = new Locale("ko", "KR");
     private final ArrayList<AlarmData> alarmList;
     private final OnItemDragListener dragListener;
     private final OnItemClickListener clickListener;
@@ -40,64 +39,157 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             R.id.tvWednesUnselected, R.id.tvThursUnselected,
             R.id.tvFriUnselected, R.id.tvSaturUnselected
         };
-
         private static final int[] TV_SELECTED_WEEK_IDS = {
             R.id.tvSunSelected, R.id.tvMonSelected, R.id.tvTuesSelected, R.id.tvWednesSelected,
             R.id.tvThursSelected, R.id.tvFriSelected, R.id.tvSaturSelected
         };
-
         private static final int[] WEEK_IDS = {
             R.id.sunSelect, R.id.monSelect, R.id.tuesSelect, R.id.wednesSelect,
             R.id.thursSelect, R.id.friSelect, R.id.saturSelect
         };
+        private final Locale locale = new Locale("ko", "KR");
 
-        private final TextView tvTimeDeactivated;
-        private final TextView tvTimeActivated;
-        private final TextView tvDate;
+        private AlarmData curData;
+        private TextView tvTimeDeactivated;
+        private TextView tvTimeActivated;
+        private TextView tvDateDeactivated;
+        private TextView tvDateActivated;
+        private SwitchMaterial switchAlarm;
+
         private final TextView[] tvUnselectedWeekdays = new TextView[7];
         private final TextView[] tvSelectedWeekdays = new TextView[7];
         private final View[] weekdaySelects = new View[7];
-        private final SwitchMaterial switchAlarm;
 
         public AlarmListViewHolder(
             @NonNull View view, OnItemClickListener clickListener, OnItemDragListener dragListener
         ) {
             super(view);
+            initViews(view);
+
+            setOnClick(view, clickListener);
+            setOnLongClick(view, dragListener);
+            setSwitchAlarmListener();
+        }
+
+        private void initViews(View view) {
             tvTimeDeactivated = view.findViewById(R.id.tvTimeDeactivated);
             tvTimeActivated = view.findViewById(R.id.tvTimeActivated);
-            tvDate = view.findViewById(R.id.tvDate);
+            tvDateDeactivated = view.findViewById(R.id.tvDateUnselected);
+            tvDateActivated = view.findViewById(R.id.tvDateSelected);
             switchAlarm = view.findViewById(R.id.switchAlarm);
             initWeekdayViews(view);
+        }
 
+        private void initWeekdayViews(View view) {
+            for (int i = 0; i < 7; i++) {
+                tvUnselectedWeekdays[i] = view.findViewById(TV_UNSELECTED_WEEK_IDS[i]);
+                tvSelectedWeekdays[i] = view.findViewById(TV_SELECTED_WEEK_IDS[i]);
+                weekdaySelects[i] = view.findViewById(WEEK_IDS[i]);
+            }
+        }
+
+        private void setOnClick(View view, OnItemClickListener clickListener) {
             view.setOnClickListener(v -> {
                 int curPos = getAdapterPosition();
                 if (curPos != RecyclerView.NO_POSITION) {
                     clickListener.onItemClick(view, curPos);
                 }
             });
+        }
 
+        private void setOnLongClick(View view, OnItemDragListener dragListener) {
             view.setOnLongClickListener(v -> {
                 dragListener.onStartDrag(this);
                 return false;
             });
+        }
 
-            switchAlarm.setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (isChecked) {
-                    tvTimeDeactivated.setVisibility(TextView.GONE);
-                    tvTimeActivated.setVisibility(TextView.VISIBLE);
-                } else {
-                    tvTimeDeactivated.setVisibility(TextView.VISIBLE);
-                    tvTimeActivated.setVisibility(TextView.GONE);
-                }
+        private void setSwitchAlarmListener() {
+            switchAlarm.setOnCheckedChangeListener((view, isChecked) -> {
+                setTvByActivationChecked(isChecked);
+                curData.setActive(isChecked);
+                AlarmDatabaseUtil.update(view.getContext(), curData);
             });
         }
 
-        private void initWeekdayViews(@NonNull View view) {
-            for (int i = 0; i < 7; i++) {
-                tvUnselectedWeekdays[i] = view.findViewById(TV_UNSELECTED_WEEK_IDS[i]);
-                tvSelectedWeekdays[i] = view.findViewById(TV_SELECTED_WEEK_IDS[i]);
-                weekdaySelects[i] = view.findViewById(WEEK_IDS[i]);
+        private void setTvByActivationChecked(boolean isChecked) {
+            if (isChecked) {
+                setTvStatus(TextView.VISIBLE, TextView.GONE);
+            } else {
+                setTvStatus(TextView.GONE, TextView.VISIBLE);
             }
+        }
+
+        private void setTvStatus(int activationStatus, int deactivationStatus) {
+            tvTimeActivated.setVisibility(activationStatus);
+            tvDateActivated.setVisibility(activationStatus);
+            tvTimeDeactivated.setVisibility(deactivationStatus);
+            tvDateDeactivated.setVisibility(deactivationStatus);
+            setTvWeekdayStatus(activationStatus, deactivationStatus);
+        }
+
+        private void setTvWeekdayStatus(int activationStatus, int deactivationStatus) {
+            for (int i = 0; i < 7; i++) {
+                if ((curData.getPeriodicWeekBit() & (1 << i)) > 0) {
+                    tvSelectedWeekdays[i].setVisibility(activationStatus);
+                    tvUnselectedWeekdays[i].setVisibility(deactivationStatus);
+                }
+            }
+        }
+
+        private void bind(AlarmData data) {
+            curData = data;
+
+            initTvWeekdays();
+            setTimeView(data);
+            setDateView(data);
+
+            switchAlarm.setChecked(data.isActive());
+            setTvByActivationChecked(switchAlarm.isChecked());
+        }
+
+        private void initTvWeekdays() {
+            for (int i = 0; i < 7; i++) {
+                tvSelectedWeekdays[i].setVisibility(TextView.GONE);
+                tvUnselectedWeekdays[i].setVisibility(TextView.VISIBLE);
+            }
+        }
+
+        private void setTimeView(AlarmData data) {
+            int hour = data.getTimeInMin() / 60, minute = data.getTimeInMin() % 60;
+            String timeText = String.format(locale, "%02d:%02d", hour, minute);
+
+            tvTimeDeactivated.setText(timeText);
+            tvTimeActivated.setText(timeText);
+        }
+
+        private void setDateView(AlarmData data) {
+            StringBuilder tvDateTextStringBuilder = new StringBuilder();
+            byte weekBit = data.getPeriodicWeekBit();
+            if (weekBit > 0) {
+                setPeriodicDateView(weekBit, tvDateTextStringBuilder);
+            } else {
+                setSpecificDateView(data.getSpecificDateInMillis(), tvDateTextStringBuilder);
+            }
+            tvDateActivated.setText(tvDateTextStringBuilder.toString());
+            tvDateDeactivated.setText(tvDateTextStringBuilder.toString());
+        }
+
+        private void setPeriodicDateView(byte weekBit, StringBuilder sb) {
+            sb.append("매주");
+            for (int i = 0; i < 7; i++) {
+                if ((weekBit & (1 << i)) > 0) {
+                    sb.append(" ").append(WEEK[i]);
+                    weekdaySelects[i].setVisibility(View.VISIBLE);
+                } else {
+                    weekdaySelects[i].setVisibility(View.GONE);
+                }
+            }
+        }
+
+        private void setSpecificDateView(long date, StringBuilder sb) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", locale);
+            sb.append(format.format(new Date(date)));
         }
     }
 
@@ -124,48 +216,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     @Override
     public void onBindViewHolder(@NonNull AlarmListViewHolder holder, int position) {
-        AlarmData data = alarmList.get(position);
-        setTimeView(holder, data);
-        setDateView(holder, data);
-
-        holder.switchAlarm.setChecked(data.isActive());
-    }
-
-    private void setTimeView(AlarmListViewHolder holder, AlarmData data) {
-        int hour = data.getTimeInMin() / 60, minute = data.getTimeInMin() % 60;
-        String timeText = String.format(locale, "%02d:%02d", hour, minute);
-
-        holder.tvTimeDeactivated.setText(timeText);
-        holder.tvTimeActivated.setText(timeText);
-    }
-
-    private void setDateView(AlarmListViewHolder holder, AlarmData data) {
-        StringBuilder tvDateTextStringBuilder = new StringBuilder();
-        byte weekBit = data.getPeriodicWeekBit();
-        if (weekBit > 0) {
-            setPeriodicDateView(holder, weekBit, tvDateTextStringBuilder);
-        } else {
-            setSpecificDateView(data.getSpecificDateInMillis(), tvDateTextStringBuilder);
-        }
-        holder.tvDate.setText(tvDateTextStringBuilder.toString());
-    }
-
-    private void setPeriodicDateView(AlarmListViewHolder holder, byte weekBit, StringBuilder sb) {
-        sb.append("매 주");
-        for (int i = 0; i < 7; i++) {
-            if ((weekBit & (1 << i)) == 0) {
-                continue;
-            }
-            sb.append(" ").append(WEEK[i]);
-            holder.tvUnselectedWeekdays[i].setVisibility(View.GONE);
-            holder.tvSelectedWeekdays[i].setVisibility(View.VISIBLE);
-            holder.weekdaySelects[i].setVisibility(View.VISIBLE);
-        }
-    }
-
-    private void setSpecificDateView(long date, StringBuilder sb) {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", locale);
-        sb.append(format.format(new Date(date)));
+        holder.bind(alarmList.get(position));
     }
 
     @Override
