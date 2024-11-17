@@ -24,7 +24,7 @@
             android:orientation="vertical">
 
             <LinearLayout
-                style="@style/alarmSetterScrollView"
+                style="@style/AlarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -45,7 +45,7 @@
                         android:textSize="25sp" />
 
                     <ImageButton
-                        style="@style/datePickerButtonStyle"
+                        style="@style/DatePickerButtonStyle"
                         android:id="@+id/datePicker"
                         android:layout_width="32dp"
                         android:layout_height="32dp"
@@ -76,38 +76,38 @@
                     android:layout_marginTop="15dp">
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbSunday"
                         android:text="@string/txt_sunday"
                         android:textColor="@color/red" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbMonday"
                         android:text="@string/txt_monday" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbTuesday"
                         android:text="@string/txt_tuesday" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbWednesday"
                         android:text="@string/txt_wednesday" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbThursday"
                         android:text="@string/txt_thursday" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbFriday"
                         android:text="@string/txt_friday" />
 
                     <CheckBox
-                        style="@style/weekDayCheckboxStyle"
+                        style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbSaturday"
                         android:text="@string/txt_saturday"
                         android:textColor="#4D4DFF" />
@@ -115,7 +115,7 @@
             </LinearLayout>
 
             <LinearLayout
-                style="@style/alarmSetterScrollView"
+                style="@style/AlarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -146,7 +146,7 @@
             </LinearLayout>
 
             <LinearLayout
-                style="@style/alarmSetterScrollView"
+                style="@style/AlarmSetterScrollView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="20dp"
@@ -265,7 +265,7 @@
         android:layout_height="wrap_content">
 
         <com.google.android.material.button.MaterialButton
-            style="@style/buttonStyle"
+            style="@style/ButtonStyle"
             android:id="@+id/btnCancel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -280,7 +280,7 @@
             app:cornerRadius="20dp" />
 
         <com.google.android.material.button.MaterialButton
-            style="@style/buttonStyle"
+            style="@style/ButtonStyle"
             android:id="@+id/btnSave"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

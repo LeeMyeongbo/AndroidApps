@@ -12,61 +12,61 @@
         <!-- Customize your theme here. -->
         <item name="android:windowNoTitle">true</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:timePickerStyle">@style/newsAlarmTimePickerStyle</item>
-        <item name="android:datePickerDialogTheme">@style/newsAlarmDatePickerDialogStyle</item>
+        <item name="android:timePickerStyle">@style/NewsAlarmTimePickerStyle</item>
+        <item name="android:datePickerDialogTheme">@style/NewsAlarmDatePickerDialogStyle</item>
     </style>
 
     <!-- time picker style for dark theme -->
-    <style name="newsAlarmTimePickerStyle" parent="android:Widget.Material.TimePicker">
+    <style name="NewsAlarmTimePickerStyle" parent="android:Widget.Material.TimePicker">
         <item name="android:timePickerMode">spinner</item>
     </style>
 
     <!-- date picker dialog style for dark theme -->
-    <style name="newsAlarmDatePickerDialogStyle" parent="android:Theme.Material.Dialog">
+    <style name="NewsAlarmDatePickerDialogStyle" parent="android:Theme.Material.Dialog">
         <item name="android:textColorPrimaryInverse">@color/white</item>
         <item name="android:textColorSecondaryInverse">@color/white</item>
         <item name="android:colorAccent">#7186FF</item>
         <item name="android:windowBackground">#140B3A</item>
-        <item name="android:datePickerStyle">@style/datePickerStyle</item>
-        <item name="android:buttonBarPositiveButtonStyle">@style/dialogPositiveButtonStyle</item>
-        <item name="android:buttonBarNegativeButtonStyle">@style/dialogNegativeButtonStyle</item>
+        <item name="android:datePickerStyle">@style/DatePickerStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/DialogPositiveButtonStyle</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/DialogNegativeButtonStyle</item>
     </style>
 
-    <style name="datePickerStyle" parent="@android:style/Widget.Material.DatePicker">
+    <style name="DatePickerStyle" parent="@android:style/Widget.Material.DatePicker">
         <item name="android:headerBackground">#00147A</item>
         <item name="android:background">#140B3A</item>
     </style>
 
-    <style name="dialogPositiveButtonStyle"
+    <style name="DialogPositiveButtonStyle"
         parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <style name="dialogNegativeButtonStyle"
+    <style name="DialogNegativeButtonStyle"
         parent="Widget.MaterialComponents.Button.TextButton.Dialog">
         <item name="android:textColor">@color/red</item>
     </style>
 
-    <!-- DatePicker button style for dark theme -->
+    <!-- datePicker button style for dark theme -->
     <!--https://icons8.com/icon/84997/calendar -->
-    <style name="datePickerButtonStyle">
+    <style name="DatePickerButtonStyle">
         <item name="android:src">@drawable/calendar_dark</item>
     </style>
 
-    <!-- Menu button style for dark theme -->
+    <!-- menu button style for dark theme -->
     <!-- https://icons8.com/icon/3096/menu -->
-    <style name="newsAlarmMenuButtonStyle">
+    <style name="NewsAlarmMenuButtonStyle">
         <item name="android:src">@drawable/menu_dark</item>
         <item name="android:background">@drawable/round_btn_effect_dark</item>
     </style>
 
-    <!-- Alarm list item style for dark theme -->
-    <style name="alarmListItemStyle">
+    <!-- alarm list item style for dark theme -->
+    <style name="AlarmListItemStyle">
         <item name="android:background">@drawable/alarm_item_bg_dark</item>
     </style>
 
-    <!-- Weekday textview background layout style in alarm list item -->
-    <style name="alarmListItemStyle.weekdayTextLayout">
+    <!-- weekday textview background layout style in alarm list item -->
+    <style name="AlarmListItemStyle.WeekdayTextLayout">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
@@ -74,8 +74,8 @@
         <item name="android:orientation">vertical</item>
     </style>
 
-    <!-- Weekday selection display view in alarm list for dark theme -->
-    <style name="alarmListItemStyle.weekdaySelectionStyle">
+    <!-- weekday selection display view in alarm list for dark theme -->
+    <style name="AlarmListItemStyle.WeekdaySelectionStyle">
         <item name="android:background">@drawable/item_weekday_selected_view_dark</item>
         <item name="android:layout_width">7dp</item>
         <item name="android:layout_height">7dp</item>
@@ -83,8 +83,8 @@
         <item name="android:visibility">gone</item>
     </style>
 
-    <!-- Weekday textview when unselected in alarm list for dark theme -->
-    <style name="alarmListItemStyle.weekdayTextStyle">
+    <!-- textview in alarm list when unselected for dark theme -->
+    <style name="AlarmListItemStyle.TextStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
@@ -93,15 +93,14 @@
         <item name="android:textSize">15sp</item>
     </style>
 
-    <!-- Weekday textview when unselected in alarm list for dark theme -->
-    <style name="alarmListItemStyle.weekdayTextStyle.Selected"
-            parent="alarmListItemStyle.weekdayTextStyle">
+    <!-- textview in alarm list when selected for dark theme -->
+    <style name="AlarmListItemStyle.TextStyle.Selected" parent="AlarmListItemStyle.TextStyle">
         <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <!-- common button style for dark theme -->
-    <style name="buttonStyle">
+    <style name="ButtonStyle">
         <item name="android:textColor">@color/white</item>
         <item name="backgroundTint">#323232</item>
         <item name="rippleColor">#969696</item>
@@ -109,12 +108,12 @@
     </style>
 
     <!-- scrollView background for dark theme -->
-    <style name="alarmSetterScrollView">
+    <style name="AlarmSetterScrollView">
         <item name="android:background">@drawable/alarm_setting_bg_dark</item>
     </style>
 
     <!-- weekDay checkbox for dark theme -->
-    <style name="weekDayCheckboxStyle">
+    <style name="WeekDayCheckboxStyle">
         <item name="android:background">@drawable/checkbox_week_custom_dark</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>

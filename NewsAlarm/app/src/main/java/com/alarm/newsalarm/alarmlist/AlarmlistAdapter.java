@@ -51,7 +51,8 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             R.id.thursSelect, R.id.friSelect, R.id.saturSelect
         };
 
-        private final TextView tvTime;
+        private final TextView tvTimeDeactivated;
+        private final TextView tvTimeActivated;
         private final TextView tvDate;
         private final TextView[] tvUnselectedWeekdays = new TextView[7];
         private final TextView[] tvSelectedWeekdays = new TextView[7];
@@ -62,7 +63,8 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             @NonNull View view, OnItemClickListener clickListener, OnItemDragListener dragListener
         ) {
             super(view);
-            tvTime = view.findViewById(R.id.tvTime);
+            tvTimeDeactivated = view.findViewById(R.id.tvTimeDeactivated);
+            tvTimeActivated = view.findViewById(R.id.tvTimeActivated);
             tvDate = view.findViewById(R.id.tvDate);
             switchAlarm = view.findViewById(R.id.switchAlarm);
             initWeekdayViews(view);
@@ -77,6 +79,16 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             view.setOnLongClickListener(v -> {
                 dragListener.onStartDrag(this);
                 return false;
+            });
+
+            switchAlarm.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                if (isChecked) {
+                    tvTimeDeactivated.setVisibility(TextView.GONE);
+                    tvTimeActivated.setVisibility(TextView.VISIBLE);
+                } else {
+                    tvTimeDeactivated.setVisibility(TextView.VISIBLE);
+                    tvTimeActivated.setVisibility(TextView.GONE);
+                }
             });
         }
 
@@ -123,7 +135,8 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         int hour = data.getTimeInMin() / 60, minute = data.getTimeInMin() % 60;
         String timeText = String.format(locale, "%02d:%02d", hour, minute);
 
-        holder.tvTime.setText(timeText);
+        holder.tvTimeDeactivated.setText(timeText);
+        holder.tvTimeActivated.setText(timeText);
     }
 
     private void setDateView(AlarmListViewHolder holder, AlarmData data) {
