@@ -55,6 +55,7 @@ public class MainActivity extends BaseActivity {
             return false;
         }
         adapter.addItem(data);
+        lvAlarmList.scrollToPosition(adapter.getItemCount() - 1);
         return true;
     }
 

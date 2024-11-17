@@ -140,7 +140,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         private void bind(AlarmData data) {
             curData = data;
 
-            initTvWeekdays();
+            initWeekdayViews();
             setTimeView(data);
             setDateView(data);
 
@@ -148,10 +148,11 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             setTvByActivationChecked(switchAlarm.isChecked());
         }
 
-        private void initTvWeekdays() {
+        private void initWeekdayViews() {
             for (int i = 0; i < 7; i++) {
                 tvSelectedWeekdays[i].setVisibility(TextView.GONE);
                 tvUnselectedWeekdays[i].setVisibility(TextView.VISIBLE);
+                weekdaySelects[i].setVisibility(View.GONE);
             }
         }
 
@@ -243,6 +244,6 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     public void addItem(AlarmData data) {
         alarmList.add(data);
-        notifyItemInserted(alarmList.size() - 1);
+        notifyItemInserted(alarmList.size());
     }
 }
