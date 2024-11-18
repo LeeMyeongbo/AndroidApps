@@ -3,6 +3,7 @@ package com.alarm.newsalarm;
 import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.KeyEvent;
@@ -22,16 +23,19 @@ import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.google.android.material.button.MaterialButton;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
 public class MainActivity extends BaseActivity {
 
+    private SharedPreferences sharedPref;
     private RecyclerView lvAlarmList;
     private AlarmManager alarmManager;
     private AlarmlistAdapter adapter;
     private ItemTouchHelper helper;
-    private LinkedList<AlarmData> alarmDataList;
+    private final LinkedList<AlarmData> alarmDataList = new LinkedList<>();
     private long backKeyReleasedTime = -1;
     private long backKeyPressedTime = -1;
     private int clickedPos;
@@ -81,10 +85,11 @@ public class MainActivity extends BaseActivity {
 
     private void init() {
         alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
         initUI();
         requestExactAlarmPermission();
-        alarmDataList = AlarmDatabaseUtil.getAll(this);
+        prepareAlarmData();
         initAlarmListView();
     }
 
@@ -106,6 +111,27 @@ public class MainActivity extends BaseActivity {
             Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
             startActivity(intent);
         }
+    }
+
+    private void prepareAlarmData() {
+        String[] ids = sharedPref.getString("id_order", "").split(",");
+        ArrayList<AlarmData> loadedData = new ArrayList<>(AlarmDatabaseUtil.getAll(this));
+        for (int i = 0; i < loadedData.size(); i++) {
+            alarmDataList.add(loadedData.get(lowerBound(loadedData, Long.parseLong(ids[i]))));
+        }
+    }
+
+    private int lowerBound(List<AlarmData> data, long id) {
+        int max = data.size(), min = 0;
+        while (min < max) {
+            int mid = (min + max) / 2;
+            if (id > data.get(mid).getId()) {
+                min = mid + 1;
+            } else {
+                max = mid;
+            }
+        }
+        return min;
     }
 
     private void initAlarmListView() {
@@ -158,5 +184,21 @@ public class MainActivity extends BaseActivity {
 
     private boolean isBackKeyReleasedTwoTimesWithinTwoSeconds(long curBackKeyReleased) {
         return curBackKeyReleased - backKeyReleasedTime < 2000;
+    }
+
+    @Override
+    protected void onDestroy() {
+        storeIdOrder();
+        super.onDestroy();
+    }
+
+    private void storeIdOrder() {
+        StringBuilder idOrder = new StringBuilder();
+        int size = alarmDataList.size();
+        for (int i = 0; i < size; i++) {
+            idOrder.append(alarmDataList.get(i).getId()).append(",");
+        }
+        idOrder.deleteCharAt(idOrder.lastIndexOf(","));
+        sharedPref.edit().putString("id_order", idOrder.toString()).apply();
     }
 }
