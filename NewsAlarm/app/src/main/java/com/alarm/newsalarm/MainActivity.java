@@ -34,6 +34,7 @@ public class MainActivity extends BaseActivity {
     private ArrayList<AlarmData> alarmDataList;
     private long backKeyReleasedTime = -1;
     private long backKeyPressedTime = -1;
+    private int clickedPos;
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
         new ActivityResultContracts.StartActivityForResult(),
@@ -41,22 +42,19 @@ public class MainActivity extends BaseActivity {
             if (result.getResultCode() != RESULT_OK) {
                 return;
             }
-            if (appendNewAlarmData(result)) {
-                return;
-            }
+            appendNewAlarmData(result);
             updateExistingAlarmData(result);
         }
     );
 
-    private boolean appendNewAlarmData(ActivityResult result) {
+    private void appendNewAlarmData(ActivityResult result) {
         AlarmData data = Objects.requireNonNull(result.getData())
             .getParcelableExtra("addNewAlarmData", AlarmData.class);
         if (data == null) {
-            return false;
+            return;
         }
         adapter.addItem(data);
         lvAlarmList.scrollToPosition(adapter.getItemCount() - 1);
-        return true;
     }
 
     private void updateExistingAlarmData(ActivityResult result) {
@@ -65,7 +63,8 @@ public class MainActivity extends BaseActivity {
         if (data == null) {
             return;
         }
-        /* To Do : update alarm data item */
+        adapter.updateItem(clickedPos, data);
+        lvAlarmList.scrollToPosition(clickedPos);
     }
 
     public MainActivity() {
@@ -123,6 +122,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void executeAlarmSetterActivityWithData(int pos) {
+        clickedPos = pos;
         Intent intent = new Intent();
         intent.putExtra("alarmData", alarmDataList.get(pos));
         executeAlarmSetterActivity(intent);

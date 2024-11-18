@@ -254,12 +254,18 @@ public class AlarmSetterActivity extends BaseActivity {
             if (addNewAlarmData()) {
                 Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
             } else {
-                Toast.makeText(this, "유효하지 않은 알람 데이터입니다..", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "알람을 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
                 Log.i(CLASS_NAME, "saveSetting$couldn't add new alarm data..");
                 return;
             }
         } else {
-            /* To Do : update existing alarm data */
+            if (updateAlarmData()) {
+                Log.i(CLASS_NAME, "saveSetting$updating existing alarm data completed!");
+            } else {
+                Toast.makeText(this, "알람을 수정할 수 없습니다.", Toast.LENGTH_SHORT).show();
+                Log.i(CLASS_NAME, "saveSetting$couldn't update alarm data..");
+                return;
+            }
         }
         finish();
     }
@@ -284,6 +290,19 @@ public class AlarmSetterActivity extends BaseActivity {
         long curId = sharedPref.getLong("alarm_id", 0L);
         sharedPref.edit().putLong("alarm_id", ++curId).apply();
         return curId;
+    }
+
+    private boolean updateAlarmData() {
+        alarmData.setAlarmName(etAlarmName.getText().toString());
+        alarmData.setAlarmTopic(etNewsTopic.getText().toString());
+        alarmData.setVolumeSize(slVolume.getValue());
+        alarmData.setVibIntensity((int) slVib.getValue());
+        setAlarmTime();
+        if (!AlarmDatabaseUtil.update(this, alarmData)) {
+            return false;
+        }
+        sendResultToMainActivity("updateAlarmData");
+        return true;
     }
 
     private void setAlarmTime() {

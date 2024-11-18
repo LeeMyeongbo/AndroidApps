@@ -246,4 +246,9 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         alarmList.add(data);
         notifyItemInserted(alarmList.size());
     }
+
+    public void updateItem(int position, AlarmData data) {
+        alarmList.set(position, data);
+        notifyItemChanged(position);
+    }
 }
