@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity {
             return;
         }
         adapter.addItem(data);
-        lvAlarmList.scrollToPosition(adapter.getItemCount() - 1);
+        lvAlarmList.scrollToPosition(0);
     }
 
     private void updateExistingAlarmData(ActivityResult result) {

@@ -19,7 +19,9 @@ import com.alarm.newsalarm.alarmlist.AlarmlistAdapter.AlarmListViewHolder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -230,7 +232,6 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         }
         AlarmData fromItem = alarmList.remove(from);
         alarmList.add(to, fromItem);
-        /* To Do : update order in room also */
         notifyItemMoved(from, to);
     }
 
@@ -241,8 +242,8 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
     }
 
     public void addItem(AlarmData data) {
-        alarmList.add(data);
-        notifyItemInserted(alarmList.size());
+        ((LinkedList<AlarmData>) alarmList).push(data);
+        notifyItemInserted(0);
     }
 
     public void updateItem(int position, AlarmData data) {

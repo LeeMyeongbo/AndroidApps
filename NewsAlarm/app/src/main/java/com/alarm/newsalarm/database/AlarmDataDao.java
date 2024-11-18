@@ -12,7 +12,7 @@ import java.util.List;
 public interface AlarmDataDao {
 
     @Insert
-    void insert(AlarmData data);
+    void insert(AlarmData... data);
 
     @Update
     void update(AlarmData data);
