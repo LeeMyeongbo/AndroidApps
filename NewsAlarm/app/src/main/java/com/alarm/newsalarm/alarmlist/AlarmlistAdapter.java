@@ -19,15 +19,15 @@ import com.alarm.newsalarm.alarmlist.AlarmlistAdapter.AlarmListViewHolder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements ItemActionListener {
 
     private static final String[] WEEK = {"일", "월", "화", "수", "목", "금", "토"};
 
-    private final ArrayList<AlarmData> alarmList;
+    private final List<AlarmData> alarmList;
     private final OnItemDragListener dragListener;
     private final OnItemClickListener clickListener;
     private Context context;
@@ -195,9 +195,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
     }
 
     public AlarmlistAdapter(
-        ArrayList<AlarmData> dataset,
-        OnItemClickListener clickListener,
-        OnItemDragListener dragListener
+        List<AlarmData> dataset, OnItemClickListener clickListener, OnItemDragListener dragListener
     ) {
         this.alarmList = dataset;
         this.clickListener = clickListener;

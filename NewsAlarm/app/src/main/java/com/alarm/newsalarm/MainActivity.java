@@ -22,7 +22,7 @@ import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.google.android.material.button.MaterialButton;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Objects;
 
 public class MainActivity extends BaseActivity {
@@ -31,7 +31,7 @@ public class MainActivity extends BaseActivity {
     private AlarmManager alarmManager;
     private AlarmlistAdapter adapter;
     private ItemTouchHelper helper;
-    private ArrayList<AlarmData> alarmDataList;
+    private LinkedList<AlarmData> alarmDataList;
     private long backKeyReleasedTime = -1;
     private long backKeyPressedTime = -1;
     private int clickedPos;

@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.room.Room;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AlarmDatabaseUtil {
@@ -88,10 +88,10 @@ public class AlarmDatabaseUtil {
         new Thread(() -> getDB(context).alarmDataDao().delete(data)).start();
     }
 
-    public static ArrayList<AlarmData> getAll(Context context) {
-        AtomicReference<ArrayList<AlarmData>> alarmList = new AtomicReference<>();
+    public static LinkedList<AlarmData> getAll(Context context) {
+        AtomicReference<LinkedList<AlarmData>> alarmList = new AtomicReference<>();
         Thread thread = new Thread(() ->
-            alarmList.set(new ArrayList<>(getDB(context).alarmDataDao().getAll()))
+            alarmList.set(new LinkedList<>(getDB(context).alarmDataDao().getAll()))
         );
         try {
             thread.start();
