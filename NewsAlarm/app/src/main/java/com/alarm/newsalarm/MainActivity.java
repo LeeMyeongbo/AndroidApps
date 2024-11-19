@@ -198,7 +198,9 @@ public class MainActivity extends BaseActivity {
         for (int i = 0; i < size; i++) {
             idOrder.append(alarmDataList.get(i).getId()).append(",");
         }
-        idOrder.deleteCharAt(idOrder.lastIndexOf(","));
+        if (size > 0) {
+            idOrder.deleteCharAt(idOrder.lastIndexOf(","));
+        }
         sharedPref.edit().putString("id_order", idOrder.toString()).apply();
     }
 }
