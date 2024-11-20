@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.alarm.newsalarm.sampleplayer.SampleSoundPlayer;
@@ -41,6 +42,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private final CheckBox[] cbWeekdays = new CheckBox[7];
     private AlarmData alarmData;
+    private AlarmSetter setter;
     private SharedPreferences sharedPref;
     private SampleSoundPlayer soundPlayer;
     private SampleVibrator vibrator;
@@ -77,6 +79,8 @@ public class AlarmSetterActivity extends BaseActivity {
 
         displayVolumeImgByVolume(slVolume.getValue());
         displayVibImgByVibIntensity(slVib.getValue());
+
+        setter = new AlarmSetter(this);
     }
 
     private void initUI() {
@@ -252,6 +256,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private void saveSetting() {
         if (alarmData == null) {
             if (addNewAlarmData()) {
+                registerAlarm();
                 Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
             } else {
                 Toast.makeText(this, "알람을 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -260,6 +265,7 @@ public class AlarmSetterActivity extends BaseActivity {
             }
         } else {
             if (updateAlarmData()) {
+                modifyAlarm();
                 Log.i(CLASS_NAME, "saveSetting$updating existing alarm data completed!");
             } else {
                 Toast.makeText(this, "알람을 수정할 수 없습니다.", Toast.LENGTH_SHORT).show();
@@ -358,6 +364,19 @@ public class AlarmSetterActivity extends BaseActivity {
         Intent resultIntent = new Intent();
         resultIntent.putExtra(extraName, alarmData);
         setResult(RESULT_OK, resultIntent);
+    }
+
+    private void registerAlarm() {
+        if (alarmData.getPeriodicWeekBit() == 0) {
+            setter.setSpecificAlarm(alarmData.getId(), alarmData.getSpecificDateInMillis());
+        } else {
+            /* To Do : register periodic alarm */
+        }
+    }
+
+    private void modifyAlarm() {
+        setter.cancelAlarm(alarmData.getId());
+        registerAlarm();
     }
 
     @Override

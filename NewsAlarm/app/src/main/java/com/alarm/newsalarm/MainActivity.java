@@ -4,6 +4,7 @@ import android.app.AlarmManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.KeyEvent;
@@ -89,6 +90,7 @@ public class MainActivity extends BaseActivity {
 
         initUI();
         requestExactAlarmPermission();
+        requestOverlayPermission();
         prepareAlarmData();
         initAlarmListView();
     }
@@ -110,6 +112,16 @@ public class MainActivity extends BaseActivity {
         if (!alarmManager.canScheduleExactAlarms()) {
             Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
             startActivity(intent);
+        }
+    }
+
+    private void requestOverlayPermission() {
+        if (!Settings.canDrawOverlays(this)) {
+            Intent intent = new Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:" + getPackageName())
+            );
+            launcher.launch(intent);
         }
     }
 
