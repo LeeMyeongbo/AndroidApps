@@ -19,7 +19,6 @@ import com.alarm.newsalarm.alarmlist.AlarmlistAdapter.AlarmListViewHolder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -159,30 +158,33 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         }
 
         private void setTimeView(AlarmData data) {
-            int hour = data.getTimeInMin() / 60, minute = data.getTimeInMin() % 60;
-            String timeText = String.format(locale, "%02d:%02d", hour, minute);
+            String timeText = getAlarmTimeInfoText(data.getSpecificDateInMillis(), "HH:mm");
 
             tvTimeDeactivated.setText(timeText);
             tvTimeActivated.setText(timeText);
         }
 
-        private void setDateView(AlarmData data) {
-            StringBuilder tvDateTextStringBuilder = new StringBuilder();
-            byte weekBit = data.getPeriodicWeekBit();
-            if (weekBit > 0) {
-                setPeriodicDateView(weekBit, tvDateTextStringBuilder);
-            } else {
-                setSpecificDateView(data.getSpecificDateInMillis(), tvDateTextStringBuilder);
-            }
-            tvDateActivated.setText(tvDateTextStringBuilder.toString());
-            tvDateDeactivated.setText(tvDateTextStringBuilder.toString());
+        private String getAlarmTimeInfoText(long date, String format) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format, locale);
+            return dateFormat.format(new Date(date));
         }
 
-        private void setPeriodicDateView(byte weekBit, StringBuilder sb) {
-            sb.append("매주");
+        private void setDateView(AlarmData data) {
+            String dateInfo;
+            int weekBit = data.getPeriodicWeekBit();
+            if (weekBit > 0) {
+                setPeriodicDateView(weekBit);
+                dateInfo = getPeriodicDateInfoText(weekBit);
+            } else {
+                dateInfo = getAlarmTimeInfoText(data.getSpecificDateInMillis(), "yyyy-MM-dd");
+            }
+            tvDateActivated.setText(dateInfo);
+            tvDateDeactivated.setText(dateInfo);
+        }
+
+        private void setPeriodicDateView(int weekBit) {
             for (int i = 0; i < 7; i++) {
                 if ((weekBit & (1 << i)) > 0) {
-                    sb.append(" ").append(WEEK[i]);
                     weekdaySelects[i].setVisibility(View.VISIBLE);
                 } else {
                     weekdaySelects[i].setVisibility(View.GONE);
@@ -190,9 +192,14 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             }
         }
 
-        private void setSpecificDateView(long date, StringBuilder sb) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd", locale);
-            sb.append(format.format(new Date(date)));
+        private String getPeriodicDateInfoText(int weekBit) {
+            StringBuilder tvDateStringBuilder = new StringBuilder("매주");
+            for (int i = 0; i < 7; i++) {
+                if ((weekBit & (1 << i)) > 0) {
+                    tvDateStringBuilder.append(" ").append(WEEK[i]);
+                }
+            }
+            return tvDateStringBuilder.toString();
         }
     }
 

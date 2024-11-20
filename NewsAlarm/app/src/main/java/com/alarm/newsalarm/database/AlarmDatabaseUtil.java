@@ -26,8 +26,8 @@ public class AlarmDatabaseUtil {
     }
 
     private static boolean isValid(AlarmData data) {
-        return isVolumeSizeValid(data) && isVibIntensityValid(data) && isTimeValid(data)
-                && (isSpecificDateValid(data) || data.getPeriodicWeekBit() > 0);
+        return isVolumeSizeValid(data) && isVibIntensityValid(data)
+                && isSpecificDateValid(data) && data.getPeriodicWeekBit() >= 0;
     }
 
     private static boolean isVolumeSizeValid(AlarmData data) {
@@ -54,15 +54,6 @@ public class AlarmDatabaseUtil {
             return true;
         }
         Log.e(CLASS_NAME, "isSpecificDateValid$alarm date must be set by future date!");
-        return false;
-    }
-
-    private static boolean isTimeValid(AlarmData data) {
-        int timeMin = data.getTimeInMin();
-        if (timeMin >= 0 && timeMin < 1440) {
-            return true;
-        }
-        Log.e(CLASS_NAME, "isTimeValid$time must be set by 0(00:00) to 1439(23:59)!");
         return false;
     }
 

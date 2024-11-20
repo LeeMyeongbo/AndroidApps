@@ -21,8 +21,8 @@ public class AlarmSetter {
     }
 
     public void setSpecificAlarm(AlarmData data) {
-        PendingIntent pShowIntent = getPendingReserveIntent((int) data.getId());
-        PendingIntent pNotifyIntent = getPendingNotifyIntent((int) data.getId());
+        PendingIntent pShowIntent = getPendingReserveIntent(data.getId());
+        PendingIntent pNotifyIntent = getPendingNotifyIntent(data.getId());
 
         AlarmManagerCompat.setAlarmClock(
             alarmManager, data.getSpecificDateInMillis(), pShowIntent, pNotifyIntent
@@ -45,7 +45,7 @@ public class AlarmSetter {
     }
 
     public void cancelAlarm(AlarmData data) {
-        alarmManager.cancel(getPendingNotifyIntent((int) data.getId()));
+        alarmManager.cancel(getPendingNotifyIntent(data.getId()));
     }
 
     public void setPeriodicAlarm() {

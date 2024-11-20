@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey;
 public class AlarmData implements Parcelable {
 
     @PrimaryKey
-    private long id;
+    private int id;
 
     @ColumnInfo(name = "Name")
     private String alarmName = "";
@@ -30,10 +30,7 @@ public class AlarmData implements Parcelable {
     private long specificDateInMillis = -1;
 
     @ColumnInfo(name = "WeekBit")
-    private byte periodicWeekBit;
-
-    @ColumnInfo(name = "Time")
-    private int timeInMin = -1;
+    private int periodicWeekBit;
 
     @ColumnInfo(name = "Active")
     private boolean isActive = true;
@@ -52,19 +49,18 @@ public class AlarmData implements Parcelable {
     };
 
     protected AlarmData(Parcel in) {
-        id = in.readLong();
+        id = in.readInt();
         alarmName = in.readString();
         alarmTopic = in.readString();
         volumeSize = in.readFloat();
         vibIntensity = in.readInt();
         specificDateInMillis = in.readLong();
-        periodicWeekBit = in.readByte();
-        timeInMin = in.readInt();
+        periodicWeekBit = in.readInt();
         isActive = in.readBoolean();
     }
 
     public AlarmData(
-        long id, String alarmName, String alarmTopic, float volumeSize, int vibIntensity
+        int id, String alarmName, String alarmTopic, float volumeSize, int vibIntensity
     ) {
         setId(id);
         setAlarmName(alarmName);
@@ -73,11 +69,11 @@ public class AlarmData implements Parcelable {
         setVibIntensity(vibIntensity);
     }
 
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 
-    public long getId() {
+    public int getId() {
         return id;
     }
 
@@ -121,20 +117,12 @@ public class AlarmData implements Parcelable {
         return specificDateInMillis;
     }
 
-    public void setPeriodicWeekBit(byte bit) {
+    public void setPeriodicWeekBit(int bit) {
         this.periodicWeekBit = bit;
     }
 
-    public byte getPeriodicWeekBit() {
+    public int getPeriodicWeekBit() {
         return periodicWeekBit;
-    }
-
-    public void setTimeInMin(int timeInMin) {
-        this.timeInMin = timeInMin;
-    }
-
-    public int getTimeInMin() {
-        return timeInMin;
     }
 
     public void setActive(boolean isActive) {
@@ -152,14 +140,13 @@ public class AlarmData implements Parcelable {
 
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
-        dest.writeLong(id);
+        dest.writeInt(id);
         dest.writeString(alarmName);
         dest.writeString(alarmTopic);
         dest.writeFloat(volumeSize);
         dest.writeInt(vibIntensity);
         dest.writeLong(specificDateInMillis);
-        dest.writeByte(periodicWeekBit);
-        dest.writeInt(timeInMin);
+        dest.writeInt(periodicWeekBit);
         dest.writeBoolean(isActive);
     }
 }
