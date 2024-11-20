@@ -368,14 +368,14 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void registerAlarm() {
         if (alarmData.getPeriodicWeekBit() == 0) {
-            setter.setSpecificAlarm(alarmData.getId(), alarmData.getSpecificDateInMillis());
+            setter.setSpecificAlarm(alarmData);
         } else {
             /* To Do : register periodic alarm */
         }
     }
 
     private void modifyAlarm() {
-        setter.cancelAlarm(alarmData.getId());
+        setter.cancelAlarm(alarmData);
         registerAlarm();
     }
 

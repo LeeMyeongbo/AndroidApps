@@ -8,6 +8,7 @@ import android.content.Intent;
 import androidx.core.app.AlarmManagerCompat;
 
 import com.alarm.newsalarm.MainActivity;
+import com.alarm.newsalarm.database.AlarmData;
 
 public class AlarmSetter {
 
@@ -19,12 +20,12 @@ public class AlarmSetter {
         this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 
-    public void setSpecificAlarm(long id, long triggerTimeInMillis) {
-        PendingIntent pShowIntent = getPendingReserveIntent((int) id);
-        PendingIntent pNotifyIntent = getPendingNotifyIntent((int) id);
+    public void setSpecificAlarm(AlarmData data) {
+        PendingIntent pShowIntent = getPendingReserveIntent((int) data.getId());
+        PendingIntent pNotifyIntent = getPendingNotifyIntent((int) data.getId());
 
         AlarmManagerCompat.setAlarmClock(
-            alarmManager, triggerTimeInMillis, pShowIntent, pNotifyIntent
+            alarmManager, data.getSpecificDateInMillis(), pShowIntent, pNotifyIntent
         );
     }
 
@@ -43,8 +44,8 @@ public class AlarmSetter {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-    public void cancelAlarm(long id) {
-        alarmManager.cancel(getPendingNotifyIntent((int) id));
+    public void cancelAlarm(AlarmData data) {
+        alarmManager.cancel(getPendingNotifyIntent((int) data.getId()));
     }
 
     public void setPeriodicAlarm() {
