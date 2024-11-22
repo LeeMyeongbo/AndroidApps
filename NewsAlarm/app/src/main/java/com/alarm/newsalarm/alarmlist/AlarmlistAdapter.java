@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.alarm.newsalarm.R;
+import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.alarm.newsalarm.alarmlist.AlarmlistAdapter.AlarmListViewHolder;
@@ -110,6 +111,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
                 setTvByActivationChecked(isChecked);
                 curData.setActive(isChecked);
                 AlarmDatabaseUtil.update(view.getContext(), curData);
+                setAlarmBySwitch(view, isChecked);
             });
         }
 
@@ -135,6 +137,15 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
                     tvSelectedWeekdays[i].setVisibility(activationStatus);
                     tvUnselectedWeekdays[i].setVisibility(deactivationStatus);
                 }
+            }
+        }
+
+        private void setAlarmBySwitch(View view, boolean isChecked) {
+            AlarmSetter setter = new AlarmSetter(view.getContext());
+            if (isChecked) {
+                setter.registerAlarm(curData);
+            } else {
+                setter.cancelAlarm(curData);
             }
         }
 
@@ -244,7 +255,9 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     @Override
     public void onItemSwiped(int position) {
-        AlarmDatabaseUtil.delete(context, alarmList.remove(position));
+        AlarmData data = alarmList.remove(position);
+        AlarmDatabaseUtil.delete(context, data);
+        new AlarmSetter(context).cancelAlarm(data);
         notifyItemRemoved(position);
     }
 

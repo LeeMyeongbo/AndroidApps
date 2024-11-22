@@ -167,6 +167,23 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        removeInvalidAlarms();
+    }
+
+    private void removeInvalidAlarms() {
+        for (int i = alarmDataList.size() - 1; i >= 0; i--) {
+            AlarmData curData = alarmDataList.get(i);
+            if (curData.getPeriodicWeekBit() == 0
+                    && curData.getSpecificDateInMillis() < System.currentTimeMillis()) {
+                alarmDataList.remove(i);
+                AlarmDatabaseUtil.delete(this, curData);
+            }
+        }
+    }
+
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         backKeyPressedTime = System.currentTimeMillis();
         return super.onKeyDown(keyCode, event);
@@ -206,11 +223,10 @@ public class MainActivity extends BaseActivity {
 
     private void storeIdOrder() {
         StringBuilder idOrder = new StringBuilder();
-        int size = alarmDataList.size();
-        for (int i = 0; i < size; i++) {
-            idOrder.append(alarmDataList.get(i).getId()).append(",");
+        for (AlarmData data : alarmDataList) {
+            idOrder.append(data.getId()).append(",");
         }
-        if (size > 0) {
+        if (idOrder.length() > 0) {
             idOrder.deleteCharAt(idOrder.lastIndexOf(","));
         }
         sharedPref.edit().putString("id_order", idOrder.toString()).apply();

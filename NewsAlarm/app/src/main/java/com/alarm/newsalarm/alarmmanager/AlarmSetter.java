@@ -20,9 +20,9 @@ public class AlarmSetter {
         this.alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 
-    public void setSpecificAlarm(AlarmData data) {
+    public void registerAlarm(AlarmData data) {
         PendingIntent pShowIntent = getPendingReserveIntent(data.getId());
-        PendingIntent pNotifyIntent = getPendingNotifyIntent(data.getId());
+        PendingIntent pNotifyIntent = getPendingNotifyIntent(data);
 
         AlarmManagerCompat.setAlarmClock(
             alarmManager, data.getSpecificDateInMillis(), pShowIntent, pNotifyIntent
@@ -37,18 +37,15 @@ public class AlarmSetter {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
-    private PendingIntent getPendingNotifyIntent(int id) {
+    private PendingIntent getPendingNotifyIntent(AlarmData data) {
         Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.putExtra("alarmData", data);
 
-        return PendingIntent.getBroadcast(context, id, intent,
+        return PendingIntent.getBroadcast(context, data.getId(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
     }
 
     public void cancelAlarm(AlarmData data) {
-        alarmManager.cancel(getPendingNotifyIntent(data.getId()));
-    }
-
-    public void setPeriodicAlarm() {
-        /* To Do */
+        alarmManager.cancel(getPendingNotifyIntent(data));
     }
 }

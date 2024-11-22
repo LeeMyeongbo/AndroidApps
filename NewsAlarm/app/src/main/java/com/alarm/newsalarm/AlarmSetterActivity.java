@@ -23,7 +23,6 @@ import com.google.android.material.slider.Slider;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Locale;
 
 public class AlarmSetterActivity extends BaseActivity {
@@ -200,7 +199,7 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void openDatePicker() {
-        dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+        dialog.getDatePicker().setMinDate(System.currentTimeMillis());
         dialog.getDatePicker().setMaxDate(possibleMaxDate);
         dialog.show();
     }
@@ -320,25 +319,33 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void setAlarmTime() {
-        StringBuilder toastMessage = new StringBuilder("매주");
-        int weekBit = getWeekBit(toastMessage);
+        int weekBit = getWeekBit();
         if (weekBit > 0) {
-            toastMessage.append(" 마다 알람이 울립니다.");
-            Toast.makeText(this, toastMessage.toString(), Toast.LENGTH_LONG).show();
             alarmData.setPeriodicWeekBit(weekBit);
+            showPeriodicAlarmToast();
         }
         alarmData.setSpecificDateInMillis(getDateInMillis());
     }
 
-    private int getWeekBit(StringBuilder toastMessage) {
+    private int getWeekBit() {
         int weekBit = 0;
         for (int i = 0; i < 7; i++) {
             if (cbWeekdays[i].isChecked()) {
-                toastMessage.append(" ").append(cbWeekdays[i].getText());
                 weekBit = weekBit | (1 << i);
             }
         }
         return weekBit;
+    }
+
+    private void showPeriodicAlarmToast() {
+        StringBuilder toastMessage = new StringBuilder("매주");
+        for (CheckBox cb : cbWeekdays) {
+            if (cb.isChecked()) {
+                toastMessage.append(" ").append(cb.getText());
+            }
+        }
+        toastMessage.append(" 마다 알람이 울립니다.");
+        Toast.makeText(this, toastMessage.toString(), Toast.LENGTH_LONG).show();
     }
 
     private long getDateInMillis() {
@@ -346,14 +353,13 @@ public class AlarmSetterActivity extends BaseActivity {
         long alarmDate = calendar.getTimeInMillis();
 
         if (alarmData.getPeriodicWeekBit() == 0) {
-            showSpecificAlarmTimeToast();
+            showSpecificAlarmToast();
         }
-
-        calendar.setTime(new Date(System.currentTimeMillis()));
+        calendar.setTimeInMillis(System.currentTimeMillis());
         return alarmDate;
     }
 
-    private void showSpecificAlarmTimeToast() {
+    private void showSpecificAlarmToast() {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("ko", "KR"));
         String timeFormat = format.format(calendar.getTime());
         Toast.makeText(this, timeFormat + "에 알람이 울립니다.", Toast.LENGTH_LONG).show();
@@ -379,11 +385,7 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void registerAlarm() {
-        if (alarmData.getPeriodicWeekBit() == 0) {
-            setter.setSpecificAlarm(alarmData);
-        } else {
-            /* To Do : register periodic alarm */
-        }
+        setter.registerAlarm(alarmData);
     }
 
     private void modifyAlarm() {
