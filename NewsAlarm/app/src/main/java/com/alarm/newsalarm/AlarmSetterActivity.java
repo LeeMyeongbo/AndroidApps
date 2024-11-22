@@ -16,8 +16,8 @@ import android.widget.Toast;
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
-import com.alarm.newsalarm.sampleplayer.SampleSoundPlayer;
-import com.alarm.newsalarm.sampleplayer.SampleVibrator;
+import com.alarm.newsalarm.outputmanager.SoundPlayer;
+import com.alarm.newsalarm.outputmanager.Vibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
@@ -43,8 +43,8 @@ public class AlarmSetterActivity extends BaseActivity {
     private AlarmData alarmData;
     private AlarmSetter setter;
     private SharedPreferences sharedPref;
-    private SampleSoundPlayer soundPlayer;
-    private SampleVibrator vibrator;
+    private SoundPlayer soundPlayer;
+    private Vibrator vibrator;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
     private ImageButton btnDateSelector;
@@ -72,8 +72,8 @@ public class AlarmSetterActivity extends BaseActivity {
         initDatePickerDialog();
         setViewsFromAlarmData();
         setEventListener();
-        soundPlayer = new SampleSoundPlayer(this);
-        vibrator = new SampleVibrator(this);
+        soundPlayer = new SoundPlayer(this);
+        vibrator = new Vibrator(this);
         sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
         displayVolumeImgByVolume(slVolume.getValue());
@@ -205,12 +205,12 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void playSoundByValue(float value) {
-        soundPlayer.playSound(R.raw.ding_dong, value);
+        soundPlayer.playShortSound(R.raw.ding_dong, value);
         Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
     }
 
     private void vibrateByValue(float value) {
-        vibrator.vibrate((int) value * 51);
+        vibrator.vibrateOnce((int) value * 51);
         Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + (int) value);
     }
 

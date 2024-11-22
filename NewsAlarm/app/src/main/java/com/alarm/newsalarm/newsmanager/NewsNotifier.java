@@ -9,10 +9,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.R;
+import com.alarm.newsalarm.database.AlarmData;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
@@ -32,10 +34,12 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public class NewsNotification {
+public class NewsNotifier {
 
-    private static final NewsNotification news = new NewsNotification();
+    private static final String CLASS_NAME = "NewsNotifier";
+    private static final NewsNotifier INSTANCE = new NewsNotifier();
 
+    private AlarmData data;
     private TextToSpeech tts;
     private RequestQueue queue;
     private MediaPlayer mp;
@@ -43,11 +47,12 @@ public class NewsNotification {
     private Handler handler;
     private int news_num;
 
-    public static NewsNotification getInstance() {
-        return news;
+    public static NewsNotifier getInstance() {
+        return INSTANCE;
     }
 
-    public void notifyNews(Context context) {
+    public void notifyNews(Context context, AlarmData data) {
+        this.data = data;
         bundle = new Bundle();
         queue = Volley.newRequestQueue(context.getApplicationContext());
         handler = new Handler(Looper.getMainLooper()) {
@@ -61,8 +66,10 @@ public class NewsNotification {
                 speakTTS(news_num + "번 뉴스입니다.", 1);
                 speakTTS(title, 1);
                 speakTTS("기사 내용입니다.", 1);
-                for (String content : contents)
+                assert contents != null;
+                for (String content : contents) {
                     speakTTS(content, 0);
+                }
             }
         };
         getNews(context);
@@ -78,24 +85,17 @@ public class NewsNotification {
             playBackgroundMusic(context);
             speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
 
-            Set<JSONObject> jsonObjects = convert2JSONSet(response);
+            Set<JSONObject> jsonObjects = convertToJSONSet(response);
             new Thread(() -> {
                 for (JSONObject j : jsonObjects) {
-                    String title = getArticleTitle(j);
-                    String[] contents = getArticleBody(j);
-
-                    if (title != null && contents != null) {
-                        bundle.putString("title", title);
-                        bundle.putStringArray("content", contents);
-                        Message msg = handler.obtainMessage();
-                        msg.setData(bundle);
-                        handler.sendMessage(msg);
-                    }
+                    bundle.putString("title", getArticleTitle(j));
+                    bundle.putStringArray("content", getArticleBody(j));
+                    Message msg = handler.obtainMessage();
+                    msg.setData(bundle);
+                    handler.sendMessage(msg);
                 }
             }).start();
-        }, error -> {
-            speakTTS("서버 통신 오류가 발생했습니다.", 0);
-        }) {
+        }, error -> speakTTS("서버 통신 오류가 발생했습니다.", 0)) {
             @Override
             public Map<String, String> getHeaders() {
                 Map<String, String> params = new HashMap<>();
@@ -113,18 +113,20 @@ public class NewsNotification {
         mp = new MediaPlayer();
         mp.setAudioStreamType(AudioManager.STREAM_ALARM);
         try {
-            mp.setDataSource(context, Uri.parse("android.resource://" + context.getPackageName()
-                + "/" + R.raw.morningkiss));
+            mp.setDataSource(context, Uri.parse(
+                "android.resource://" + context.getPackageName() + "/" + R.raw.morningkiss
+            ));
             mp.prepare();
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(CLASS_NAME, "playBackgroundMusic$" + e.getMessage());
         }
         mp.setVolume(0.1f, 0.1f);
         mp.setLooping(true);
         mp.start();
+        Log.i(CLASS_NAME, "playBackgroundMusic$MediaPlayer started");
     }
 
-    public Set<JSONObject> convert2JSONSet(String response) {
+    public Set<JSONObject> convertToJSONSet(String response) {
         try {
             JSONObject jsonObject = new JSONObject(response);
             JSONArray arrayArticles = jsonObject.getJSONArray("items");
@@ -133,14 +135,18 @@ public class NewsNotification {
 
             for (int i = 0; i < length; i++) {
                 JSONObject articleObject = arrayArticles.getJSONObject(i);
-                if (articleObject.getString("link").contains("news.naver.com"))
+                if (articleObject.getString("link").contains("news.naver.com")) {
                     jsonObjects.add(articleObject);
-                if (jsonObjects.size() == 5) break;
+                }
+                if (jsonObjects.size() == 5) {
+                    Log.i(CLASS_NAME, "convertToJSONSet$JSON objects with news contents ready");
+                    break;
+                }
             }
 
             return jsonObjects;
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e(CLASS_NAME, "convertToJSONSet$" + e.getMessage());
         }
 
         return new HashSet<>();
@@ -150,10 +156,10 @@ public class NewsNotification {
         try {
             return j.getString("title").replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
         } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
+            Log.e(CLASS_NAME, "getArticleTitle$" + e.getMessage());
         }
 
-        return null;
+        return "";
     }
 
     public String[] getArticleBody(JSONObject j) {
@@ -169,10 +175,10 @@ public class NewsNotification {
 
             return contents;
         } catch (JSONException | NullPointerException e) {
-            e.printStackTrace();
+            Log.e(CLASS_NAME, "getArticleBody$" + e.getMessage());
         }
 
-        return null;
+        return new String[0];
     }
 
     public Element crawlPassage(String link) {
@@ -188,22 +194,25 @@ public class NewsNotification {
             for (int i = num - 1; i >= 0; i--) {
                 String tag = e.child(i).tagName();
                 if ((!tag.equals("font") && !tag.equals("span") && !tag.equals("b"))
-                    || e.child(i).className().equals("end_photo_org"))
+                        || e.child(i).className().equals("end_photo_org")) {
                     e.child(i).remove();
+                }
             }
 
             return e;
         } catch (IOException | NullPointerException e) {
-            e.printStackTrace();
+            Log.e(CLASS_NAME, "crawlPassage$" + e.getMessage());
         }
 
         return null;
     }
 
     public String modifyContent(Element e) {
-        if (e == null) return null;
-        String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
+        if (e == null) {
+            return "";
+        }
 
+        String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
         int idx = content.indexOf('#');
         if (idx == -1)
             idx = content.indexOf('※');
@@ -230,12 +239,14 @@ public class NewsNotification {
     public void speakTTS(String txt, int mode) {
         HashMap<String, String> myHashAlarm = new HashMap<>();
         myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
-        if (mode == 1)
+        if (mode == 1) {
             tts.playSilentUtterance(800L, TextToSpeech.QUEUE_ADD, "silence");
+        }
         tts.speak(txt, TextToSpeech.QUEUE_ADD, myHashAlarm);
     }
 
     public void destroyTTS() {
+        Log.i(CLASS_NAME, "destroyTTS$alarm off");
         if (tts != null) {
             tts.stop();
             tts.shutdown();

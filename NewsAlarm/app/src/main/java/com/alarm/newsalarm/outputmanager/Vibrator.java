@@ -1,19 +1,19 @@
-package com.alarm.newsalarm.sampleplayer;
+package com.alarm.newsalarm.outputmanager;
 
 import android.content.Context;
 import android.os.CombinedVibration;
 import android.os.VibrationEffect;
 import android.os.VibratorManager;
 
-public class SampleVibrator {
+public class Vibrator {
 
     private final VibratorManager vibrator;
 
-    public SampleVibrator(Context context) {
+    public Vibrator(Context context) {
         vibrator = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
     }
 
-    public void vibrate(int amplitude) {
+    public void vibrateOnce(int amplitude) {
         if (amplitude == 0) {
             return;
         }

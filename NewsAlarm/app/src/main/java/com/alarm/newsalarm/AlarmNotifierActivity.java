@@ -5,7 +5,8 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 import com.alarm.newsalarm.alarmmanager.WakeLockUtil;
-import com.alarm.newsalarm.newsmanager.NewsNotification;
+import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.newsmanager.NewsNotifier;
 import com.google.android.material.button.MaterialButton;
 
 public class AlarmNotifierActivity extends BaseActivity {
@@ -20,7 +21,9 @@ public class AlarmNotifierActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_notifier);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        NewsNotification.getInstance().notifyNews(this);
+        NewsNotifier.getInstance().notifyNews(
+            this, getIntent().getParcelableExtra("alarmData", AlarmData.class)
+        );
         init();
     }
 
@@ -36,7 +39,7 @@ public class AlarmNotifierActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        NewsNotification.getInstance().destroyTTS();
+        NewsNotifier.getInstance().destroyTTS();
         WakeLockUtil.releaseWakeLock();
         super.onDestroy();
     }
