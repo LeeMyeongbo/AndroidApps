@@ -289,7 +289,7 @@ public class AlarmSetterActivity extends BaseActivity {
             etAlarmName.getText().toString(),
             etNewsTopic.getText().toString(),
             (int) slVolume.getValue(),
-            (int) slVib.getValue()
+            (int) slVib.getValue() * 51
         );
         setAlarmTime();
         if (!AlarmDatabaseUtil.insert(this, alarmData)) {
@@ -309,7 +309,7 @@ public class AlarmSetterActivity extends BaseActivity {
         alarmData.setAlarmName(etAlarmName.getText().toString());
         alarmData.setAlarmTopic(etNewsTopic.getText().toString());
         alarmData.setVolumeSize((int) slVolume.getValue());
-        alarmData.setVibIntensity((int) slVib.getValue());
+        alarmData.setVibIntensity((int) slVib.getValue() * 51);
         setAlarmTime();
         if (!AlarmDatabaseUtil.update(this, alarmData)) {
             return false;
@@ -396,7 +396,7 @@ public class AlarmSetterActivity extends BaseActivity {
     @Override
     protected void onDestroy() {
         soundPlayer.release();
-        vibrator.cancel();
+        vibrator.release();
         super.onDestroy();
     }
 }

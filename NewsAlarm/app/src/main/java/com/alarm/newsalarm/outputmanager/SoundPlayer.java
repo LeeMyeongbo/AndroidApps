@@ -60,11 +60,13 @@ public class SoundPlayer {
     }
 
     public void playShortSound(int volume) {
+        Log.i(CLASS_NAME, "playShortSound$set volume : " + volume);
         manager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
         soundId = soundPool.load(context, R.raw.ding_dong, 1);
     }
 
     public void playBgm(int volume) {
+        Log.i(CLASS_NAME, "playBgm$set volume : " + volume);
         manager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
         player.start();
     }
@@ -80,5 +82,6 @@ public class SoundPlayer {
             player.release();
             player = null;
         }
+        Log.i(CLASS_NAME, "release$SoundPlayer released completely!");
     }
 }

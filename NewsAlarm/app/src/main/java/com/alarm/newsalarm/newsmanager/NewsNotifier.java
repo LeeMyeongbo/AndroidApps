@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.outputmanager.SoundPlayer;
+import com.alarm.newsalarm.outputmanager.Vibrator;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
@@ -36,8 +37,10 @@ public class NewsNotifier {
 
     private static final String CLASS_NAME = "NewsNotifier";
     private static final NewsNotifier INSTANCE = new NewsNotifier();
+    private final int MSG_ADD_NEWS = 0x01;
 
     private SoundPlayer soundPlayer;
+    private Vibrator vibrator;
     private AlarmData data;
     private TextToSpeech tts;
     private RequestQueue queue;
@@ -68,6 +71,7 @@ public class NewsNotifier {
     public void notifyNews(Context context, AlarmData data) {
         this.data = data;
         soundPlayer = new SoundPlayer(context);
+        vibrator = new Vibrator(context);
         bundle = new Bundle();
         queue = Volley.newRequestQueue(context.getApplicationContext());
         getNews(context);
@@ -81,6 +85,7 @@ public class NewsNotifier {
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
             soundPlayer.playBgm(data.getVolumeSize());
+            vibrator.vibrateRepeatedly(data.getVibIntensity());
             speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
 
             Set<JSONObject> jsonObjects = convertToJSONSet(response);
@@ -90,6 +95,7 @@ public class NewsNotifier {
                     bundle.putStringArray("content", getArticleBody(j));
                     Message msg = handler.obtainMessage();
                     msg.setData(bundle);
+                    msg.what = MSG_ADD_NEWS;
                     handler.sendMessage(msg);
                 }
             }).start();
@@ -229,7 +235,9 @@ public class NewsNotifier {
     public void destroyTTS() {
         Log.i(CLASS_NAME, "destroyTTS$alarm off");
         if (tts != null) {
+            handler.removeMessages(MSG_ADD_NEWS);
             soundPlayer.release();
+            vibrator.release();
             tts.stop();
             tts.shutdown();
             tts = null;
