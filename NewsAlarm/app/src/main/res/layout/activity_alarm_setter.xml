@@ -197,8 +197,8 @@
                         android:layout_toEndOf="@id/muteImg"
                         android:tag="볼륨 크기"
                         android:valueFrom="0"
-                        android:valueTo="100"
-                        android:stepSize="10"
+                        android:valueTo="15"
+                        android:stepSize="1"
                         app:trackHeight="12dp" />
                 </RelativeLayout>
 

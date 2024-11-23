@@ -188,7 +188,7 @@ public class AlarmSetterActivity extends BaseActivity {
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
             displayVolumeImgByVolume(value);
-            playSoundByValue(value);
+            playSoundByValue((int) value);
         });
         slVib.addOnChangeListener((slider, value, fromUser) -> {
             displayVibImgByVibIntensity(value);
@@ -204,8 +204,8 @@ public class AlarmSetterActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void playSoundByValue(float value) {
-        soundPlayer.playShortSound(R.raw.ding_dong, value);
+    private void playSoundByValue(int value) {
+        soundPlayer.playShortSound(value);
         Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
     }
 
@@ -288,7 +288,7 @@ public class AlarmSetterActivity extends BaseActivity {
             getNewId(),
             etAlarmName.getText().toString(),
             etNewsTopic.getText().toString(),
-            slVolume.getValue(),
+            (int) slVolume.getValue(),
             (int) slVib.getValue()
         );
         setAlarmTime();
@@ -308,7 +308,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private boolean updateAlarmData() {
         alarmData.setAlarmName(etAlarmName.getText().toString());
         alarmData.setAlarmTopic(etNewsTopic.getText().toString());
-        alarmData.setVolumeSize(slVolume.getValue());
+        alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue());
         setAlarmTime();
         if (!AlarmDatabaseUtil.update(this, alarmData)) {

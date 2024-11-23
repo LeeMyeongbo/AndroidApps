@@ -21,7 +21,7 @@ public class AlarmData implements Parcelable {
     private String alarmTopic = "";
 
     @ColumnInfo(name = "VolumeSize")
-    private float volumeSize;
+    private int volumeSize;
 
     @ColumnInfo(name = "VibIntensity")
     private int vibIntensity;
@@ -52,7 +52,7 @@ public class AlarmData implements Parcelable {
         id = in.readInt();
         alarmName = in.readString();
         alarmTopic = in.readString();
-        volumeSize = in.readFloat();
+        volumeSize = in.readInt();
         vibIntensity = in.readInt();
         specificDateInMillis = in.readLong();
         periodicWeekBit = in.readInt();
@@ -60,7 +60,7 @@ public class AlarmData implements Parcelable {
     }
 
     public AlarmData(
-        int id, String alarmName, String alarmTopic, float volumeSize, int vibIntensity
+        int id, String alarmName, String alarmTopic, int volumeSize, int vibIntensity
     ) {
         setId(id);
         setAlarmName(alarmName);
@@ -93,11 +93,11 @@ public class AlarmData implements Parcelable {
         return alarmTopic;
     }
 
-    public void setVolumeSize(float volumeSize) {
+    public void setVolumeSize(int volumeSize) {
         this.volumeSize = volumeSize;
     }
 
-    public float getVolumeSize() {
+    public int getVolumeSize() {
         return volumeSize;
     }
 
@@ -143,7 +143,7 @@ public class AlarmData implements Parcelable {
         dest.writeInt(id);
         dest.writeString(alarmName);
         dest.writeString(alarmTopic);
-        dest.writeFloat(volumeSize);
+        dest.writeInt(volumeSize);
         dest.writeInt(vibIntensity);
         dest.writeLong(specificDateInMillis);
         dest.writeInt(periodicWeekBit);

@@ -31,8 +31,8 @@ public class AlarmDatabaseUtil {
     }
 
     private static boolean isVolumeSizeValid(AlarmData data) {
-        float vol = data.getVolumeSize();
-        if (Float.compare(vol, 0f) >= 0 && Float.compare(vol, 100f) <= 0) {
+        int vol = data.getVolumeSize();
+        if (vol >= 0 && vol < 16) {
             return true;
         }
         Log.e(CLASS_NAME, "isVolumeSizeValid$volume size must be set by 0.0 to 100.0!");

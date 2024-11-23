@@ -2,8 +2,6 @@ package com.alarm.newsalarm.newsmanager;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,8 +11,8 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.alarm.newsalarm.R;
 import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.outputmanager.SoundPlayer;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
@@ -39,12 +37,28 @@ public class NewsNotifier {
     private static final String CLASS_NAME = "NewsNotifier";
     private static final NewsNotifier INSTANCE = new NewsNotifier();
 
+    private SoundPlayer soundPlayer;
     private AlarmData data;
     private TextToSpeech tts;
     private RequestQueue queue;
-    private MediaPlayer mp;
     private Bundle bundle;
-    private Handler handler;
+    private final Handler handler = new Handler(Looper.getMainLooper()) {
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            news_num++;
+            String title = msg.getData().getString("title");
+            String[] contents = msg.getData().getStringArray("content");
+
+            speakTTS(news_num + "번 뉴스입니다.", 1);
+            speakTTS(title, 1);
+            speakTTS("기사 내용입니다.", 1);
+            assert contents != null;
+            for (String content : contents) {
+                speakTTS(content, 0);
+            }
+        }
+    };
     private int news_num;
 
     public static NewsNotifier getInstance() {
@@ -53,25 +67,9 @@ public class NewsNotifier {
 
     public void notifyNews(Context context, AlarmData data) {
         this.data = data;
+        soundPlayer = new SoundPlayer(context);
         bundle = new Bundle();
         queue = Volley.newRequestQueue(context.getApplicationContext());
-        handler = new Handler(Looper.getMainLooper()) {
-
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                news_num++;
-                String title = msg.getData().getString("title");
-                String[] contents = msg.getData().getStringArray("content");
-
-                speakTTS(news_num + "번 뉴스입니다.", 1);
-                speakTTS(title, 1);
-                speakTTS("기사 내용입니다.", 1);
-                assert contents != null;
-                for (String content : contents) {
-                    speakTTS(content, 0);
-                }
-            }
-        };
         getNews(context);
     }
 
@@ -82,7 +80,7 @@ public class NewsNotifier {
         String url = "https://openapi.naver.com/v1/search/news?query=" + keyword + "&display=20";
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
-            playBackgroundMusic(context);
+            soundPlayer.playBgm(data.getVolumeSize());
             speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
 
             Set<JSONObject> jsonObjects = convertToJSONSet(response);
@@ -107,23 +105,6 @@ public class NewsNotifier {
         };
         stringRequest.setShouldCache(false);
         queue.add(stringRequest);
-    }
-
-    public void playBackgroundMusic(Context context) {
-        mp = new MediaPlayer();
-        mp.setAudioStreamType(AudioManager.STREAM_ALARM);
-        try {
-            mp.setDataSource(context, Uri.parse(
-                "android.resource://" + context.getPackageName() + "/" + R.raw.morningkiss
-            ));
-            mp.prepare();
-        } catch (IOException e) {
-            Log.e(CLASS_NAME, "playBackgroundMusic$" + e.getMessage());
-        }
-        mp.setVolume(0.1f, 0.1f);
-        mp.setLooping(true);
-        mp.start();
-        Log.i(CLASS_NAME, "playBackgroundMusic$MediaPlayer started");
     }
 
     public Set<JSONObject> convertToJSONSet(String response) {
@@ -248,13 +229,10 @@ public class NewsNotifier {
     public void destroyTTS() {
         Log.i(CLASS_NAME, "destroyTTS$alarm off");
         if (tts != null) {
+            soundPlayer.release();
             tts.stop();
             tts.shutdown();
             tts = null;
-
-            mp.stop();
-            mp.release();
-            news_num = 0;
         }
     }
 }
