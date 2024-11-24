@@ -11,6 +11,8 @@ import com.google.android.material.button.MaterialButton;
 
 public class AlarmNotifierActivity extends BaseActivity {
 
+    private NewsNotifier notifier;
+
     public AlarmNotifierActivity() {
         super("AlarmNotifierActivity");
     }
@@ -21,9 +23,9 @@ public class AlarmNotifierActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_notifier);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        NewsNotifier.getInstance().notifyNews(
-            this, getIntent().getParcelableExtra("alarmData", AlarmData.class)
-        );
+        AlarmData data = getIntent().getParcelableExtra("alarmData", AlarmData.class);
+        notifier = new NewsNotifier(this, data);
+        notifier.start();
         init();
     }
 
@@ -39,7 +41,7 @@ public class AlarmNotifierActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        NewsNotifier.getInstance().destroyTTS();
+        notifier.finish();
         WakeLockUtil.releaseWakeLock();
         super.onDestroy();
     }

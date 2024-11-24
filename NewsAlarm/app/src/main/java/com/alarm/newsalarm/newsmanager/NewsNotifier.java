@@ -1,246 +1,101 @@
 package com.alarm.newsalarm.newsmanager;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.outputmanager.SoundPlayer;
+import com.alarm.newsalarm.outputmanager.TtsManager;
 import com.alarm.newsalarm.outputmanager.Vibrator;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class NewsNotifier {
 
     private static final String CLASS_NAME = "NewsNotifier";
-    private static final NewsNotifier INSTANCE = new NewsNotifier();
-    private final int MSG_ADD_NEWS = 0x01;
 
-    private SoundPlayer soundPlayer;
-    private Vibrator vibrator;
-    private AlarmData data;
-    private TextToSpeech tts;
-    private RequestQueue queue;
-    private Bundle bundle;
+    static final int MSG_LOAD_NEWS_START = 0x00;
+    static final int MSG_LOAD_NEWS_SUCCESS = 0x01;
+    static final int MSG_LOAD_NEWS_FAILURE = 0x02;
+    static final int MSG_CRAWL_NEWS_SUCCESS = 0x03;
+    static final int MSG_CRAWL_NEWS_FAILURE = 0x04;
+    static final int MSG_NEWS_ALARM_END = 0x05;
+
+    private final NewsLoader loader;
+    private final NewsArticleCrawler crawler;
+    private final SoundPlayer soundPlayer;
+    private final Vibrator vibrator;
+    private final TtsManager ttsManager;
+    private final AlarmData data;
     private final Handler handler = new Handler(Looper.getMainLooper()) {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            news_num++;
-            String title = msg.getData().getString("title");
-            String[] contents = msg.getData().getStringArray("content");
-
-            speakTTS(news_num + "번 뉴스입니다.", 1);
-            speakTTS(title, 1);
-            speakTTS("기사 내용입니다.", 1);
-            assert contents != null;
-            for (String content : contents) {
-                speakTTS(content, 0);
+            switch (msg.what) {
+                case MSG_LOAD_NEWS_START -> {
+                    Log.i(CLASS_NAME, "handleMessage$loading news data started!");
+                    loader.load(data.getAlarmTopic());
+                }
+                case MSG_LOAD_NEWS_SUCCESS -> {
+                    Log.i(CLASS_NAME, "handleMessage$loading news data completed!");
+                    ArrayList<String> loadedData = msg.getData().getStringArrayList("load_return");
+                    crawler.crawl(Objects.requireNonNull(loadedData));
+                }
+                case MSG_LOAD_NEWS_FAILURE -> {
+                    Log.i(CLASS_NAME, "handleMessage$loading news data failed!");
+                    ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 주세요.", 1);
+                }
+                case MSG_CRAWL_NEWS_SUCCESS -> {
+                    Log.i(CLASS_NAME, "handleMessage$crawl news article completed!");
+                    Bundle bundle = msg.getData();
+                    ttsManager.speakArticles(
+                        Objects.requireNonNull(bundle.getStringArrayList("crawl_return_title")),
+                        Objects.requireNonNull(bundle.getStringArrayList("crawl_return_body"))
+                    );
+                }
+                case MSG_CRAWL_NEWS_FAILURE -> {
+                    Log.i(CLASS_NAME, "handleMessage$crawl news article failed!");
+                    ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스에 연결하지 못했습니다.", 1);
+                }
+                case MSG_NEWS_ALARM_END -> {
+                    handler.removeMessages(MSG_LOAD_NEWS_START);
+                    handler.removeMessages(MSG_LOAD_NEWS_SUCCESS);
+                    handler.removeMessages(MSG_LOAD_NEWS_FAILURE);
+                    handler.removeMessages(MSG_CRAWL_NEWS_SUCCESS);
+                    handler.removeMessages(MSG_CRAWL_NEWS_FAILURE);
+                }
             }
         }
     };
-    private int news_num;
 
-    public static NewsNotifier getInstance() {
-        return INSTANCE;
-    }
-
-    public void notifyNews(Context context, AlarmData data) {
+    public NewsNotifier(Context context, AlarmData data) {
         this.data = data;
+        loader = new NewsLoader(context, handler);
+        crawler = new NewsArticleCrawler(handler);
         soundPlayer = new SoundPlayer(context);
         vibrator = new Vibrator(context);
-        bundle = new Bundle();
-        queue = Volley.newRequestQueue(context.getApplicationContext());
-        getNews(context);
+        ttsManager = new TtsManager(context, data);
     }
 
-    public void getNews(Context context) {
-        createTTS(context);
-
-        String keyword = "코로나";
-        String url = "https://openapi.naver.com/v1/search/news?query=" + keyword + "&display=20";
-
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url, response -> {
-            soundPlayer.playBgm(data.getVolumeSize());
-            vibrator.vibrateRepeatedly(data.getVibIntensity());
-            speakTTS("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
-
-            Set<JSONObject> jsonObjects = convertToJSONSet(response);
-            new Thread(() -> {
-                for (JSONObject j : jsonObjects) {
-                    bundle.putString("title", getArticleTitle(j));
-                    bundle.putStringArray("content", getArticleBody(j));
-                    Message msg = handler.obtainMessage();
-                    msg.setData(bundle);
-                    msg.what = MSG_ADD_NEWS;
-                    handler.sendMessage(msg);
-                }
-            }).start();
-        }, error -> speakTTS("서버 통신 오류가 발생했습니다.", 0)) {
-            @Override
-            public Map<String, String> getHeaders() {
-                Map<String, String> params = new HashMap<>();
-                params.put("X-Naver-Client-Id", "77ZHNWgvaXOrqCOeo3s5");
-                params.put("X-Naver-Client-Secret", "x_SI3JImaI");
-
-                return params;
-            }
-        };
-        stringRequest.setShouldCache(false);
-        queue.add(stringRequest);
+    public void start() {
+        soundPlayer.playBgm(data.getVolumeSize());
+        vibrator.vibrateRepeatedly(data.getVibIntensity());
+        handler.sendEmptyMessage(MSG_LOAD_NEWS_START);
     }
 
-    public Set<JSONObject> convertToJSONSet(String response) {
-        try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray arrayArticles = jsonObject.getJSONArray("items");
-            int length = arrayArticles.length();
-            Set<JSONObject> jsonObjects = new HashSet<>();
-
-            for (int i = 0; i < length; i++) {
-                JSONObject articleObject = arrayArticles.getJSONObject(i);
-                if (articleObject.getString("link").contains("news.naver.com")) {
-                    jsonObjects.add(articleObject);
-                }
-                if (jsonObjects.size() == 5) {
-                    Log.i(CLASS_NAME, "convertToJSONSet$JSON objects with news contents ready");
-                    break;
-                }
-            }
-
-            return jsonObjects;
-        } catch (JSONException e) {
-            Log.e(CLASS_NAME, "convertToJSONSet$" + e.getMessage());
-        }
-
-        return new HashSet<>();
-    }
-
-    public String getArticleTitle(JSONObject j) {
-        try {
-            return j.getString("title").replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
-        } catch (JSONException | NullPointerException e) {
-            Log.e(CLASS_NAME, "getArticleTitle$" + e.getMessage());
-        }
-
-        return "";
-    }
-
-    public String[] getArticleBody(JSONObject j) {
-        try {
-            String content = modifyContent(crawlPassage(j.getString("link")));
-            int line = 1000;
-            int send = content.length() / line;
-            String[] contents = new String[send + 1];
-            for (int i = 0; i <= send; i++) {
-                int l = Integer.min(line * i + line, content.length());
-                contents[i] = content.substring(i * line, l);
-            }
-
-            return contents;
-        } catch (JSONException | NullPointerException e) {
-            Log.e(CLASS_NAME, "getArticleBody$" + e.getMessage());
-        }
-
-        return new String[0];
-    }
-
-    public Element crawlPassage(String link) {
-        try {
-            Document doc = Jsoup.connect(link).get();
-            Element e = doc.selectFirst("#dic_area");
-            if (e == null)
-                e = doc.selectFirst("#articeBody");
-            if (e == null)
-                e = doc.selectFirst("#newsEndContents");
-
-            int num = e.childrenSize();
-            for (int i = num - 1; i >= 0; i--) {
-                String tag = e.child(i).tagName();
-                if ((!tag.equals("font") && !tag.equals("span") && !tag.equals("b"))
-                        || e.child(i).className().equals("end_photo_org")) {
-                    e.child(i).remove();
-                }
-            }
-
-            return e;
-        } catch (IOException | NullPointerException e) {
-            Log.e(CLASS_NAME, "crawlPassage$" + e.getMessage());
-        }
-
-        return null;
-    }
-
-    public String modifyContent(Element e) {
-        if (e == null) {
-            return "";
-        }
-
-        String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
-        int idx = content.indexOf('#');
-        if (idx == -1)
-            idx = content.indexOf('※');
-        if (idx == -1)
-            idx = content.indexOf('▶');
-        if (idx == -1)
-            idx = content.indexOf('ⓒ');
-        if (idx != -1)
-            content = content.substring(0, idx);
-
-        return content;
-    }
-
-    public void createTTS(Context context) {
-        tts = new TextToSpeech(context, status -> {
-            if (status != TextToSpeech.ERROR) {
-                tts.setLanguage(Locale.KOREAN);
-            }
-        });
-        tts.setPitch(1.0f);
-        tts.setSpeechRate(0.85f);
-    }
-
-    public void speakTTS(String txt, int mode) {
-        HashMap<String, String> myHashAlarm = new HashMap<>();
-        myHashAlarm.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(AudioManager.STREAM_ALARM));
-        if (mode == 1) {
-            tts.playSilentUtterance(800L, TextToSpeech.QUEUE_ADD, "silence");
-        }
-        tts.speak(txt, TextToSpeech.QUEUE_ADD, myHashAlarm);
-    }
-
-    public void destroyTTS() {
-        Log.i(CLASS_NAME, "destroyTTS$alarm off");
-        if (tts != null) {
-            handler.removeMessages(MSG_ADD_NEWS);
-            soundPlayer.release();
-            vibrator.release();
-            tts.stop();
-            tts.shutdown();
-            tts = null;
-        }
+    public void finish() {
+        handler.sendEmptyMessage(MSG_NEWS_ALARM_END);
+        loader.release();
+        crawler.release();
+        soundPlayer.release();
+        vibrator.release();
+        ttsManager.release();
     }
 }
