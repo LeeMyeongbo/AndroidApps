@@ -50,7 +50,7 @@ public class NewsNotifier {
                 }
                 case MSG_LOAD_NEWS_FAILURE -> {
                     Log.i(CLASS_NAME, "handleMessage$loading news data failed!");
-                    ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 주세요.", 1);
+                    ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 보시거나, 다른 키워드로 부탁드립니다.", 1);
                 }
                 case MSG_CRAWL_NEWS_SUCCESS -> {
                     Log.i(CLASS_NAME, "handleMessage$crawl news article completed!");
@@ -62,7 +62,7 @@ public class NewsNotifier {
                 }
                 case MSG_CRAWL_NEWS_FAILURE -> {
                     Log.i(CLASS_NAME, "handleMessage$crawl news article failed!");
-                    ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스에 연결하지 못했습니다.", 1);
+                    ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스에 연결하지 못했습니다. 연결이 원활한 환경에서 시도바랍니다.", 1);
                 }
                 case MSG_NEWS_ALARM_END -> {
                     handler.removeMessages(MSG_LOAD_NEWS_START);

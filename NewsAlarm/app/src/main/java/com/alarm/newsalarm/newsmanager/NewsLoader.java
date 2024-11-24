@@ -76,17 +76,17 @@ public class NewsLoader {
     @NonNull
     private Set<String> selectOnlyNaverNews(JSONArray jsonArticleArray) throws JSONException {
         Set<String> jsonArticleSet = new HashSet<>();
-
         for (int i = 0; i < jsonArticleArray.length(); i++) {
             JSONObject jsonArticle = jsonArticleArray.getJSONObject(i);
             if (jsonArticle.getString("link").contains("news.naver.com")) {
                 jsonArticleSet.add(jsonArticle.toString());
             }
             if (jsonArticleSet.size() == 5) {
-                Log.i(CLASS_NAME, "selectOnlyNaverNews$5 naver news contents ready");
                 break;
             }
         }
+        Log.i(CLASS_NAME, "selectOnlyNaverNews$num of news selected : " + jsonArticleSet.size());
+
         return jsonArticleSet;
     }
 

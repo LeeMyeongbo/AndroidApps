@@ -21,7 +21,6 @@ public class Vibrator {
 
         @Override
         public void handleMessage(@NonNull Message msg) {
-            Log.i(CLASS_NAME, "vibrateRepeatedly$amplitude : " + msg.arg1);
             VibrationEffect effect = VibrationEffect.createOneShot(1000, msg.arg1);
             vibrator.vibrate(CombinedVibration.createParallel(effect));
             sendMessageAgain(msg.arg1);
@@ -58,6 +57,7 @@ public class Vibrator {
         msg.what = MSG_VIBRATE;
         msg.arg1 = amplitude;
         handler.sendMessageDelayed(msg, 1000);
+        Log.i(CLASS_NAME, "vibrateRepeatedly$amplitude : " + amplitude);
     }
 
     public void release() {

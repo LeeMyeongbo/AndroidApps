@@ -76,8 +76,8 @@ public class AlarmSetterActivity extends BaseActivity {
         vibrator = new Vibrator(this);
         sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
-        displayVolumeImgByVolume(slVolume.getValue());
-        displayVibImgByVibIntensity(slVib.getValue());
+        displayVolumeImgByVolume((int) slVolume.getValue());
+        displayVibImgByVibIntensity((int) slVib.getValue());
 
         setter = new AlarmSetter(this);
     }
@@ -187,11 +187,11 @@ public class AlarmSetterActivity extends BaseActivity {
     private void setEventListener() {
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
-            displayVolumeImgByVolume(value);
+            displayVolumeImgByVolume((int) value);
             playSoundByValue((int) value);
         });
         slVib.addOnChangeListener((slider, value, fromUser) -> {
-            displayVibImgByVibIntensity(value);
+            displayVibImgByVibIntensity((int) value);
             vibrateByValue(value);
         });
         btnSave.setOnClickListener(v -> saveSetting());
@@ -214,14 +214,14 @@ public class AlarmSetterActivity extends BaseActivity {
         Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + (int) value);
     }
 
-    private void displayVolumeImgByVolume(float volume) {
-        if (Float.compare(0f, volume) == 0) {
+    private void displayVolumeImgByVolume(int volume) {
+        if (volume == 0) {
             setInvisibleAllVolumeImg();
             ivVolumeMute.setVisibility(ImageView.VISIBLE);
-        } else if (Float.compare(volume, 0f) > 0 && Float.compare(volume, 33f) <= 0) {
+        } else if (volume <= 5) {
             setInvisibleAllVolumeImg();
             ivVolumeLow.setVisibility(ImageView.VISIBLE);
-        } else if (Float.compare(volume, 33f) > 0 && Float.compare(volume, 66f) <= 0) {
+        } else if (volume <= 10) {
             setInvisibleAllVolumeImg();
             ivVolumeMedium.setVisibility(ImageView.VISIBLE);
         } else {
@@ -237,14 +237,14 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVolumeHigh.setVisibility(ImageView.INVISIBLE);
     }
 
-    private void displayVibImgByVibIntensity(float vib) {
-        if (Float.compare(vib, 0f) == 0) {
+    private void displayVibImgByVibIntensity(int vib) {
+        if (vib == 0) {
             setInvisibleAllVibImg();
             ivVibNone.setVisibility(ImageView.VISIBLE);
-        } else if (Float.compare(vib, 1f) == 0) {
+        } else if (vib <= 1) {
             setInvisibleAllVibImg();
             ivVibLow.setVisibility(ImageView.VISIBLE);
-        } else if (Float.compare(vib, 1f) > 0 && Float.compare(vib, 4f) < 0) {
+        } else if (vib <= 3) {
             setInvisibleAllVibImg();
             ivVibMedium.setVisibility(ImageView.VISIBLE);
         } else {

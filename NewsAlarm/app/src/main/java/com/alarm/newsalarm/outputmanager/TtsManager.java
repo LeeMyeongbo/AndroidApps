@@ -3,6 +3,7 @@ package com.alarm.newsalarm.outputmanager;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
+import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
@@ -15,6 +16,7 @@ public class TtsManager {
 
     private static final String CLASS_NAME = "TtsManager";
 
+    private final Bundle bundle = new Bundle();
     private final AlarmData data;
     private AudioAttributes attr;
     private TextToSpeech tts;
@@ -23,6 +25,7 @@ public class TtsManager {
         initAudioAttributes();
         initTts(context);
         this.data = data;
+        bundle.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1f);
     }
 
     private void initAudioAttributes() {
@@ -70,7 +73,7 @@ public class TtsManager {
         if (mode == 1) {
             tts.playSilentUtterance(800L, TextToSpeech.QUEUE_ADD, "silence");
         }
-        tts.speak(txt, TextToSpeech.QUEUE_ADD, null, "speak");
+        tts.speak(txt, TextToSpeech.QUEUE_ADD, bundle, "speak");
     }
 
     public void release() {

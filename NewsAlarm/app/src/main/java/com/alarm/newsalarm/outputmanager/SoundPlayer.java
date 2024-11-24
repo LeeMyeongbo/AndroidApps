@@ -9,8 +9,6 @@ import android.util.Log;
 
 import com.alarm.newsalarm.R;
 
-import java.io.IOException;
-
 public class SoundPlayer {
 
     private static final String CLASS_NAME = "SoundPlayer";
@@ -55,7 +53,7 @@ public class SoundPlayer {
 
     private void initMediaPlayer() {
         player = MediaPlayer.create(context, R.raw.morningkiss, attr, 1);
-        player.setVolume(1f, 1f);
+        player.setVolume(0.15f, 0.15f);
         player.setLooping(true);
     }
 
