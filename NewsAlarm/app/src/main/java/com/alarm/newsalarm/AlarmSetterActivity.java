@@ -10,6 +10,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -27,18 +28,14 @@ import java.util.Locale;
 
 public class AlarmSetterActivity extends BaseActivity {
 
+    private static final String[] WEEK = {"일", "월", "화", "수", "목", "금", "토"};
     private static final int[] WEEK_IDS = {
         R.id.cbSunday, R.id.cbMonday, R.id.cbTuesday, R.id.cbWednesday,
         R.id.cbThursday, R.id.cbFriday, R.id.cbSaturday
     };
-    private static final Calendar calendar = Calendar.getInstance();
-    private static final long possibleMaxDate;
-    static {
-        calendar.add(Calendar.MONTH, 1);
-        possibleMaxDate = calendar.getTimeInMillis();
-        calendar.add(Calendar.MONTH, -1);
-    }
 
+    private final Calendar calendar = Calendar.getInstance();
+    private final Locale locale = new Locale("ko", "KR");
     private final CheckBox[] cbWeekdays = new CheckBox[7];
     private AlarmData alarmData;
     private AlarmSetter setter;
@@ -47,20 +44,19 @@ public class AlarmSetterActivity extends BaseActivity {
     private Vibrator vibrator;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
+    private TextView tvInfo;
     private ImageButton btnDateSelector;
     private EditText etAlarmName, etNewsTopic;
     private ImageView ivVolumeMute, ivVolumeLow, ivVolumeMedium, ivVolumeHigh;
     private ImageView ivVibNone, ivVibLow, ivVibMedium, ivVibHigh;
     private Slider slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
-    private int year, month, day;
+    private int curWeekBit;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
 
-        this.year = calendar.get(Calendar.YEAR);
-        this.month = calendar.get(Calendar.MONTH);
-        this.day = calendar.get(Calendar.DAY_OF_MONTH);
+        calendar.setTimeInMillis(System.currentTimeMillis());
     }
 
     @Override
@@ -69,8 +65,8 @@ public class AlarmSetterActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_setter);
 
         initUI();
-        initDatePickerDialog();
         setViewsFromAlarmData();
+        setTvInfo();
         setEventListener();
         soundPlayer = new SoundPlayer(this);
         vibrator = new Vibrator(this);
@@ -83,11 +79,13 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void initUI() {
+        dialog = new DatePickerDialog(this);
         timePicker = findViewById(R.id.timePicker);
         btnDateSelector = findViewById(R.id.datePicker);
         for (int i = 0; i < 7; i++) {
             cbWeekdays[i] = findViewById(WEEK_IDS[i]);
         }
+        tvInfo = findViewById(R.id.tvInfo);
         etAlarmName = findViewById(R.id.etAlarmName);
         etNewsTopic = findViewById(R.id.etNewsTopic);
         slVolume = findViewById(R.id.slideVolume);
@@ -109,63 +107,22 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibHigh = findViewById(R.id.vibHighImg);
     }
 
-    private void initDatePickerDialog() {
-        dialog = new DatePickerDialog(this);
-        dialog.setOnDateSetListener((v, year, month, day) -> saveSelectedDate(year, month, day));
-        dialog.setOnCancelListener(d -> resetToSelectedDate());
-    }
-
-    private void saveSelectedDate(int year, int month, int day) {
-        revertWeekdayCheckBox();
-        this.year = year;
-        this.month = month;
-        this.day = day;
-        Log.d(CLASS_NAME, "saveSelectedDate$date selecting complete!");
-        Toast.makeText(
-            this,
-            this.year + "-" + this.month + "-" + this.day + " 날짜로 알람 설정합니다.",
-            Toast.LENGTH_SHORT
-        ).show();
-    }
-
-    private void revertWeekdayCheckBox() {
-        for (CheckBox weekday : cbWeekdays) {
-            weekday.setChecked(false);
-        }
-    }
-
-    private void resetToSelectedDate() {
-        dialog.updateDate(year, month, day);
-        Log.d(CLASS_NAME, "resetToSelectedDate$date selecting cancelled");
-    }
-
     private void setViewsFromAlarmData() {
         alarmData = getIntent().getParcelableExtra("alarmData", AlarmData.class);
         if (alarmData == null) {
             return;
         }
-        setWeekCheckbox(alarmData.getPeriodicWeekBit());
-        setDatePickerDialog();
+        curWeekBit = alarmData.getPeriodicWeekBit();
+        calendar.setTimeInMillis(alarmData.getSpecificDateInMillis());
+        setWeekCheckbox();
         setTimePicker();
         setEditTexts();
         setSliders();
-        calendar.setTimeInMillis(System.currentTimeMillis());
     }
 
-    private void setWeekCheckbox(int weekBit) {
+    private void setWeekCheckbox() {
         for (int i = 0; i < 7; i++) {
-            cbWeekdays[i].setChecked((weekBit & (1 << i)) == (1 << i));
-        }
-    }
-
-    private void setDatePickerDialog() {
-        calendar.setTimeInMillis(alarmData.getSpecificDateInMillis());
-        if (alarmData.getPeriodicWeekBit() == 0) {
-            dialog.updateDate(
-                calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DAY_OF_MONTH)
-            );
+            cbWeekdays[i].setChecked((curWeekBit & (1 << i)) == (1 << i));
         }
     }
 
@@ -181,10 +138,39 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void setSliders() {
         slVolume.setValue(alarmData.getVolumeSize());
-        slVib.setValue(alarmData.getVibIntensity());
+        slVib.setValue(alarmData.getVibIntensity() / 51f);
+    }
+
+    private void setTvInfo() {
+        if (curWeekBit == 0) {
+            setTvInfoSpecific();
+            return;
+        }
+        setTvInfoToPeriodic();
+    }
+
+    private void setTvInfoSpecific() {
+        StringBuilder builder = new StringBuilder();
+        long dateMillis = calendar.getTimeInMillis();
+        SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 HH:mm", locale);
+        String timeFormat = dateMillis <= System.currentTimeMillis()
+            ? format.format(dateMillis + 1000L * 60 * 60 * 24)
+            : format.format(dateMillis);
+        tvInfo.setText(builder.append(timeFormat).append("에 알람이 울립니다.").toString());
+    }
+
+    private void setTvInfoToPeriodic() {
+        StringBuilder builder = new StringBuilder("매주");
+        for (int i = 0; i < 7; i++) {
+            if ((curWeekBit & (1 << i)) == (1 << i)) {
+                builder.append(" ").append(WEEK[i]);
+            }
+        }
+        tvInfo.setText(builder.append("마다 알람이 울립니다.").toString());
     }
 
     private void setEventListener() {
+        dialog.setOnDateSetListener((v, year, month, day) -> saveSelectedDate(year, month, day));
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
             displayVolumeImgByVolume((int) value);
@@ -196,11 +182,39 @@ public class AlarmSetterActivity extends BaseActivity {
         });
         btnSave.setOnClickListener(v -> saveSetting());
         btnCancel.setOnClickListener(v -> finish());
+        timePicker.setOnTimeChangedListener((view, hourOfDay, minute) -> {
+            calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            calendar.set(Calendar.MINUTE, minute);
+            setTvInfo();
+        });
+        for (int i = 0; i < 7; i++) {
+            int finalI = i;
+            cbWeekdays[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
+                curWeekBit = isChecked ? curWeekBit + (1 << finalI) : curWeekBit - (1 << finalI);
+                setTvInfo();
+            });
+        }
+    }
+
+    private void saveSelectedDate(int year, int month, int day) {
+        revertWeekdayCheckBox();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, day);
+        setTvInfo();
+    }
+
+    private void revertWeekdayCheckBox() {
+        for (CheckBox weekday : cbWeekdays) {
+            weekday.setChecked(false);
+        }
+        curWeekBit = 0;
     }
 
     private void openDatePicker() {
-        dialog.getDatePicker().setMinDate(System.currentTimeMillis());
-        dialog.getDatePicker().setMaxDate(possibleMaxDate);
+        long curDate = System.currentTimeMillis();
+        dialog.getDatePicker().setMinDate(curDate);
+        dialog.getDatePicker().setMaxDate(curDate + 1000L * 60 * 60 * 24 * 28);
         dialog.show();
     }
 
@@ -319,63 +333,17 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void setAlarmTime() {
-        int weekBit = getWeekBit();
-        if (weekBit > 0) {
-            alarmData.setPeriodicWeekBit(weekBit);
-            showPeriodicAlarmToast();
-        }
+        alarmData.setPeriodicWeekBit(curWeekBit);
         alarmData.setSpecificDateInMillis(getDateInMillis());
     }
 
-    private int getWeekBit() {
-        int weekBit = 0;
-        for (int i = 0; i < 7; i++) {
-            if (cbWeekdays[i].isChecked()) {
-                weekBit = weekBit | (1 << i);
-            }
-        }
-        return weekBit;
-    }
-
-    private void showPeriodicAlarmToast() {
-        StringBuilder toastMessage = new StringBuilder("매주");
-        for (CheckBox cb : cbWeekdays) {
-            if (cb.isChecked()) {
-                toastMessage.append(" ").append(cb.getText());
-            }
-        }
-        toastMessage.append(" 마다 알람이 울립니다.");
-        Toast.makeText(this, toastMessage.toString(), Toast.LENGTH_LONG).show();
-    }
-
     private long getDateInMillis() {
-        setAlarmDateInCalendar();
-        long alarmDate = calendar.getTimeInMillis();
-
-        if (alarmData.getPeriodicWeekBit() == 0) {
-            showSpecificAlarmToast();
-        }
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        return alarmDate;
-    }
-
-    private void showSpecificAlarmToast() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", new Locale("ko", "KR"));
-        String timeFormat = format.format(calendar.getTime());
-        Toast.makeText(this, timeFormat + "에 알람이 울립니다.", Toast.LENGTH_LONG).show();
-    }
-
-    private void setAlarmDateInCalendar() {
-        calendar.set(Calendar.YEAR, year);
-        calendar.set(Calendar.MONTH, month);
-        calendar.set(Calendar.DAY_OF_MONTH, day);
-        calendar.set(Calendar.HOUR_OF_DAY, timePicker.getHour());
-        calendar.set(Calendar.MINUTE, timePicker.getMinute());
         calendar.set(Calendar.SECOND, 0);
-
-        if (System.currentTimeMillis() >= calendar.getTimeInMillis()) {
-            calendar.add(Calendar.DATE, 1);
+        if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
+
+        return calendar.getTimeInMillis();
     }
 
     private void sendResultToMainActivity(String extraName) {
