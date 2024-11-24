@@ -59,6 +59,7 @@ public class NewsNotifier {
                         Objects.requireNonNull(bundle.getStringArrayList("crawl_return_title")),
                         Objects.requireNonNull(bundle.getStringArrayList("crawl_return_body"))
                     );
+                    Log.i(CLASS_NAME, "handleMessage$speaking articles just started!");
                 }
                 case MSG_CRAWL_NEWS_FAILURE -> {
                     Log.i(CLASS_NAME, "handleMessage$crawl news article failed!");
