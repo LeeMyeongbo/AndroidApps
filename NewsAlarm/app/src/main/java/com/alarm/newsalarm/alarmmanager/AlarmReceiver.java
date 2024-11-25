@@ -33,7 +33,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void managePeriodicAlarm(Context context, AlarmData data) {
         if ((data.getPeriodicWeekBit() | (1 << getCurWeekDay(data))) > 0) {
-            Log.i(CLASS_NAME, "managePeriodicAlarm$periodic alarm Started");
+            Log.i(CLASS_NAME, "managePeriodicAlarm$periodic alarm started");
             startNotifierActivity(context, data);
         }
         registerNextDayAlarm(context, data);
@@ -50,7 +50,6 @@ public class AlarmReceiver extends BroadcastReceiver {
         data.setSpecificDateInMillis(calendar.getTimeInMillis());
         setter.registerAlarm(data);
         AlarmDatabaseUtil.update(context, data);
-        calendar.setTimeInMillis(System.currentTimeMillis());
     }
 
     private void manageSpecificAlarm(Context context, AlarmData data) {

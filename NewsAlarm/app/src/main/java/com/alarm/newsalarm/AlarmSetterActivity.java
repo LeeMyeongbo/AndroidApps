@@ -23,6 +23,7 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -70,12 +71,11 @@ public class AlarmSetterActivity extends BaseActivity {
         setEventListener();
         soundPlayer = new SoundPlayer(this);
         vibrator = new Vibrator(this);
+        setter = new AlarmSetter(this);
         sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
         displayVolumeImgByVolume((int) slVolume.getValue());
         displayVibImgByVibIntensity((int) slVib.getValue());
-
-        setter = new AlarmSetter(this);
     }
 
     private void initUI() {
@@ -185,12 +185,19 @@ public class AlarmSetterActivity extends BaseActivity {
         timePicker.setOnTimeChangedListener((view, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
+            calendar.set(Calendar.SECOND, 0);
             setTvInfo();
         });
         for (int i = 0; i < 7; i++) {
-            int finalI = i;
+            final int FI = i;
             cbWeekdays[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                curWeekBit = isChecked ? curWeekBit + (1 << finalI) : curWeekBit - (1 << finalI);
+                if (curWeekBit == 0) {
+                    LocalDate today = LocalDate.now();
+                    calendar.set(Calendar.YEAR, today.getYear());
+                    calendar.set(Calendar.MONTH, today.getMonthValue() - 1);
+                    calendar.set(Calendar.DAY_OF_MONTH, today.getDayOfMonth());
+                }
+                curWeekBit = isChecked ? curWeekBit + (1 << FI) : curWeekBit - (1 << FI);
                 setTvInfo();
             });
         }
