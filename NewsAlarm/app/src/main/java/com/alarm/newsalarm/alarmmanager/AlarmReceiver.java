@@ -58,10 +58,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void startNotifierActivity(Context context, AlarmData data) {
-        WakeLockUtil.acquireWakeLock(context);
-        Intent intent = new Intent(context, AlarmNotifierActivity.class);
-        intent.putExtra("alarmData", data);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        if (WakeLockUtil.acquireWakeLock(context)) {
+            Intent intent = new Intent(context, AlarmNotifierActivity.class);
+            intent.putExtra("alarmData", data);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
     }
 }

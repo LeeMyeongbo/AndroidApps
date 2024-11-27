@@ -1,6 +1,7 @@
 package com.alarm.newsalarm.alarmlist;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import java.util.Locale;
 
 public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements ItemActionListener {
 
+    private static final String CLASS_NAME = "AlarmlistAdapter";
     private static final String[] WEEK = {"일", "월", "화", "수", "목", "금", "토"};
 
     private final List<AlarmData> alarmList;
@@ -36,6 +38,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     public static class AlarmListViewHolder extends ViewHolder {
 
+        private static final String CLASS_NAME = "AlarmlistAdapter.AlarmListViewHolder";
         private static final int[] TV_UNSELECTED_WEEK_IDS = {
             R.id.tvSunUnselected, R.id.tvMonUnselected, R.id.tvTuesUnselected,
             R.id.tvWednesUnselected, R.id.tvThursUnselected,
@@ -143,8 +146,10 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         private void setAlarmBySwitch(View view, boolean isChecked) {
             AlarmSetter setter = new AlarmSetter(view.getContext());
             if (isChecked) {
+                Log.i(CLASS_NAME, "setAlarmBySwitch$alarm switch on.. alarm turned on");
                 setter.registerAlarm(curData);
             } else {
+                Log.i(CLASS_NAME, "setAlarmBySwitch$alarm switch off.. alarm turned off");
                 setter.cancelAlarm(curData);
             }
         }
@@ -225,6 +230,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
     @NonNull
     @Override
     public AlarmListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.i(CLASS_NAME, "onCreateViewHolder");
         context = parent.getContext();
         View view = LayoutInflater
             .from(context)
@@ -248,6 +254,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         if (from == to) {
             return;
         }
+        Log.i(CLASS_NAME, "onItemMoved$an alarm data moved from " + from + " to " + to);
         AlarmData fromItem = alarmList.remove(from);
         alarmList.add(to, fromItem);
         notifyItemMoved(from, to);
@@ -255,6 +262,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     @Override
     public void onItemSwiped(int position) {
+        Log.i(CLASS_NAME, "onItemSwiped$alarm data removed index : " + position);
         AlarmData data = alarmList.remove(position);
         AlarmDatabaseUtil.delete(context, data);
         new AlarmSetter(context).cancelAlarm(data);
@@ -262,11 +270,13 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
     }
 
     public void addItem(AlarmData data) {
+        Log.i(CLASS_NAME, "addItem$new alarm data added");
         ((LinkedList<AlarmData>) alarmList).push(data);
         notifyItemInserted(0);
     }
 
     public void updateItem(int position, AlarmData data) {
+        Log.i(CLASS_NAME, "updateItem$alarm data updated index : " + position);
         alarmList.set(position, data);
         notifyItemChanged(position);
     }

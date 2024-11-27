@@ -10,13 +10,14 @@ public class WakeLockUtil {
     private WakeLockUtil() {
     }
 
-    public static void acquireWakeLock(Context context) {
+    public synchronized static boolean acquireWakeLock(Context context) {
         if (wakeLock != null) {
-            return;
+            return false;
         }
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "newAlarm:tag");
-        wakeLock.acquire(10 * 60 * 1000L);
+        wakeLock.acquire(1000L * 60 * 30);
+        return true;
     }
 
     public static void releaseWakeLock() {
