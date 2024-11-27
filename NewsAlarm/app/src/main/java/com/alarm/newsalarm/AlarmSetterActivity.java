@@ -58,6 +58,8 @@ public class AlarmSetterActivity extends BaseActivity {
         super("AlarmSetterActivity");
 
         calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
@@ -180,27 +182,21 @@ public class AlarmSetterActivity extends BaseActivity {
             displayVibImgByVibIntensity((int) value);
             vibrateByValue(value);
         });
-        btnSave.setOnClickListener(v -> saveSetting());
-        btnCancel.setOnClickListener(v -> finish());
         timePicker.setOnTimeChangedListener((view, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
-            calendar.set(Calendar.SECOND, 0);
             setTvInfo();
         });
         for (int i = 0; i < 7; i++) {
             final int FI = i;
             cbWeekdays[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                if (curWeekBit == 0) {
-                    LocalDate today = LocalDate.now();
-                    calendar.set(Calendar.YEAR, today.getYear());
-                    calendar.set(Calendar.MONTH, today.getMonthValue() - 1);
-                    calendar.set(Calendar.DAY_OF_MONTH, today.getDayOfMonth());
-                }
                 curWeekBit = isChecked ? curWeekBit + (1 << FI) : curWeekBit - (1 << FI);
+                setDateAsTodayWhenDeselectAll();
                 setTvInfo();
             });
         }
+        btnSave.setOnClickListener(v -> saveSetting());
+        btnCancel.setOnClickListener(v -> finish());
     }
 
     private void saveSelectedDate(int year, int month, int day) {
@@ -281,6 +277,19 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibHigh.setVisibility(ImageView.INVISIBLE);
     }
 
+    private void setDateAsTodayWhenDeselectAll() {
+        if (curWeekBit == 0) {
+            setDateAsToday();
+        }
+    }
+
+    private void setDateAsToday() {
+        LocalDate today = LocalDate.now();
+        calendar.set(Calendar.YEAR, today.getYear());
+        calendar.set(Calendar.MONTH, today.getMonthValue() - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, today.getDayOfMonth());
+    }
+
     private void saveSetting() {
         if (alarmData == null) {
             if (addNewAlarmData()) {
@@ -345,7 +354,9 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private long getDateInMillis() {
-        calendar.set(Calendar.SECOND, 0);
+        if (curWeekBit > 0) {
+            setDateAsToday();
+        }
         if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
             calendar.add(Calendar.DAY_OF_MONTH, 1);
         }
