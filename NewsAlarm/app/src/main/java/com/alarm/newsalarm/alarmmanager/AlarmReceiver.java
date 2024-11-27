@@ -59,6 +59,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void startNotifierActivity(Context context, AlarmData data) {
         if (WakeLockUtil.acquireWakeLock(context)) {
+            Log.i(CLASS_NAME, "startNotifierActivity$start notifier");
             Intent intent = new Intent(context, AlarmNotifierActivity.class);
             intent.putExtra("alarmData", data);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
