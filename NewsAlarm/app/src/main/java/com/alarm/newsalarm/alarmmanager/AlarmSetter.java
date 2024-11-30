@@ -8,6 +8,7 @@ import android.content.Intent;
 import androidx.core.app.AlarmManagerCompat;
 
 import com.alarm.newsalarm.MainActivity;
+import com.alarm.newsalarm.AlarmReceiver;
 import com.alarm.newsalarm.database.AlarmData;
 
 public class AlarmSetter {
@@ -40,6 +41,7 @@ public class AlarmSetter {
     private PendingIntent getPendingNotifyIntent(AlarmData data) {
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("alarmData", data);
+        intent.setAction("com.alarm.newsalarm.ACTION_ALARM_GOES_OFF");
 
         return PendingIntent.getBroadcast(context, data.getId(), intent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
