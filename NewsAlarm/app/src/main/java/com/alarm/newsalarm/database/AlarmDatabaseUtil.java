@@ -67,7 +67,7 @@ public class AlarmDatabaseUtil {
     }
 
     public static boolean update(Context context, AlarmData data) {
-        if (isValid(data)) {
+        if (!data.isActive() || isValid(data)) {
             new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
             return true;
         }

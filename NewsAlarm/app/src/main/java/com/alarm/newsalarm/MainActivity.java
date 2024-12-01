@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.alarm.newsalarm.alarmlist.AlarmlistAdapter;
+import com.alarm.newsalarm.alarmlist.AlarmListAdapter;
 import com.alarm.newsalarm.alarmlist.ItemTouchHelperCallback;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity {
     private SharedPreferences sharedPref;
     private RecyclerView lvAlarmList;
     private AlarmManager alarmManager;
-    private AlarmlistAdapter adapter;
+    private AlarmListAdapter adapter;
     private ItemTouchHelper helper;
     private final LinkedList<AlarmData> alarmDataList = new LinkedList<>();
     private long backKeyReleasedTime = -1;
@@ -153,7 +153,7 @@ public class MainActivity extends BaseActivity {
 
     private void initAlarmListView() {
         Log.i(CLASS_NAME, "initAlarmListView");
-        adapter = new AlarmlistAdapter(
+        adapter = new AlarmListAdapter(
             alarmDataList,
             (view, position) -> executeAlarmSetterActivityWithData(position),
             viewHolder -> helper.startDrag(viewHolder)
@@ -180,14 +180,13 @@ public class MainActivity extends BaseActivity {
     }
 
     private void removeInvalidAlarms() {
-        for (int i = alarmDataList.size() - 1; i >= 0; i--) {
+        for (int i = 0; i < alarmDataList.size(); i++) {
             AlarmData curData = alarmDataList.get(i);
-            if (curData.getPeriodicWeekBit() == 0
-                    && curData.getSpecificDateInMillis() < System.currentTimeMillis()) {
+            if (curData.isActive() && curData.getPeriodicWeekBit() == 0
+                    && curData.getSpecificDateInMillis() <= System.currentTimeMillis()) {
                 Log.i(CLASS_NAME, "removeInvalidAlarms$delete expired alarm index : " + i);
-                alarmDataList.remove(i);
-                AlarmDatabaseUtil.delete(this, curData);
-                adapter.notifyItemRemoved(i);
+                curData.setActive(false);
+                adapter.notifyItemChanged(i);
             }
         }
     }

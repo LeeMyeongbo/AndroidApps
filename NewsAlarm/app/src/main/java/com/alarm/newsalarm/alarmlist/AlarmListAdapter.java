@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,10 +14,11 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.alarm.newsalarm.R;
+import com.alarm.newsalarm.alarmmanager.AlarmHelperUtil;
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
-import com.alarm.newsalarm.alarmlist.AlarmlistAdapter.AlarmListViewHolder;
+import com.alarm.newsalarm.alarmlist.AlarmListAdapter.AlarmListViewHolder;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
@@ -26,9 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements ItemActionListener {
+public class AlarmListAdapter extends Adapter<AlarmListViewHolder> implements ItemActionListener {
 
-    private static final String CLASS_NAME = "AlarmlistAdapter";
+    private static final String CLASS_NAME = "AlarmListAdapter";
     private static final String[] WEEK = {"일", "월", "화", "수", "목", "금", "토"};
 
     private final List<AlarmData> alarmList;
@@ -38,7 +40,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
 
     public static class AlarmListViewHolder extends ViewHolder {
 
-        private static final String CLASS_NAME = "AlarmlistAdapter.AlarmListViewHolder";
+        private static final String CLASS_NAME = "AlarmListAdapter.AlarmListViewHolder";
         private static final int[] TV_UNSELECTED_WEEK_IDS = {
             R.id.tvSunUnselected, R.id.tvMonUnselected, R.id.tvTuesUnselected,
             R.id.tvWednesUnselected, R.id.tvThursUnselected,
@@ -110,11 +112,11 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         }
 
         private void setSwitchAlarmListener() {
-            switchAlarm.setOnCheckedChangeListener((view, isChecked) -> {
-                setTvByActivationChecked(isChecked);
-                curData.setActive(isChecked);
-                AlarmDatabaseUtil.update(view.getContext(), curData);
-                setAlarmBySwitch(view, isChecked);
+            switchAlarm.setOnClickListener(v -> {
+                setTvByActivationChecked(switchAlarm.isChecked());
+                curData.setActive(switchAlarm.isChecked());
+                setAlarmBySwitch(v.getContext(), switchAlarm.isChecked());
+                AlarmDatabaseUtil.update(v.getContext(), curData);
             });
         }
 
@@ -143,14 +145,32 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             }
         }
 
-        private void setAlarmBySwitch(View view, boolean isChecked) {
-            AlarmSetter setter = new AlarmSetter(view.getContext());
+        private void setAlarmBySwitch(Context context, boolean isChecked) {
+            AlarmSetter setter = new AlarmSetter(context);
             if (isChecked) {
-                Log.i(CLASS_NAME, "setAlarmBySwitch$alarm switch on.. alarm turned on");
+                Log.i(CLASS_NAME, "setAlarmBySwitch$turned alarm " + curData.getId() + " on");
+                setProperAlarmDate(context);
                 setter.registerAlarm(curData);
             } else {
-                Log.i(CLASS_NAME, "setAlarmBySwitch$alarm switch off.. alarm turned off");
+                Log.i(CLASS_NAME, "setAlarmBySwitch$turned alarm " + curData.getId() + " off");
                 setter.cancelAlarm(curData);
+            }
+        }
+
+        private void setProperAlarmDate(Context context) {
+            long dateTimeMills = curData.getSpecificDateInMillis();
+            if (curData.getPeriodicWeekBit() > 0 || dateTimeMills <= System.currentTimeMillis()) {
+                long date = AlarmHelperUtil.getProperAlarmDate(dateTimeMills);
+                curData.setSpecificDateInMillis(date);
+                updateItemViewForSpecificAlarm(context);
+            }
+        }
+
+        private void updateItemViewForSpecificAlarm(Context context) {
+            if (curData.getPeriodicWeekBit() == 0) {
+                Toast.makeText(context, getAlarmTimeInfoText("yyyy-MM-dd HH:mm")
+                    + "로 알람 설정되었습니다.", Toast.LENGTH_SHORT).show();
+                setDateView();
             }
         }
 
@@ -158,8 +178,8 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             curData = data;
 
             initWeekdayViews();
-            setTimeView(data);
-            setDateView(data);
+            setTimeView();
+            setDateView();
 
             switchAlarm.setChecked(data.isActive());
             setTvByActivationChecked(switchAlarm.isChecked());
@@ -173,26 +193,26 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
             }
         }
 
-        private void setTimeView(AlarmData data) {
-            String timeText = getAlarmTimeInfoText(data.getSpecificDateInMillis(), "HH:mm");
+        private void setTimeView() {
+            String timeText = getAlarmTimeInfoText("HH:mm");
 
             tvTimeDeactivated.setText(timeText);
             tvTimeActivated.setText(timeText);
         }
 
-        private String getAlarmTimeInfoText(long date, String format) {
+        private String getAlarmTimeInfoText(String format) {
             SimpleDateFormat dateFormat = new SimpleDateFormat(format, locale);
-            return dateFormat.format(new Date(date));
+            return dateFormat.format(new Date(curData.getSpecificDateInMillis()));
         }
 
-        private void setDateView(AlarmData data) {
+        private void setDateView() {
             String dateInfo;
-            int weekBit = data.getPeriodicWeekBit();
+            int weekBit = curData.getPeriodicWeekBit();
             if (weekBit > 0) {
                 setPeriodicDateView(weekBit);
                 dateInfo = getPeriodicDateInfoText(weekBit);
             } else {
-                dateInfo = getAlarmTimeInfoText(data.getSpecificDateInMillis(), "yyyy-MM-dd");
+                dateInfo = getAlarmTimeInfoText("yyyy-MM-dd");
             }
             tvDateActivated.setText(dateInfo);
             tvDateDeactivated.setText(dateInfo);
@@ -219,7 +239,7 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         }
     }
 
-    public AlarmlistAdapter(
+    public AlarmListAdapter(
         List<AlarmData> dataset, OnItemClickListener clickListener, OnItemDragListener dragListener
     ) {
         this.alarmList = dataset;
@@ -254,30 +274,30 @@ public class AlarmlistAdapter extends Adapter<AlarmListViewHolder> implements It
         if (from == to) {
             return;
         }
-        Log.i(CLASS_NAME, "onItemMoved$an alarm data moved from " + from + " to " + to);
-        AlarmData fromItem = alarmList.remove(from);
-        alarmList.add(to, fromItem);
+        AlarmData data = alarmList.remove(from);
+        alarmList.add(to, data);
         notifyItemMoved(from, to);
+        Log.i(CLASS_NAME, "onItemMoved$alarm " + data.getId() + " moved " + from + " to " + to);
     }
 
     @Override
     public void onItemSwiped(int position) {
-        Log.i(CLASS_NAME, "onItemSwiped$alarm data removed index : " + position);
         AlarmData data = alarmList.remove(position);
         AlarmDatabaseUtil.delete(context, data);
         new AlarmSetter(context).cancelAlarm(data);
         notifyItemRemoved(position);
+        Log.i(CLASS_NAME, "onItemSwiped$alarm " + data.getId() + " was deleted from alarm list");
     }
 
     public void addItem(AlarmData data) {
-        Log.i(CLASS_NAME, "addItem$new alarm data added");
         ((LinkedList<AlarmData>) alarmList).push(data);
         notifyItemInserted(0);
+        Log.i(CLASS_NAME, "addItem$new alarm " + data.getId() + " was inserted front of list");
     }
 
     public void updateItem(int position, AlarmData data) {
-        Log.i(CLASS_NAME, "updateItem$alarm data updated index : " + position);
         alarmList.set(position, data);
         notifyItemChanged(position);
+        Log.i(CLASS_NAME, "updateItem$alarm " + data.getId() + " was updated");
     }
 }

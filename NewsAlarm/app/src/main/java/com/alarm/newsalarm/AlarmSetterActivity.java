@@ -340,6 +340,7 @@ public class AlarmSetterActivity extends BaseActivity {
         alarmData.setAlarmTopic(etNewsTopic.getText().toString());
         alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue() * 51);
+        alarmData.setActive(true);
         setAlarmTime();
         if (!AlarmDatabaseUtil.update(this, alarmData)) {
             return false;
