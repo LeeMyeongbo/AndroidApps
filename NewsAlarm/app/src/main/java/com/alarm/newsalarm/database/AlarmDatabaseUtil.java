@@ -16,7 +16,7 @@ public class AlarmDatabaseUtil {
     private AlarmDatabaseUtil() {
     }
 
-    private static AlarmDatabase getDB(Context context) {
+    private synchronized static AlarmDatabase getDB(Context context) {
         if (db != null) {
             return db;
         }
@@ -57,22 +57,18 @@ public class AlarmDatabaseUtil {
         return false;
     }
 
-    public static boolean insert(Context context, AlarmData data) {
+    public static void insert(Context context, AlarmData data) {
         if (isValid(data)) {
             new Thread(() -> getDB(context).alarmDataDao().insert(data)).start();
-            return true;
         }
         Log.i(CLASS_NAME, "insert$alarm data insertion failed!");
-        return false;
     }
 
-    public static boolean update(Context context, AlarmData data) {
+    public static void update(Context context, AlarmData data) {
         if (!data.isActive() || isValid(data)) {
             new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
-            return true;
         }
         Log.i(CLASS_NAME, "update$alarm data update failed!");
-        return false;
     }
 
     public static void delete(Context context, AlarmData data) {

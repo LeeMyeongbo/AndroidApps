@@ -322,9 +322,7 @@ public class AlarmSetterActivity extends BaseActivity {
             (int) slVib.getValue() * 51
         );
         setAlarmTime();
-        if (!AlarmDatabaseUtil.insert(this, alarmData)) {
-            return false;
-        }
+        AlarmDatabaseUtil.insert(this, alarmData);
         sendResultToMainActivity("addNewAlarmData");
         return true;
     }
@@ -342,9 +340,8 @@ public class AlarmSetterActivity extends BaseActivity {
         alarmData.setVibIntensity((int) slVib.getValue() * 51);
         alarmData.setActive(true);
         setAlarmTime();
-        if (!AlarmDatabaseUtil.update(this, alarmData)) {
-            return false;
-        }
+
+        AlarmDatabaseUtil.update(this, alarmData);
         sendResultToMainActivity("updateAlarmData");
         return true;
     }
