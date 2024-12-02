@@ -1,8 +1,5 @@
 package com.alarm.newsalarm.newsmanager;
 
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.util.Pair;
 
@@ -15,6 +12,7 @@ import org.jsoup.nodes.Element;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -24,89 +22,47 @@ import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 
-public class NewsArticleCrawler {
+class NewsArticleCrawler {
 
     private static final String CLASS_NAME = "NewsArticleCrawler";
 
     private final ExecutorService service = Executors.newFixedThreadPool(5);
-    private final Bundle bundle = new Bundle();
-    private final Handler handler;
+    private final List<Callable<Pair<String, String>>> excutorList = new ArrayList<>();
     private List<Future<Pair<String, String>>> futureList;
 
-    NewsArticleCrawler(Handler handler) {
-        this.handler = handler;
-    }
-
-    void crawl(List<String> jsonArticleStringList) {
-        List<Callable<Pair<String, String>>> crawlingList = new ArrayList<>();
-        for (String jsonArticleString : jsonArticleStringList) {
-            crawlingList.add(new CrawlingExecutor(parseToJson(jsonArticleString)));
+    Pair<ArrayList<String>, ArrayList<String>> crawl(Set<JSONObject> jsonArticleSet) {
+        for (JSONObject article : jsonArticleSet) {
+            excutorList.add(new CrawlingExecutor(article));
         }
-        crawlAsync(crawlingList);
+        return crawlAsync();
     }
 
-    private JSONObject parseToJson(String json) {
+    private Pair<ArrayList<String>, ArrayList<String>> crawlAsync() {
         try {
-            return new JSONObject(json);
-        } catch (JSONException e) {
-            Log.e(CLASS_NAME, "parseToJson$parse String to JSONObject failed!");
-        }
-        return null;
-    }
-
-    private void crawlAsync(List<Callable<Pair<String, String>>> crawlingList) {
-        try {
-            futureList = service.invokeAll(crawlingList, 2, TimeUnit.SECONDS);
-            ArrayList<Pair<String, String>> completedArticleList = getCompletedArticleList();
-            if (!completedArticleList.isEmpty()) {
-                sendMessageSuccess(completedArticleList);
-                return;
-            }
+            futureList = service.invokeAll(excutorList, 2, TimeUnit.SECONDS);
+            return getCompletedArticleList();
         } catch (InterruptedException | RejectedExecutionException | NullPointerException e) {
-            Log.e(CLASS_NAME, "crawlAsync$" + e.getMessage());
+            Log.e(CLASS_NAME, "crawlAsync$" + e);
         }
-        sendMessageFailure();
+        return new Pair<>(new ArrayList<>(), new ArrayList<>());
     }
 
-    private ArrayList<Pair<String, String>> getCompletedArticleList() {
-        ArrayList<Pair<String, String>> completedArticleList = new ArrayList<>();
+    private Pair<ArrayList<String>, ArrayList<String>> getCompletedArticleList() {
+        ArrayList<String> titleList = new ArrayList<>();
+        ArrayList<String> bodyList = new ArrayList<>();
         for (int i = 0; i < futureList.size(); i++) {
             try {
                 Pair<String, String> article = futureList.get(i).get();
                 if ("".equals(article.first) || "".equals(article.second)) {
                     continue;
                 }
-                completedArticleList.add(article);
+                titleList.add(article.first);
+                bodyList.add(article.second);
             } catch (ExecutionException | InterruptedException | CancellationException e) {
-                Log.e(CLASS_NAME, "getCompletedArticleList$" + e.getMessage());
+                Log.e(CLASS_NAME, "getCompletedArticleList$" + e);
             }
         }
-        return completedArticleList;
-    }
-
-    private void sendMessageSuccess(ArrayList<Pair<String, String>> articleList) {
-        putArticleDataToBundle(articleList);
-        Message msg = handler.obtainMessage();
-        msg.setData(bundle);
-        msg.what = NewsNotifier.MSG_CRAWL_NEWS_SUCCESS;
-        handler.sendMessage(msg);
-    }
-
-    private void putArticleDataToBundle(ArrayList<Pair<String, String>> articleList) {
-        ArrayList<String> titleList = new ArrayList<>();
-        ArrayList<String> bodyList = new ArrayList<>();
-        for (Pair<String, String> article : articleList) {
-            titleList.add(article.first);
-            bodyList.add(article.second);
-        }
-        bundle.putStringArrayList("crawl_return_title", titleList);
-        bundle.putStringArrayList("crawl_return_body", bodyList);
-    }
-
-    private void sendMessageFailure() {
-        Message msg = handler.obtainMessage();
-        msg.what = NewsNotifier.MSG_CRAWL_NEWS_FAILURE;
-        handler.sendMessage(msg);
+        return new Pair<>(titleList, bodyList);
     }
 
     void release() {
@@ -130,7 +86,7 @@ public class NewsArticleCrawler {
             try {
                 return jsonArticle.getString("title").replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
             } catch (JSONException | NullPointerException e) {
-                Log.e(CLASS_NAME, "getArticleTitle$" + e.getMessage());
+                Log.e(CLASS_NAME, "getArticleTitle$" + e);
             }
 
             return "";
@@ -140,7 +96,7 @@ public class NewsArticleCrawler {
             try {
                 return modifyContent(crawlPassage(jsonArticle.getString("link")));
             } catch (JSONException | NullPointerException e) {
-                Log.e(CLASS_NAME, "getArticleBody$" + e.getMessage());
+                Log.e(CLASS_NAME, "getArticleBody$" + e);
             }
 
             return "";
@@ -185,7 +141,7 @@ public class NewsArticleCrawler {
 
                 return e;
             } catch (IOException | NullPointerException e) {
-                Log.e(CLASS_NAME, "crawlPassage$" + e.getMessage());
+                Log.e(CLASS_NAME, "crawlPassage$" + e);
             }
 
             return null;

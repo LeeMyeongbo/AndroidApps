@@ -16,16 +16,18 @@ public class TtsManager {
 
     private static final String CLASS_NAME = "TtsManager";
 
+    private final ArrayList<Runnable> speakList = new ArrayList<>();
     private final Bundle bundle = new Bundle();
     private final AlarmData data;
     private AudioAttributes attr;
     private TextToSpeech tts;
+    private boolean isTtsInitialized;
 
     public TtsManager(Context context, AlarmData data) {
-        initAudioAttributes();
-        initTts(context);
         this.data = data;
         bundle.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1f);
+        initAudioAttributes();
+        initTts(context);
     }
 
     private void initAudioAttributes() {
@@ -40,11 +42,16 @@ public class TtsManager {
         tts = new TextToSpeech(context, status -> {
             if (status != TextToSpeech.ERROR) {
                 tts.setLanguage(Locale.KOREAN);
+                tts.setAudioAttributes(attr);
+                tts.setPitch(1.0f);
+                tts.setSpeechRate(0.85f);
+                for (Runnable r : speakList) {
+                    r.run();
+                }
+                isTtsInitialized = true;
+                Log.i(CLASS_NAME, "initTts$tts initialized successfully");
             }
         });
-        tts.setAudioAttributes(attr);
-        tts.setPitch(1.0f);
-        tts.setSpeechRate(0.85f);
     }
 
     public void speakArticles(ArrayList<String> titleList, ArrayList<String> bodyList) {
@@ -70,6 +77,14 @@ public class TtsManager {
     }
 
     public void speak(String txt, int mode) {
+        if (isTtsInitialized) {
+            speakWithTts(txt, mode);
+        } else {
+            speakList.add(() -> speakWithTts(txt, mode));
+        }
+    }
+
+    private void speakWithTts(String txt, int mode) {
         if (mode == 1) {
             tts.playSilentUtterance(800L, TextToSpeech.QUEUE_ADD, "silence");
         }

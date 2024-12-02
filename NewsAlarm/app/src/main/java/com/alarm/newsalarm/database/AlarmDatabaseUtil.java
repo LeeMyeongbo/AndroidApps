@@ -59,19 +59,20 @@ public class AlarmDatabaseUtil {
 
     public static void insert(Context context, AlarmData data) {
         if (isValid(data)) {
+            Log.i(CLASS_NAME, "insert$alarm data insertion started!");
             new Thread(() -> getDB(context).alarmDataDao().insert(data)).start();
         }
-        Log.i(CLASS_NAME, "insert$alarm data insertion failed!");
     }
 
     public static void update(Context context, AlarmData data) {
         if (!data.isActive() || isValid(data)) {
+            Log.i(CLASS_NAME, "update$alarm data update started!");
             new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
         }
-        Log.i(CLASS_NAME, "update$alarm data update failed!");
     }
 
     public static void delete(Context context, AlarmData data) {
+        Log.i(CLASS_NAME, "delete$alarm data removal started!");
         new Thread(() -> getDB(context).alarmDataDao().delete(data)).start();
     }
 
@@ -81,16 +82,18 @@ public class AlarmDatabaseUtil {
             alarmList.set(getDB(context).alarmDataDao().getAll())
         );
         try {
+            Log.i(CLASS_NAME, "getAll$load all alarm data");
             thread.start();
-            thread.join();
+            thread.join(3000);
         } catch (InterruptedException e) {
-            Log.e(CLASS_NAME, "getAll$" + e.getMessage());
+            Log.e(CLASS_NAME, "getAll$" + e);
             throw new RuntimeException(e);
         }
         return alarmList.get();
     }
 
     public static void clear(Context context) {
+        Log.i(CLASS_NAME, "clear$clear all alarm data");
         new Thread(() -> getDB(context).alarmDataDao().clear()).start();
     }
 }

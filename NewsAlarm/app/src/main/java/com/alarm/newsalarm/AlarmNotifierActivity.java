@@ -23,10 +23,14 @@ public class AlarmNotifierActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_notifier);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        startNotifier();
+        init();
+    }
+
+    private void startNotifier() {
         AlarmData data = getIntent().getParcelableExtra("alarmData", AlarmData.class);
         notifier = new NewsNotifier(this, data);
         notifier.start();
-        init();
     }
 
     private void init() {

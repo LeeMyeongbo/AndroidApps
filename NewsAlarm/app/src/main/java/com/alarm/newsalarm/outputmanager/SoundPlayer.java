@@ -70,16 +70,24 @@ public class SoundPlayer {
     }
 
     public void release() {
+        releaseSoundPool();
+        releaseMediaplayer();
+        Log.i(CLASS_NAME, "release$SoundPlayer released completely!");
+    }
+
+    private void releaseSoundPool() {
         if (soundPool != null) {
             soundPool.stop(streamId);
             soundPool.release();
             soundPool = null;
         }
+    }
+
+    private void releaseMediaplayer() {
         if (player != null) {
             player.stop();
             player.release();
             player = null;
         }
-        Log.i(CLASS_NAME, "release$SoundPlayer released completely!");
     }
 }
