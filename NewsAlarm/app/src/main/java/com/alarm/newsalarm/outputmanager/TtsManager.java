@@ -40,17 +40,16 @@ public class TtsManager {
 
     private void initTts(Context context) {
         tts = new TextToSpeech(context, status -> {
-            if (status != TextToSpeech.ERROR) {
-                tts.setLanguage(Locale.KOREAN);
-                tts.setAudioAttributes(attr);
-                tts.setPitch(1.0f);
-                tts.setSpeechRate(0.85f);
-                for (Runnable r : speakList) {
-                    r.run();
-                }
-                isTtsInitialized = true;
-                Log.i(CLASS_NAME, "initTts$tts initialized successfully");
+            if (status == TextToSpeech.ERROR) {
+                return;
             }
+            tts.setLanguage(Locale.KOREAN);
+            tts.setAudioAttributes(attr);
+            tts.setPitch(1.0f);
+            tts.setSpeechRate(0.85f);
+            speakList.forEach(Runnable::run);
+            isTtsInitialized = true;
+            Log.i(CLASS_NAME, "initTts$tts initialized successfully");
         });
     }
 
