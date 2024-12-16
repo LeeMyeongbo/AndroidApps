@@ -33,6 +33,24 @@ android {
         sourceCompatibility JavaVersion.current()
         targetCompatibility JavaVersion.current()
     }
+
+    applicationVariants.configureEach { variant ->
+        variant.outputs.configureEach { output ->
+            def apk = output.outputFile
+            def name = parent.project.getName()
+            def buildType = variant.buildType.name
+            def versionName = variant.versionName
+            def newName
+
+            if (apk.name.startsWith("app-debug")) {
+                newName = apk.name.replace("app-debug", "${name}_${versionName}-${buildType}")
+            } else {
+                newName = apk.name.replace("app-release", "${name}_${versionName}-${buildType}")
+            }
+
+            outputFileName = newName
+        }
+    }
 }
 
 dependencies {
