@@ -77,7 +77,7 @@
                     android:text="@string/choose_periodic_week"
                     android:textSize="25sp" />
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="10dp"
@@ -87,39 +87,67 @@
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbSunday"
                         android:text="@string/txt_sunday"
-                        android:textColor="@color/red" />
+                        android:textColor="@color/red"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/cbMonday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbMonday"
-                        android:text="@string/txt_monday" />
+                        android:text="@string/txt_monday"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbSunday"
+                        app:layout_constraintEnd_toStartOf="@id/cbTuesday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbTuesday"
-                        android:text="@string/txt_tuesday" />
+                        android:text="@string/txt_tuesday"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbMonday"
+                        app:layout_constraintEnd_toStartOf="@id/cbWednesday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbWednesday"
-                        android:text="@string/txt_wednesday" />
+                        android:text="@string/txt_wednesday"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbTuesday"
+                        app:layout_constraintEnd_toStartOf="@id/cbThursday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbThursday"
-                        android:text="@string/txt_thursday" />
+                        android:text="@string/txt_thursday"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbWednesday"
+                        app:layout_constraintEnd_toStartOf="@id/cbFriday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbFriday"
-                        android:text="@string/txt_friday" />
+                        android:text="@string/txt_friday"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbThursday"
+                        app:layout_constraintEnd_toStartOf="@id/cbSaturday" />
 
                     <CheckBox
                         style="@style/WeekDayCheckboxStyle"
                         android:id="@+id/cbSaturday"
                         android:text="@string/txt_saturday"
-                        android:textColor="#4D4DFF" />
-                </LinearLayout>
+                        android:textColor="#1A9BED"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/cbFriday"
+                        app:layout_constraintEnd_toEndOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -265,39 +293,39 @@
                         app:trackHeight="12dp" />
                 </RelativeLayout>
             </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/ButtonStyle"
+                    android:id="@+id/btnCancel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginEnd="2.5dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/txt_cancel"
+                    android:textSize="25sp"
+                    android:stateListAnimator="@null"
+                    app:cornerRadius="20dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    style="@style/ButtonStyle"
+                    android:id="@+id/btnSave"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="2.5dp"
+                    android:paddingVertical="10dp"
+                    android:text="@string/txt_save"
+                    android:textSize="25sp"
+                    android:stateListAnimator="@null"
+                    app:cornerRadius="20dp" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <com.google.android.material.button.MaterialButton
-            style="@style/ButtonStyle"
-            android:id="@+id/btnCancel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="2.5dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:paddingVertical="10dp"
-            android:text="@string/txt_cancel"
-            android:textSize="25sp"
-            android:stateListAnimator="@null"
-            app:cornerRadius="20dp" />
-
-        <com.google.android.material.button.MaterialButton
-            style="@style/ButtonStyle"
-            android:id="@+id/btnSave"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="2.5dp"
-            android:paddingVertical="10dp"
-            android:text="@string/txt_save"
-            android:textSize="25sp"
-            android:stateListAnimator="@null"
-            app:cornerRadius="20dp" />
-    </LinearLayout>
 </LinearLayout>

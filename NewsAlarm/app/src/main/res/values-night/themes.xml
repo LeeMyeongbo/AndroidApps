@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Theme.NewsAlarm" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
@@ -116,12 +116,10 @@
     <!-- weekDay checkbox for dark theme -->
     <style name="WeekDayCheckboxStyle">
         <item name="android:background">@drawable/checkbox_week_custom_dark</item>
-        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_marginHorizontal">1dp</item>
         <item name="android:textColor">@color/white</item>
-        <item name="android:textSize">20sp</item>
+        <item name="android:textSize" tools:ignore="SpUsage">16dp</item>
         <item name="android:textAlignment">center</item>
         <item name="android:button">@null</item>
     </style>
