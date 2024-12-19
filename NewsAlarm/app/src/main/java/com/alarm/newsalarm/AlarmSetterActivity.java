@@ -6,8 +6,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -21,6 +22,7 @@ import com.alarm.newsalarm.outputmanager.SoundPlayer;
 import com.alarm.newsalarm.outputmanager.Vibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
+import com.google.android.material.textfield.TextInputEditText;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -47,7 +49,8 @@ public class AlarmSetterActivity extends BaseActivity {
     private DatePickerDialog dialog;
     private TextView tvInfo;
     private ImageButton btnDateSelector;
-    private EditText etAlarmName, etNewsTopic;
+    private TextInputEditText etAlarmName;
+    private AutoCompleteTextView topicSelector;
     private ImageView ivVolumeMute, ivVolumeLow, ivVolumeMedium, ivVolumeHigh;
     private ImageView ivVibNone, ivVibLow, ivVibMedium, ivVibHigh;
     private Slider slVolume, slVib;
@@ -68,6 +71,7 @@ public class AlarmSetterActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_setter);
 
         initUI();
+        initDropdownNewsTopicSelector();
         setViewsFromAlarmData();
         setTvInfo();
         setEventListener();
@@ -89,7 +93,7 @@ public class AlarmSetterActivity extends BaseActivity {
         }
         tvInfo = findViewById(R.id.tvInfo);
         etAlarmName = findViewById(R.id.etAlarmName);
-        etNewsTopic = findViewById(R.id.etNewsTopic);
+        topicSelector = findViewById(R.id.newsTopicSelector);
         slVolume = findViewById(R.id.slideVolume);
         slVib = findViewById(R.id.slideVib);
         btnSave = findViewById(R.id.btnSave);
@@ -107,6 +111,12 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibLow = findViewById(R.id.vibLowImg);
         ivVibMedium = findViewById(R.id.vibMediumImg);
         ivVibHigh = findViewById(R.id.vibHighImg);
+    }
+
+    private void initDropdownNewsTopicSelector() {
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.news_topic_dropdown_item,
+            getResources().getStringArray(R.array.topics));
+        topicSelector.setAdapter(adapter);
     }
 
     private void setViewsFromAlarmData() {
@@ -135,7 +145,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void setEditTexts() {
         etAlarmName.setText(alarmData.getAlarmName());
-        etNewsTopic.setText(alarmData.getAlarmTopic());
+        topicSelector.setText(alarmData.getAlarmTopic());
     }
 
     private void setSliders() {
@@ -317,7 +327,7 @@ public class AlarmSetterActivity extends BaseActivity {
         alarmData = new AlarmData(
             getNewId(),
             etAlarmName.getText().toString(),
-            etNewsTopic.getText().toString(),
+            topicSelector.getText().toString(),
             (int) slVolume.getValue(),
             (int) slVib.getValue() * 51
         );
@@ -335,7 +345,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private boolean updateAlarmData() {
         alarmData.setAlarmName(etAlarmName.getText().toString());
-        alarmData.setAlarmTopic(etNewsTopic.getText().toString());
+        alarmData.setAlarmTopic(topicSelector.getText().toString());
         alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue() * 51);
         alarmData.setActive(true);

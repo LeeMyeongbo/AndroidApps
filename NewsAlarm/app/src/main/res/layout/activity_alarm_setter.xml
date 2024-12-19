@@ -159,26 +159,37 @@
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="20dp">
 
-                <EditText
-                    android:id="@+id/etAlarmName"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:labelFor="@+id/etAlarmName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:autofillHints="name"
-                    android:inputType="text"
-                    android:paddingHorizontal="10dp"
-                    android:textSize="25sp"
-                    android:hint="@string/txt_alarm_name" />
+                    android:hint="@string/txt_alarm_name">
 
-                <EditText
-                    android:id="@+id/etNewsTopic"
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etAlarmName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:labelFor="@+id/newsTopicSelector"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="25dp"
-                    android:autofillHints="name"
-                    android:inputType="text"
-                    android:paddingHorizontal="10dp"
-                    android:textSize="25sp"
-                    android:hint="@string/txt_news_topic" />
+                    android:layout_marginTop="15dp"
+                    android:hint="@string/txt_news_topic">
+
+                    <AutoCompleteTextView
+                        android:id="@+id/newsTopicSelector"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textSize="20sp"
+                        android:inputType="none"
+                        tools:ignore="SpeakableTextPresentCheck" />
+                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
 
             <LinearLayout
@@ -235,7 +246,8 @@
                         android:valueFrom="0"
                         android:valueTo="15"
                         android:stepSize="1"
-                        app:trackHeight="12dp" />
+                        app:trackHeight="12dp"
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </RelativeLayout>
 
                 <View
@@ -290,7 +302,8 @@
                         android:valueFrom="0"
                         android:valueTo="5"
                         android:stepSize="1"
-                        app:trackHeight="12dp" />
+                        app:trackHeight="12dp"
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </RelativeLayout>
             </LinearLayout>
 
