@@ -46,7 +46,7 @@ public class TtsManager {
             tts.setLanguage(Locale.KOREAN);
             tts.setAudioAttributes(attr);
             tts.setPitch(1.0f);
-            tts.setSpeechRate(0.85f);
+            tts.setSpeechRate(data.getTempo());
             speakList.forEach(Runnable::run);
             isTtsInitialized = true;
             Log.i(CLASS_NAME, "initTts$tts initialized successfully");

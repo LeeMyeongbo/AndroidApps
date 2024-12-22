@@ -14,11 +14,14 @@ public class AlarmData implements Parcelable {
     @PrimaryKey
     private int id;
 
-    @ColumnInfo(name = "Name")
-    private String alarmName = "";
-
     @ColumnInfo(name = "Topic")
-    private String alarmTopic = "";
+    private String alarmTopic;
+
+    @ColumnInfo(name = "Gender")
+    private String gender;
+
+    @ColumnInfo(name = "Tempo")
+    private float tempo;
 
     @ColumnInfo(name = "VolumeSize")
     private int volumeSize;
@@ -27,13 +30,13 @@ public class AlarmData implements Parcelable {
     private int vibIntensity;
 
     @ColumnInfo(name = "Date")
-    private long specificDateInMillis = -1;
+    private long specificDateInMillis;
 
     @ColumnInfo(name = "WeekBit")
     private int periodicWeekBit;
 
     @ColumnInfo(name = "Active")
-    private boolean isActive = true;
+    private boolean isActive;
 
     public static final Creator<AlarmData> CREATOR = new Creator<>() {
 
@@ -50,8 +53,9 @@ public class AlarmData implements Parcelable {
 
     protected AlarmData(Parcel in) {
         id = in.readInt();
-        alarmName = in.readString();
         alarmTopic = in.readString();
+        gender = in.readString();
+        tempo = in.readFloat();
         volumeSize = in.readInt();
         vibIntensity = in.readInt();
         specificDateInMillis = in.readLong();
@@ -59,14 +63,8 @@ public class AlarmData implements Parcelable {
         isActive = in.readBoolean();
     }
 
-    public AlarmData(
-        int id, String alarmName, String alarmTopic, int volumeSize, int vibIntensity
-    ) {
+    public AlarmData(int id) {
         setId(id);
-        setAlarmName(alarmName);
-        setAlarmTopic(alarmTopic);
-        setVolumeSize(volumeSize);
-        setVibIntensity(vibIntensity);
     }
 
     public void setId(int id) {
@@ -77,20 +75,28 @@ public class AlarmData implements Parcelable {
         return id;
     }
 
-    public void setAlarmName(String name) {
-        alarmName = name;
-    }
-
-    public String getAlarmName() {
-        return alarmName;
-    }
-
     public void setAlarmTopic(String topic) {
         alarmTopic = topic;
     }
 
     public String getAlarmTopic() {
         return alarmTopic;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setTempo(float tempo) {
+        this.tempo = tempo;
+    }
+
+    public float getTempo() {
+        return tempo;
     }
 
     public void setVolumeSize(int volumeSize) {
@@ -141,8 +147,9 @@ public class AlarmData implements Parcelable {
     @Override
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(id);
-        dest.writeString(alarmName);
         dest.writeString(alarmTopic);
+        dest.writeString(gender);
+        dest.writeFloat(tempo);
         dest.writeInt(volumeSize);
         dest.writeInt(vibIntensity);
         dest.writeLong(specificDateInMillis);

@@ -1,5 +1,6 @@
 package com.alarm.newsalarm;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -22,7 +23,7 @@ import com.alarm.newsalarm.outputmanager.SoundPlayer;
 import com.alarm.newsalarm.outputmanager.Vibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
-import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -47,14 +48,16 @@ public class AlarmSetterActivity extends BaseActivity {
     private Vibrator vibrator;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
-    private TextView tvInfo;
+    private TextView tvInfo, tvTempo;
     private ImageButton btnDateSelector;
-    private TextInputEditText etAlarmName;
-    private AutoCompleteTextView topicSelector;
+    private TextInputLayout topicSelector, genderSelector;
+    private AutoCompleteTextView tvTopicList, tvGenderList;
     private ImageView ivVolumeMute, ivVolumeLow, ivVolumeMedium, ivVolumeHigh;
     private ImageView ivVibNone, ivVibLow, ivVibMedium, ivVibHigh;
-    private Slider slVolume, slVib;
+    private Slider slTempo, slVolume, slVib;
     private MaterialButton btnSave, btnCancel;
+    private String selectedTopic = "";
+    private String selectedGender = "남성";
     private int curWeekBit;
 
     public AlarmSetterActivity() {
@@ -80,6 +83,7 @@ public class AlarmSetterActivity extends BaseActivity {
         setter = new AlarmSetter(this);
         sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
+        displayTvTempoByTempo(slTempo.getValue());
         displayVolumeImgByVolume((int) slVolume.getValue());
         displayVibImgByVibIntensity((int) slVib.getValue());
     }
@@ -92,8 +96,12 @@ public class AlarmSetterActivity extends BaseActivity {
             cbWeekdays[i] = findViewById(WEEK_IDS[i]);
         }
         tvInfo = findViewById(R.id.tvInfo);
-        etAlarmName = findViewById(R.id.etAlarmName);
+        tvTempo = findViewById(R.id.tvTempo);
         topicSelector = findViewById(R.id.newsTopicSelector);
+        tvTopicList = findViewById(R.id.tvTopicList);
+        genderSelector = findViewById(R.id.genderSelector);
+        tvGenderList = findViewById(R.id.tvGenderList);
+        slTempo = findViewById(R.id.slideTempo);
         slVolume = findViewById(R.id.slideVolume);
         slVib = findViewById(R.id.slideVib);
         btnSave = findViewById(R.id.btnSave);
@@ -114,9 +122,14 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void initDropdownNewsTopicSelector() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.news_topic_dropdown_item,
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+            com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
             getResources().getStringArray(R.array.topics));
-        topicSelector.setAdapter(adapter);
+        tvTopicList.setAdapter(adapter);
+        adapter = new ArrayAdapter<>(this,
+            com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
+            getResources().getStringArray(R.array.gender));
+        tvGenderList.setAdapter(adapter);
     }
 
     private void setViewsFromAlarmData() {
@@ -128,7 +141,7 @@ public class AlarmSetterActivity extends BaseActivity {
         calendar.setTimeInMillis(alarmData.getSpecificDateInMillis());
         setWeekCheckbox();
         setTimePicker();
-        setEditTexts();
+        setSelectors();
         setSliders();
     }
 
@@ -143,12 +156,15 @@ public class AlarmSetterActivity extends BaseActivity {
         timePicker.setMinute(calendar.get(Calendar.MINUTE));
     }
 
-    private void setEditTexts() {
-        etAlarmName.setText(alarmData.getAlarmName());
-        topicSelector.setText(alarmData.getAlarmTopic());
+    private void setSelectors() {
+        selectedTopic = alarmData.getAlarmTopic();
+        selectedGender = alarmData.getGender();
+        tvTopicList.setText(selectedTopic, false);
+        tvGenderList.setText(selectedGender, false);
     }
 
     private void setSliders() {
+        slTempo.setValue(alarmData.getTempo());
         slVolume.setValue(alarmData.getVolumeSize());
         slVib.setValue(alarmData.getVibIntensity() / 51f);
     }
@@ -184,6 +200,18 @@ public class AlarmSetterActivity extends BaseActivity {
     private void setEventListener() {
         dialog.setOnDateSetListener((v, year, month, day) -> saveSelectedDate(year, month, day));
         btnDateSelector.setOnClickListener(v -> openDatePicker());
+        tvTopicList.setOnItemClickListener((parent, view, pos, id) -> {
+            selectedTopic = (String) tvTopicList.getAdapter().getItem(pos);
+            topicSelector.setHelperText("설정한 주제 : " + selectedTopic);
+        });
+        tvGenderList.setOnItemClickListener((parent, view, pos, id) -> {
+            selectedGender = (String) tvGenderList.getAdapter().getItem(pos);
+            genderSelector.setHelperText("설정한 성별 : " + selectedGender);
+        });
+        slTempo.addOnChangeListener((slider, value, fromUser) -> {
+            displayTvTempoByTempo(value);
+            /* To do : play short tts */ 
+        });
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
             displayVolumeImgByVolume((int) value);
             playSoundByValue((int) value);
@@ -239,6 +267,11 @@ public class AlarmSetterActivity extends BaseActivity {
     private void vibrateByValue(float value) {
         vibrator.vibrateOnce((int) value * 51);
         Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + (int) value);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void displayTvTempoByTempo(float tempo) {
+        tvTempo.setText("x " + tempo);
     }
 
     private void displayVolumeImgByVolume(int volume) {
@@ -324,14 +357,8 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private boolean addNewAlarmData() {
-        alarmData = new AlarmData(
-            getNewId(),
-            etAlarmName.getText().toString(),
-            topicSelector.getText().toString(),
-            (int) slVolume.getValue(),
-            (int) slVib.getValue() * 51
-        );
-        setAlarmTime();
+        alarmData = new AlarmData(getNewId());
+        setAlarmData();
         AlarmDatabaseUtil.insert(this, alarmData);
         sendResultToMainActivity("addNewAlarmData");
         return true;
@@ -344,16 +371,20 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private boolean updateAlarmData() {
-        alarmData.setAlarmName(etAlarmName.getText().toString());
-        alarmData.setAlarmTopic(topicSelector.getText().toString());
+        setAlarmData();
+        AlarmDatabaseUtil.update(this, alarmData);
+        sendResultToMainActivity("updateAlarmData");
+        return true;
+    }
+
+    private void setAlarmData() {
+        alarmData.setAlarmTopic(selectedTopic);
+        alarmData.setGender(selectedGender);
+        alarmData.setTempo(slTempo.getValue());
         alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue() * 51);
         alarmData.setActive(true);
         setAlarmTime();
-
-        AlarmDatabaseUtil.update(this, alarmData);
-        sendResultToMainActivity("updateAlarmData");
-        return true;
     }
 
     private void setAlarmTime() {
