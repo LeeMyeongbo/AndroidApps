@@ -7,14 +7,20 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
+import android.widget.Filter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
@@ -29,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Locale;
+import java.util.Objects;
 
 public class AlarmSetterActivity extends BaseActivity {
 
@@ -37,10 +44,13 @@ public class AlarmSetterActivity extends BaseActivity {
         R.id.cbSunday, R.id.cbMonday, R.id.cbTuesday, R.id.cbWednesday,
         R.id.cbThursday, R.id.cbFriday, R.id.cbSaturday
     };
+    private static final int DROPDOWN_LAYOUT =
+        com.google.android.material.R.layout.support_simple_spinner_dropdown_item;
 
     private final Calendar calendar = Calendar.getInstance();
     private final Locale locale = new Locale("ko", "KR");
     private final CheckBox[] cbWeekdays = new CheckBox[7];
+    private InputMethodManager inputManager;
     private AlarmData alarmData;
     private AlarmSetter setter;
     private SharedPreferences sharedPref;
@@ -73,8 +83,9 @@ public class AlarmSetterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_setter);
 
+        inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         initUI();
-        initDropdownNewsTopicSelector();
+        initDropdownSelectors();
         setViewsFromAlarmData();
         setTvInfo();
         setEventListener();
@@ -121,15 +132,54 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibHigh = findViewById(R.id.vibHighImg);
     }
 
-    private void initDropdownNewsTopicSelector() {
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-            com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-            getResources().getStringArray(R.array.topics));
+    private void initDropdownSelectors() {
+        initNewsTopicDropdownSelector();
+        initGenderDropdownSelector();
+    }
+
+    private void initNewsTopicDropdownSelector() {
+        String[] topics = getResources().getStringArray(R.array.topics);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, DROPDOWN_LAYOUT, topics) {
+
+            @NonNull
+            @Override
+            public Filter getFilter() {
+                return getDropdownFilter(topics);
+            }
+        };
+        tvTopicList.setThreshold(Integer.MAX_VALUE);
         tvTopicList.setAdapter(adapter);
-        adapter = new ArrayAdapter<>(this,
-            com.google.android.material.R.layout.support_simple_spinner_dropdown_item,
-            getResources().getStringArray(R.array.gender));
+    }
+
+    private void initGenderDropdownSelector() {
+        String[] genders = getResources().getStringArray(R.array.gender);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, DROPDOWN_LAYOUT, genders) {
+
+            @NonNull
+            @Override
+            public Filter getFilter() {
+                return getDropdownFilter(genders);
+            }
+        };
+        tvGenderList.setThreshold(Integer.MAX_VALUE);
         tvGenderList.setAdapter(adapter);
+    }
+
+    private Filter getDropdownFilter(String[] values) {
+        return new Filter() {
+
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                FilterResults results = new FilterResults();
+                results.count = values.length;
+                results.values = values;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+            }
+        };
     }
 
     private void setViewsFromAlarmData() {
@@ -202,11 +252,35 @@ public class AlarmSetterActivity extends BaseActivity {
         btnDateSelector.setOnClickListener(v -> openDatePicker());
         tvTopicList.setOnItemClickListener((parent, view, pos, id) -> {
             selectedTopic = (String) tvTopicList.getAdapter().getItem(pos);
-            topicSelector.setHelperText("설정한 주제 : " + selectedTopic);
+            if ("직접 입력".equals(selectedTopic)) {
+                selectedTopic = "";
+                tvTopicList.setText("", false);
+                tvTopicList.setInputType(EditorInfo.TYPE_CLASS_TEXT);
+                tvTopicList.requestFocus();
+                inputManager.showSoftInput(tvTopicList, 0);
+            } else {
+                tvTopicList.setInputType(EditorInfo.TYPE_NULL);
+                inputManager.hideSoftInputFromWindow(
+                    Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+                tvTopicList.clearFocus();
+                topicSelector.setHelperText("설정한 키워드 : " + selectedTopic);
+            }
+        });
+        tvTopicList.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                selectedTopic = tvTopicList.getText().toString();
+                inputManager.hideSoftInputFromWindow(
+                    Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
+                tvTopicList.clearFocus();
+                topicSelector.setHelperText("설정한 키워드 : " + selectedTopic);
+                return true;
+            }
+            return false;
         });
         tvGenderList.setOnItemClickListener((parent, view, pos, id) -> {
             selectedGender = (String) tvGenderList.getAdapter().getItem(pos);
-            genderSelector.setHelperText("설정한 성별 : " + selectedGender);
+            tvGenderList.clearFocus();
+            genderSelector.setHelperText("설정한 목소리 : " + selectedGender);
         });
         slTempo.addOnChangeListener((slider, value, fromUser) -> {
             displayTvTempoByTempo(value);
@@ -226,9 +300,9 @@ public class AlarmSetterActivity extends BaseActivity {
             setTvInfo();
         });
         for (int i = 0; i < 7; i++) {
-            final int FI = i;
+            final int idx = i;
             cbWeekdays[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                curWeekBit = isChecked ? curWeekBit + (1 << FI) : curWeekBit - (1 << FI);
+                curWeekBit = isChecked ? curWeekBit + (1 << idx) : curWeekBit - (1 << idx);
                 setDateAsTodayWhenDeselectAll();
                 setTvInfo();
             });
@@ -383,13 +457,9 @@ public class AlarmSetterActivity extends BaseActivity {
         alarmData.setTempo(slTempo.getValue());
         alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue() * 51);
-        alarmData.setActive(true);
-        setAlarmTime();
-    }
-
-    private void setAlarmTime() {
         alarmData.setPeriodicWeekBit(curWeekBit);
         alarmData.setSpecificDateInMillis(getDateInMillis());
+        alarmData.setActive(true);
     }
 
     private long getDateInMillis() {
