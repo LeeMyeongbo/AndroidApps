@@ -48,7 +48,7 @@ public class NewsNotifier {
 
     public void start() {
         Log.i(CLASS_NAME, "start$loading news data started!");
-        soundPlayer.playBgm(data.getVolumeSize());
+        soundPlayer.playBgm();
         vibrator.vibrateRepeatedly(data.getVibIntensity());
 
         StringRequest newsApiRequest = getRequest(data.getAlarmTopic());

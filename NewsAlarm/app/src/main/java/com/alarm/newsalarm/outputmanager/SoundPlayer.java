@@ -34,8 +34,7 @@ public class SoundPlayer {
     private void initAudioAttributes() {
         attr = new AudioAttributes.Builder()
             .setUsage(AudioAttributes.USAGE_ALARM)
-            .setLegacyStreamType(AudioManager.STREAM_ALARM)
-            .setContentType(AudioAttributes.CONTENT_TYPE_UNKNOWN)
+            .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
             .build();
     }
 
@@ -63,9 +62,7 @@ public class SoundPlayer {
         soundId = soundPool.load(context, R.raw.ding_dong, 1);
     }
 
-    public void playBgm(int volume) {
-        Log.i(CLASS_NAME, "playBgm$set volume : " + volume);
-        manager.setStreamVolume(AudioManager.STREAM_ALARM, volume, 0);
+    public void playBgm() {
         player.start();
     }
 
