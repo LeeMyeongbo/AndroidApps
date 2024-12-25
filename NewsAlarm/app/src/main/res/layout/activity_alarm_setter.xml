@@ -272,7 +272,6 @@
                     <ImageView
                         style="@style/VolumeLowImageStyle"
                         android:id="@+id/volumeLowImg"
-                        android:visibility="invisible"
                         tools:ignore="ContentDescription" />
 
                     <ImageView
@@ -293,6 +292,7 @@
                         android:layout_height="wrap_content"
                         android:layout_toEndOf="@id/muteImg"
                         android:tag="볼륨 크기"
+                        android:value="4"
                         android:valueFrom="0"
                         android:valueTo="15"
                         android:stepSize="1"
@@ -322,7 +322,6 @@
                     <ImageView
                         style="@style/VibNoneImageStyle"
                         android:id="@+id/vibNoneImg"
-                        android:visibility="invisible"
                         tools:ignore="ContentDescription" />
 
                     <ImageView

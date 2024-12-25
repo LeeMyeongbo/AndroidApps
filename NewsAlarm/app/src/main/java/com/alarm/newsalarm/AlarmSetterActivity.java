@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -25,7 +26,7 @@ import androidx.annotation.NonNull;
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
-import com.alarm.newsalarm.outputmanager.SoundPlayer;
+import com.alarm.newsalarm.outputmanager.TtsManager;
 import com.alarm.newsalarm.outputmanager.Vibrator;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.slider.Slider;
@@ -54,8 +55,8 @@ public class AlarmSetterActivity extends BaseActivity {
     private AlarmData alarmData;
     private AlarmSetter setter;
     private SharedPreferences sharedPref;
-    private SoundPlayer soundPlayer;
     private Vibrator vibrator;
+    private TtsManager ttsManager;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
     private TextView tvInfo, tvTempo;
@@ -83,20 +84,25 @@ public class AlarmSetterActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_setter);
 
-        inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        init();
         initUI();
         initDropdownSelectors();
         setViewsFromAlarmData();
         setTvInfo();
         setEventListener();
-        soundPlayer = new SoundPlayer(this);
-        vibrator = new Vibrator(this);
-        setter = new AlarmSetter(this);
-        sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
 
         displayTvTempoByTempo(slTempo.getValue());
         displayVolumeImgByVolume((int) slVolume.getValue());
         displayVibImgByVibIntensity((int) slVib.getValue());
+    }
+
+    private void init() {
+        alarmData = getIntent().getParcelableExtra("alarmData", AlarmData.class);
+        inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        vibrator = new Vibrator(this);
+        ttsManager = new TtsManager(this, alarmData);
+        setter = new AlarmSetter(this);
+        sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
     }
 
     private void initUI() {
@@ -183,7 +189,6 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void setViewsFromAlarmData() {
-        alarmData = getIntent().getParcelableExtra("alarmData", AlarmData.class);
         if (alarmData == null) {
             return;
         }
@@ -281,14 +286,15 @@ public class AlarmSetterActivity extends BaseActivity {
             selectedGender = (String) tvGenderList.getAdapter().getItem(pos);
             tvGenderList.clearFocus();
             genderSelector.setHelperText("설정한 목소리 : " + selectedGender);
+            ttsManager.setVoiceGender("남성".equals(selectedGender) ? "male" : "female");
         });
         slTempo.addOnChangeListener((slider, value, fromUser) -> {
             displayTvTempoByTempo(value);
-            /* To do : play short tts */ 
+            playSampleTextByTempo(value);
         });
         slVolume.addOnChangeListener((slider, value, fromUser) -> {
             displayVolumeImgByVolume((int) value);
-            playSoundByValue((int) value);
+            playSampleTextByVolumeSize((int) value);
         });
         slVib.addOnChangeListener((slider, value, fromUser) -> {
             displayVibImgByVibIntensity((int) value);
@@ -333,14 +339,17 @@ public class AlarmSetterActivity extends BaseActivity {
         dialog.show();
     }
 
-    private void playSoundByValue(int value) {
-        soundPlayer.playShortSound(value);
-        Log.i(CLASS_NAME, "playSoundByValue$cur volume : " + value);
+    private void playSampleTextByVolumeSize(int value) {
+        ttsManager.setVolumeSize(value);
+        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
     }
 
+    private void playSampleTextByTempo(float value) {
+        ttsManager.setVoiceTempo(value);
+        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
+    }
     private void vibrateByValue(float value) {
         vibrator.vibrateOnce((int) value * 51);
-        Log.i(CLASS_NAME, "vibrateByValue$cur vibration : " + (int) value);
     }
 
     @SuppressLint("SetTextI18n")
@@ -349,17 +358,14 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void displayVolumeImgByVolume(int volume) {
+        setInvisibleAllVolumeImg();
         if (volume == 0) {
-            setInvisibleAllVolumeImg();
             ivVolumeMute.setVisibility(ImageView.VISIBLE);
         } else if (volume <= 5) {
-            setInvisibleAllVolumeImg();
             ivVolumeLow.setVisibility(ImageView.VISIBLE);
         } else if (volume <= 10) {
-            setInvisibleAllVolumeImg();
             ivVolumeMedium.setVisibility(ImageView.VISIBLE);
         } else {
-            setInvisibleAllVolumeImg();
             ivVolumeHigh.setVisibility(ImageView.VISIBLE);
         }
     }
@@ -372,17 +378,14 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void displayVibImgByVibIntensity(int vib) {
+        setInvisibleAllVibImg();
         if (vib == 0) {
-            setInvisibleAllVibImg();
             ivVibNone.setVisibility(ImageView.VISIBLE);
         } else if (vib <= 1) {
-            setInvisibleAllVibImg();
             ivVibLow.setVisibility(ImageView.VISIBLE);
         } else if (vib <= 3) {
-            setInvisibleAllVibImg();
             ivVibMedium.setVisibility(ImageView.VISIBLE);
         } else {
-            setInvisibleAllVibImg();
             ivVibHigh.setVisibility(ImageView.VISIBLE);
         }
     }
@@ -490,7 +493,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
     @Override
     protected void onDestroy() {
-        soundPlayer.release();
+        ttsManager.release();
         vibrator.release();
         super.onDestroy();
     }
