@@ -19,7 +19,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -412,33 +411,22 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void saveSetting() {
         if (alarmData == null) {
-            if (addNewAlarmData()) {
-                registerAlarm();
-                Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
-            } else {
-                Toast.makeText(this, "알람을 추가할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                Log.i(CLASS_NAME, "saveSetting$couldn't add new alarm data..");
-                return;
-            }
+            addNewAlarmData();
+            registerAlarm();
+            Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
         } else {
-            if (updateAlarmData()) {
-                modifyAlarm();
-                Log.i(CLASS_NAME, "saveSetting$updating existing alarm data completed!");
-            } else {
-                Toast.makeText(this, "알람을 수정할 수 없습니다.", Toast.LENGTH_SHORT).show();
-                Log.i(CLASS_NAME, "saveSetting$couldn't update alarm data..");
-                return;
-            }
+            updateAlarmData();
+            modifyAlarm();
+            Log.i(CLASS_NAME, "saveSetting$updating existing alarm data completed!");
         }
         finish();
     }
 
-    private boolean addNewAlarmData() {
+    private void addNewAlarmData() {
         alarmData = new AlarmData(getNewId());
         setAlarmData();
         AlarmDatabaseUtil.insert(this, alarmData);
         sendResultToMainActivity("addNewAlarmData");
-        return true;
     }
 
     private int getNewId() {
@@ -447,11 +435,10 @@ public class AlarmSetterActivity extends BaseActivity {
         return curId;
     }
 
-    private boolean updateAlarmData() {
+    private void updateAlarmData() {
         setAlarmData();
         AlarmDatabaseUtil.update(this, alarmData);
         sendResultToMainActivity("updateAlarmData");
-        return true;
     }
 
     private void setAlarmData() {

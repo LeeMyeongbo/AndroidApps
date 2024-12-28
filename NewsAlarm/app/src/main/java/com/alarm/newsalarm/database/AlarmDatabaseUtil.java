@@ -25,50 +25,14 @@ public class AlarmDatabaseUtil {
             .build();
     }
 
-    private static boolean isValid(AlarmData data) {
-        return isVolumeSizeValid(data) && isVibIntensityValid(data)
-                && isSpecificDateValid(data) && data.getPeriodicWeekBit() >= 0;
-    }
-
-    private static boolean isVolumeSizeValid(AlarmData data) {
-        int vol = data.getVolumeSize();
-        if (vol >= 0 && vol < 16) {
-            return true;
-        }
-        Log.e(CLASS_NAME, "isVolumeSizeValid$volume size must be set by 0.0 to 100.0!");
-        return false;
-    }
-
-    private static boolean isVibIntensityValid(AlarmData data) {
-        int intensity = data.getVibIntensity();
-        if (intensity >= 0 && intensity < 256) {
-            return true;
-        }
-        Log.e(CLASS_NAME, "isVibIntensityValid$vibration intensity must be set by 0 to 255!");
-        return false;
-    }
-
-    private static boolean isSpecificDateValid(AlarmData data) {
-        long dateInMillis = data.getSpecificDateInMillis();
-        if (dateInMillis > System.currentTimeMillis()) {
-            return true;
-        }
-        Log.e(CLASS_NAME, "isSpecificDateValid$alarm date must be set by future date!");
-        return false;
-    }
-
     public static void insert(Context context, AlarmData data) {
-        if (isValid(data)) {
-            Log.i(CLASS_NAME, "insert$alarm data insertion started!");
-            new Thread(() -> getDB(context).alarmDataDao().insert(data)).start();
-        }
+        Log.i(CLASS_NAME, "insert$alarm data insertion started!");
+        new Thread(() -> getDB(context).alarmDataDao().insert(data)).start();
     }
 
     public static void update(Context context, AlarmData data) {
-        if (!data.isActive() || isValid(data)) {
-            Log.i(CLASS_NAME, "update$alarm data update started!");
-            new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
-        }
+        Log.i(CLASS_NAME, "update$alarm data update started!");
+        new Thread(() -> getDB(context).alarmDataDao().update(data)).start();
     }
 
     public static void delete(Context context, AlarmData data) {

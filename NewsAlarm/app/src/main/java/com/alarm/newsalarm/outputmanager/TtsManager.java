@@ -131,11 +131,7 @@ public class TtsManager {
     }
 
     public void speak(String txt, int mode) {
-        if (isTtsInitialized) {
-            speakWithTts(txt, mode);
-        } else {
-            speakList.add(() -> speakWithTts(txt, mode));
-        }
+        speak(txt, mode, TextToSpeech.QUEUE_ADD);
     }
 
     public void speak(String txt, int mode, int queueMode) {
@@ -144,13 +140,6 @@ public class TtsManager {
         } else {
             speakList.add(() -> speakWithTts(txt, mode, queueMode));
         }
-    }
-
-    private void speakWithTts(String txt, int mode) {
-        if (mode == 1) {
-            tts.playSilentUtterance(800L, TextToSpeech.QUEUE_ADD, "silence");
-        }
-        tts.speak(txt, TextToSpeech.QUEUE_ADD, null, "speak");
     }
 
     private void speakWithTts(String txt, int mode, int queueMode) {
