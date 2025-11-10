@@ -1,9 +1,12 @@
 package com.alarm.newsalarm;
 
+import android.graphics.Insets;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -22,6 +25,14 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         Log.i(CLASS_NAME, "onStart");
+        ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
+            Insets systemBarInsets = insets
+                .getInsets(WindowInsetsCompat.Type.systemBars())
+                .toPlatformInsets();
+            v.setPadding(systemBarInsets.left, systemBarInsets.top, systemBarInsets.right,
+                systemBarInsets.bottom);
+            return insets;
+        });
         super.onStart();
     }
 
