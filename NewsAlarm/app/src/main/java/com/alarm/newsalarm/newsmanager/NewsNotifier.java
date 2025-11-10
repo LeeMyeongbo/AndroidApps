@@ -28,32 +28,35 @@ public class NewsNotifier {
 
     private static final String CLASS_NAME = "NewsNotifier";
 
+    private final Context context;
     private final JsonNewsParser parser;
     private final NewsArticleCrawler crawler;
     private final SoundPlayer soundPlayer;
     private final Vibrator vibrator;
-    private final TtsManager ttsManager;
     private final AlarmData data;
     private final RequestQueue queue;
+    private TtsManager ttsManager;
 
     public NewsNotifier(Context context, AlarmData data) {
+        this.context = context;
         this.data = data;
         parser = new JsonNewsParser();
         crawler = new NewsArticleCrawler();
         soundPlayer = new SoundPlayer(context);
         vibrator = new Vibrator(context);
-        ttsManager = new TtsManager(context, data);
         queue = Volley.newRequestQueue(context.getApplicationContext());
     }
 
     public void start() {
-        Log.i(CLASS_NAME, "start$loading news data started!");
-        soundPlayer.playBgm();
-        vibrator.vibrateRepeatedly(data.getVibIntensity());
+        ttsManager = new TtsManager(context, data, () -> {
+            Log.i(CLASS_NAME, "start$loading news data started!");
+            soundPlayer.playBgm();
+            vibrator.vibrateRepeatedly(data.getVibIntensity());
 
-        StringRequest newsApiRequest = getRequest(data.getAlarmTopic());
-        newsApiRequest.setShouldCache(false);
-        queue.add(newsApiRequest);
+            StringRequest newsApiRequest = getRequest(data.getAlarmTopic());
+            newsApiRequest.setShouldCache(false);
+            queue.add(newsApiRequest);
+        });
     }
 
     @NonNull

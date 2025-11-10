@@ -7,7 +7,7 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 import android.util.Log;
 
-import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.database.AlarmData;
 
@@ -16,26 +16,30 @@ import java.util.Locale;
 
 public class TtsManager {
 
+    public interface OnInitListener {
+        void onInitialized();
+    }
+
     private static final String CLASS_NAME = "TtsManager";
 
+    private final OnInitListener listener;
     private final ArrayList<Runnable> speakList = new ArrayList<>();
+    private final ArrayList<Voice> voiceList = new ArrayList<>();
     private AudioManager manager;
     private AudioAttributes attr;
     private TextToSpeech tts;
-    private Voice maleVoice, femaleVoice;
     private boolean isTtsInitialized;
     private int originalVolume;
 
-    public TtsManager(Context context, @Nullable AlarmData data) {
+    public TtsManager(@NonNull Context context, AlarmData data, OnInitListener listener) {
+        this.listener = listener;
         storeOriginalVolume(context);
         initAudioAttributes();
         if (data == null) {
-            initTts(context, 1.0f, "male");
-            setVolumeSize(4);
+            initTts(context, 0, 4, 1.0f, 1.0f);
             return;
         }
-        initTts(context, data.getTempo(), "남성".equals(data.getGender()) ? "male" : "female");
-        setVolumeSize(data.getVolumeSize());
+        initTts(context, data.getVoiceIdx(), data.getVolumeSize(), data.getTempo(), data.getPitch());
     }
 
     private void storeOriginalVolume(Context context) {
@@ -50,38 +54,66 @@ public class TtsManager {
             .build();
     }
 
-    private void initTts(Context context, float tempo, String gender) {
+    private void initTts(Context context, int idx, int volumeSize, float tempo, float pitch) {
         tts = new TextToSpeech(context, status -> {
             if (status == TextToSpeech.ERROR) {
                 return;
             }
-            setTts(tempo, gender);
+            setTts(idx, volumeSize, tempo, pitch);
             speakList.forEach(Runnable::run);
             isTtsInitialized = true;
             Log.i(CLASS_NAME, "initTts$tts initialized successfully");
+
+            if (listener != null) {
+                listener.onInitialized();
+            }
         });
     }
 
-    private void setTts(float tempo, String gender) {
-        tts.setLanguage(Locale.KOREAN);
-        tts.setAudioAttributes(attr);
+    private void setTts(int idx, int volumeSize, float tempo, float pitch) {
         prepareVoices();
+        setSpecificVoice(idx);
+        setVolumeSize(volumeSize);
+        setVoicePitch(pitch);
         setVoiceTempo(tempo);
-        setVoiceGender(gender);
     }
 
     private void prepareVoices() {
-        femaleVoice = tts.getVoice();
-        Log.i(CLASS_NAME, "prepareVoices$female voice(default voice) : " + femaleVoice.getName());
-
+        tts.setLanguage(Locale.KOREAN);
+        tts.setAudioAttributes(attr);
         for (Voice voice : tts.getVoices()) {
-            if (voice.getName().contains("KR")
-                    && voice.getFeatures().parallelStream().anyMatch(s -> s.contains("=male"))) {
-                maleVoice = voice;
-                Log.i(CLASS_NAME, "prepareVoices$male voice : " + maleVoice.getName());
-                return;
+            String name = voice.getName().toLowerCase(Locale.ROOT);
+            if (name.contains("ko-kr") && name.contains("local")) {
+                voiceList.add(voice);
+                Log.i(CLASS_NAME, "prepareVoices$found voice : " + voice.getName());
             }
         }
+        if (voiceList.isEmpty()) {
+            tts.setVoice(tts.getDefaultVoice());
+            Log.i(CLASS_NAME, "prepareVoices$no local voice found - add default voice " +
+                tts.getDefaultVoice().getName());
+        }
+    }
+
+    public void setSpecificVoice(int idx) {
+        if (idx < 0 || idx >= voiceList.size()) {
+            Log.e(CLASS_NAME, "setSpecificVoice$invalid voice index : " + idx);
+            tts.setVoice(tts.getDefaultVoice());
+            return;
+        }
+        tts.setVoice(voiceList.get(idx));
+        Log.i(CLASS_NAME, "setSpecificVoice$voice index : " + idx);
+        Log.i(CLASS_NAME, "setSpecificVoice$voice name : " + voiceList.get(idx).getName());
+    }
+
+    public void setVolumeSize(int volumeSize) {
+        manager.setStreamVolume(AudioManager.STREAM_ALARM, volumeSize, 0);
+        Log.i(CLASS_NAME, "setVolumeSize$set volume : " + volumeSize);
+    }
+
+    public void setVoicePitch(float pitch) {
+        tts.setPitch(pitch);
+        Log.i(CLASS_NAME, "setVoicePitch$voice pitch : " + pitch);
     }
 
     public void setVoiceTempo(float tempo) {
@@ -89,23 +121,8 @@ public class TtsManager {
         Log.i(CLASS_NAME, "setVoiceTempo$voice tempo : " + tempo);
     }
 
-    public void setVoiceGender(String gender) {
-        switch (gender) {
-            case "female" -> {
-                tts.setVoice(femaleVoice);
-                Log.i(CLASS_NAME, "setVoiceGender$voice set to female");
-            }
-            case "male" -> {
-                tts.setVoice(maleVoice);
-                Log.i(CLASS_NAME, "setVoiceGender$voice set to male");
-            }
-            default -> Log.i(CLASS_NAME, "setVoiceGender$wrong gender parameter!!");
-        }
-    }
-
-    public void setVolumeSize(int volumeSize) {
-        manager.setStreamVolume(AudioManager.STREAM_ALARM, volumeSize, 0);
-        Log.i(CLASS_NAME, "setVolumeSize$set volume : " + volumeSize);
+    public int getAvailableVoiceNum() {
+        return voiceList.size();
     }
 
     public void speakArticles(ArrayList<String> titleList, ArrayList<String> bodyList) {

@@ -17,8 +17,11 @@ public class AlarmData implements Parcelable {
     @ColumnInfo(name = "Topic")
     private String alarmTopic;
 
-    @ColumnInfo(name = "Gender")
-    private String gender;
+    @ColumnInfo(name = "Voice")
+    private int voiceIdx;
+
+    @ColumnInfo(name = "Pitch")
+    private float pitch;
 
     @ColumnInfo(name = "Tempo")
     private float tempo;
@@ -54,7 +57,8 @@ public class AlarmData implements Parcelable {
     protected AlarmData(Parcel in) {
         id = in.readInt();
         alarmTopic = in.readString();
-        gender = in.readString();
+        voiceIdx = in.readInt();
+        pitch = in.readFloat();
         tempo = in.readFloat();
         volumeSize = in.readInt();
         vibIntensity = in.readInt();
@@ -83,12 +87,20 @@ public class AlarmData implements Parcelable {
         return alarmTopic;
     }
 
-    public void setGender(String gender) {
-        this.gender = gender;
+    public void setVoiceIdx(int idx) {
+        this.voiceIdx = idx;
     }
 
-    public String getGender() {
-        return gender;
+    public int getVoiceIdx() {
+        return voiceIdx;
+    }
+
+    public void setPitch(float pitch) {
+        this.pitch = pitch;
+    }
+
+    public float getPitch() {
+        return pitch;
     }
 
     public void setTempo(float tempo) {
@@ -148,7 +160,8 @@ public class AlarmData implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeInt(id);
         dest.writeString(alarmTopic);
-        dest.writeString(gender);
+        dest.writeInt(voiceIdx);
+        dest.writeFloat(pitch);
         dest.writeFloat(tempo);
         dest.writeInt(volumeSize);
         dest.writeInt(vibIntensity);

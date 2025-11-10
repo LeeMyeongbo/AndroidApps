@@ -58,17 +58,16 @@ public class AlarmSetterActivity extends BaseActivity {
     private TtsManager ttsManager;
     private TimePicker timePicker;
     private DatePickerDialog dialog;
-    private TextView tvInfo, tvTempo;
+    private TextView tvInfo, tvTempo, tvPitch;
     private ImageButton btnDateSelector;
-    private TextInputLayout topicSelector, genderSelector;
-    private AutoCompleteTextView tvTopicList, tvGenderList;
+    private TextInputLayout topicSelector, voiceSelector;
+    private AutoCompleteTextView tvTopicList, tvVoiceList;
     private ImageView ivVolumeMute, ivVolumeLow, ivVolumeMedium, ivVolumeHigh;
     private ImageView ivVibNone, ivVibLow, ivVibMedium, ivVibHigh;
-    private Slider slTempo, slVolume, slVib;
+    private Slider slTempo, slVolume, slVib, slPitch;
     private MaterialButton btnSave, btnCancel;
     private String selectedTopic = "";
-    private String selectedGender = "남성";
-    private int curWeekBit;
+    private int selectedVoiceIdx, curWeekBit;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -85,7 +84,7 @@ public class AlarmSetterActivity extends BaseActivity {
 
         init();
         initUI();
-        initDropdownSelectors();
+        initNewsTopicDropdownSelector();
         setViewsFromAlarmData();
         setTvInfo();
         setEventListener();
@@ -93,13 +92,14 @@ public class AlarmSetterActivity extends BaseActivity {
         displayTvTempoByTempo(slTempo.getValue());
         displayVolumeImgByVolume((int) slVolume.getValue());
         displayVibImgByVibIntensity((int) slVib.getValue());
+        displayTvPitchByPitch(slPitch.getValue());
     }
 
     private void init() {
         alarmData = getIntent().getParcelableExtra("alarmData", AlarmData.class);
         inputManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         vibrator = new Vibrator(this);
-        ttsManager = new TtsManager(this, alarmData);
+        ttsManager = new TtsManager(this, alarmData, this::initVoiceDropdownSelector);
         setter = new AlarmSetter(this);
         sharedPref = getSharedPreferences("id_pref", Context.MODE_PRIVATE);
     }
@@ -113,13 +113,15 @@ public class AlarmSetterActivity extends BaseActivity {
         }
         tvInfo = findViewById(R.id.tvInfo);
         tvTempo = findViewById(R.id.tvTempo);
+        tvPitch = findViewById(R.id.tvPitch);
         topicSelector = findViewById(R.id.newsTopicSelector);
         tvTopicList = findViewById(R.id.tvTopicList);
-        genderSelector = findViewById(R.id.genderSelector);
-        tvGenderList = findViewById(R.id.tvGenderList);
+        voiceSelector = findViewById(R.id.voiceSelector);
+        tvVoiceList = findViewById(R.id.tvVoiceList);
         slTempo = findViewById(R.id.slideTempo);
         slVolume = findViewById(R.id.slideVolume);
         slVib = findViewById(R.id.slideVib);
+        slPitch = findViewById(R.id.slidePitch);
         btnSave = findViewById(R.id.btnSave);
         btnCancel = findViewById(R.id.btnCancel);
         initImageViews();
@@ -137,11 +139,6 @@ public class AlarmSetterActivity extends BaseActivity {
         ivVibHigh = findViewById(R.id.vibHighImg);
     }
 
-    private void initDropdownSelectors() {
-        initNewsTopicDropdownSelector();
-        initGenderDropdownSelector();
-    }
-
     private void initNewsTopicDropdownSelector() {
         String[] topics = getResources().getStringArray(R.array.topics);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, DROPDOWN_LAYOUT, topics) {
@@ -156,18 +153,21 @@ public class AlarmSetterActivity extends BaseActivity {
         tvTopicList.setAdapter(adapter);
     }
 
-    private void initGenderDropdownSelector() {
-        String[] genders = getResources().getStringArray(R.array.gender);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, DROPDOWN_LAYOUT, genders) {
+    private void initVoiceDropdownSelector() {
+        String[] voices = new String[ttsManager.getAvailableVoiceNum()];
+        for (int i = 1; i <= voices.length; i++) {
+            voices[i - 1] = "음성 " + i;
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, DROPDOWN_LAYOUT, voices) {
 
             @NonNull
             @Override
             public Filter getFilter() {
-                return getDropdownFilter(genders);
+                return getDropdownFilter(voices);
             }
         };
-        tvGenderList.setThreshold(Integer.MAX_VALUE);
-        tvGenderList.setAdapter(adapter);
+        tvVoiceList.setThreshold(Integer.MAX_VALUE);
+        tvVoiceList.setAdapter(adapter);
     }
 
     private Filter getDropdownFilter(String[] values) {
@@ -212,15 +212,15 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void setSelectors() {
         selectedTopic = alarmData.getAlarmTopic();
-        selectedGender = alarmData.getGender();
         tvTopicList.setText(selectedTopic, false);
-        tvGenderList.setText(selectedGender, false);
+        tvVoiceList.setText("음성 " + (alarmData.getVoiceIdx() + 1), false);
     }
 
     private void setSliders() {
         slTempo.setValue(alarmData.getTempo());
         slVolume.setValue(alarmData.getVolumeSize());
         slVib.setValue(alarmData.getVibIntensity() / 51f);
+        slPitch.setValue(alarmData.getPitch());
     }
 
     private void setTvInfo() {
@@ -281,11 +281,11 @@ public class AlarmSetterActivity extends BaseActivity {
             }
             return false;
         });
-        tvGenderList.setOnItemClickListener((parent, view, pos, id) -> {
-            selectedGender = (String) tvGenderList.getAdapter().getItem(pos);
-            tvGenderList.clearFocus();
-            genderSelector.setHelperText("설정한 목소리 : " + selectedGender);
-            ttsManager.setVoiceGender("남성".equals(selectedGender) ? "male" : "female");
+        tvVoiceList.setOnItemClickListener((parent, view, pos, id) -> {
+            selectedVoiceIdx = pos;
+            tvVoiceList.clearFocus();
+            voiceSelector.setHelperText("설정한 목소리 : 음성" + (selectedVoiceIdx + 1));
+            ttsManager.setSpecificVoice(selectedVoiceIdx);
         });
         slTempo.addOnChangeListener((slider, value, fromUser) -> {
             displayTvTempoByTempo(value);
@@ -298,6 +298,10 @@ public class AlarmSetterActivity extends BaseActivity {
         slVib.addOnChangeListener((slider, value, fromUser) -> {
             displayVibImgByVibIntensity((int) value);
             vibrateByValue(value);
+        });
+        slPitch.addOnChangeListener((slider, value, fromUser) -> {
+            displayTvPitchByPitch(value);
+            playSampleTestByPitch(value);
         });
         timePicker.setOnTimeChangedListener((view, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
@@ -347,6 +351,12 @@ public class AlarmSetterActivity extends BaseActivity {
         ttsManager.setVoiceTempo(value);
         ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
     }
+
+    private void playSampleTestByPitch(float value) {
+        ttsManager.setVoicePitch(value);
+        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
+    }
+
     private void vibrateByValue(float value) {
         vibrator.vibrateOnce((int) value * 51);
     }
@@ -354,6 +364,11 @@ public class AlarmSetterActivity extends BaseActivity {
     @SuppressLint("SetTextI18n")
     private void displayTvTempoByTempo(float tempo) {
         tvTempo.setText("x " + tempo);
+    }
+
+    @SuppressLint("SetTextI18n")
+    private void displayTvPitchByPitch(float pitch) {
+        tvPitch.setText("" + pitch);
     }
 
     private void displayVolumeImgByVolume(int volume) {
@@ -443,7 +458,8 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void setAlarmData() {
         alarmData.setAlarmTopic(selectedTopic);
-        alarmData.setGender(selectedGender);
+        alarmData.setVoiceIdx(selectedVoiceIdx);
+        alarmData.setPitch(slPitch.getValue());
         alarmData.setTempo(slTempo.getValue());
         alarmData.setVolumeSize((int) slVolume.getValue());
         alarmData.setVibIntensity((int) slVib.getValue() * 51);

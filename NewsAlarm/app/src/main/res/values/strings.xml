@@ -16,10 +16,12 @@
     <string name="txt_bgm">알람음 크기</string>
     <string name="txt_vib">진동 세기</string>
     <string name="txt_news_topic">관심 있는 뉴스 주제</string>
-    <string name="txt_voice">목소리 성별</string>
+    <string name="txt_voice">음성</string>
+    <string name="txt_pitch">음조</string>
     <string name="txt_cancel">취소</string>
     <string name="txt_save">저장</string>
     <string name="tempo_value">x 1.0</string>
+    <string name="pitch_value">1.0</string>
     <string name="choose_exact_date">특정 날짜로 고르기</string>
     <string name="choose_periodic_week">요일 선택</string>
     <string name="release_alarm">알람 해제</string>
@@ -33,10 +35,5 @@
         <item>상식</item>
         <item>건강</item>
         <item>직접 입력</item>
-    </string-array>
-
-    <string-array name="gender">
-        <item>남성</item>
-        <item>여성</item>
     </string-array>
 </resources>
