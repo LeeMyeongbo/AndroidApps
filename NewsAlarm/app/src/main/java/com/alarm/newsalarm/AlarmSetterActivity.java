@@ -1,5 +1,7 @@
 package com.alarm.newsalarm;
 
+import static androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP;
+
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -7,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -17,10 +21,14 @@ import android.widget.CheckBox;
 import android.widget.Filter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsAnimationCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
@@ -34,6 +42,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -50,6 +59,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private final Calendar calendar = Calendar.getInstance();
     private final Locale locale = new Locale("ko", "KR");
     private final CheckBox[] cbWeekdays = new CheckBox[7];
+    private ScrollView backgroundScrollview;
     private InputMethodManager inputManager;
     private AlarmData alarmData;
     private AlarmSetter setter;
@@ -67,7 +77,7 @@ public class AlarmSetterActivity extends BaseActivity {
     private Slider slTempo, slVolume, slVib, slPitch;
     private MaterialButton btnSave, btnCancel;
     private String selectedTopic = "";
-    private int selectedVoiceIdx, curWeekBit;
+    private int selectedVoiceIdx = -1, curWeekBit;
 
     public AlarmSetterActivity() {
         super("AlarmSetterActivity");
@@ -105,6 +115,7 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void initUI() {
+        backgroundScrollview = findViewById(R.id.backgroundScrollview);
         dialog = new DatePickerDialog(this);
         timePicker = findViewById(R.id.timePicker);
         btnDateSelector = findViewById(R.id.datePicker);
@@ -153,6 +164,7 @@ public class AlarmSetterActivity extends BaseActivity {
         tvTopicList.setAdapter(adapter);
     }
 
+    @SuppressLint("SetTextI18n")
     private void initVoiceDropdownSelector() {
         String[] voices = new String[ttsManager.getAvailableVoiceNum()];
         for (int i = 1; i <= voices.length; i++) {
@@ -168,6 +180,10 @@ public class AlarmSetterActivity extends BaseActivity {
         };
         tvVoiceList.setThreshold(Integer.MAX_VALUE);
         tvVoiceList.setAdapter(adapter);
+        if (alarmData != null) {
+            selectedVoiceIdx = alarmData.getVoiceIdx();
+            tvVoiceList.setText("음성 " + (selectedVoiceIdx + 1), false);
+        }
     }
 
     private Filter getDropdownFilter(String[] values) {
@@ -213,7 +229,6 @@ public class AlarmSetterActivity extends BaseActivity {
     private void setSelectors() {
         selectedTopic = alarmData.getAlarmTopic();
         tvTopicList.setText(selectedTopic, false);
-        tvVoiceList.setText("음성 " + (alarmData.getVoiceIdx() + 1), false);
     }
 
     private void setSliders() {
@@ -236,8 +251,7 @@ public class AlarmSetterActivity extends BaseActivity {
         long dateMillis = calendar.getTimeInMillis();
         SimpleDateFormat format = new SimpleDateFormat("MM월 dd일 HH:mm", locale);
         String timeFormat = dateMillis <= System.currentTimeMillis()
-            ? format.format(dateMillis + 1000L * 60 * 60 * 24)
-            : format.format(dateMillis);
+            ? format.format(dateMillis + 1000L * 60 * 60 * 24) : format.format(dateMillis);
         tvInfo.setText(builder.append(timeFormat).append("에 알람이 울립니다.").toString());
     }
 
@@ -254,8 +268,43 @@ public class AlarmSetterActivity extends BaseActivity {
     private void setEventListener() {
         dialog.setOnDateSetListener((v, year, month, day) -> saveSelectedDate(year, month, day));
         btnDateSelector.setOnClickListener(v -> openDatePicker());
+        ViewCompat.setWindowInsetsAnimationCallback(backgroundScrollview,
+            new WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+
+                @NonNull
+                @Override
+                public WindowInsetsCompat onProgress(@NonNull WindowInsetsCompat insets,
+                        @NonNull List<WindowInsetsAnimationCompat> runningAnimations) {
+                    return insets;
+                }
+
+                @Override
+                public void onEnd(@NonNull WindowInsetsAnimationCompat animation) {
+                    super.onEnd(animation);
+                    boolean isKeyboardVisible = Objects
+                        .requireNonNull(ViewCompat.getRootWindowInsets(backgroundScrollview))
+                        .isVisible(WindowInsetsCompat.Type.ime());
+
+                    if (isKeyboardVisible) {
+                        int finalKeyboardHeight = Objects
+                            .requireNonNull(ViewCompat.getRootWindowInsets(backgroundScrollview))
+                            .getInsets(WindowInsetsCompat.Type.ime()).bottom;
+
+                        backgroundScrollview.post(() -> {
+                            int[] location = new int[2];
+                            tvVoiceList.getLocationOnScreen(location);
+
+                            int screenHeight = backgroundScrollview.getRootView().getHeight();
+                            int scroll = location[1] - (screenHeight - finalKeyboardHeight);
+                            backgroundScrollview.smoothScrollBy(0, scroll);
+                        });
+                    } else {
+                        clearFocusOnTopicSelector();
+                    }
+                }
+            }
+        );
         tvTopicList.setOnItemClickListener((parent, view, pos, id) -> {
-            selectedTopic = (String) tvTopicList.getAdapter().getItem(pos);
             if ("직접 입력".equals(selectedTopic)) {
                 selectedTopic = "";
                 tvTopicList.setText("", false);
@@ -263,23 +312,36 @@ public class AlarmSetterActivity extends BaseActivity {
                 tvTopicList.requestFocus();
                 inputManager.showSoftInput(tvTopicList, 0);
             } else {
-                tvTopicList.setInputType(EditorInfo.TYPE_NULL);
+                selectedTopic = (String) tvTopicList.getAdapter().getItem(pos);
                 inputManager.hideSoftInputFromWindow(
                     Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
-                tvTopicList.clearFocus();
                 topicSelector.setHelperText("설정한 키워드 : " + selectedTopic);
+                clearFocusOnTopicSelector();
             }
         });
         tvTopicList.setOnKeyListener((v, keyCode, event) -> {
-            if (keyCode == KeyEvent.KEYCODE_ENTER) {
-                selectedTopic = tvTopicList.getText().toString();
+            if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_BACK) {
                 inputManager.hideSoftInputFromWindow(
                     Objects.requireNonNull(getCurrentFocus()).getWindowToken(), 0);
-                tvTopicList.clearFocus();
-                topicSelector.setHelperText("설정한 키워드 : " + selectedTopic);
-                return true;
             }
             return false;
+        });
+        tvTopicList.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                selectedTopic = s.toString();
+                topicSelector.setHelperText(selectedTopic.isBlank()
+                    ? "" : "설정한 키워드 : " + selectedTopic);
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
         });
         tvVoiceList.setOnItemClickListener((parent, view, pos, id) -> {
             selectedVoiceIdx = pos;
@@ -318,6 +380,11 @@ public class AlarmSetterActivity extends BaseActivity {
         }
         btnSave.setOnClickListener(v -> saveSetting());
         btnCancel.setOnClickListener(v -> finish());
+    }
+
+    private void clearFocusOnTopicSelector() {
+        tvTopicList.clearFocus();
+        tvTopicList.setInputType(EditorInfo.TYPE_NULL);
     }
 
     private void saveSelectedDate(int year, int month, int day) {
@@ -425,6 +492,16 @@ public class AlarmSetterActivity extends BaseActivity {
     }
 
     private void saveSetting() {
+        if (selectedTopic.isBlank()) {
+            topicSelector.setError("키워드를 입력해주세요.");
+            backgroundScrollview.smoothScrollTo(0, topicSelector.getTop());
+            return;
+        }
+        if (selectedVoiceIdx == -1) {
+            voiceSelector.setError("음성을 선택해주세요.");
+            backgroundScrollview.smoothScrollTo(0, voiceSelector.getTop());
+            return;
+        }
         if (alarmData == null) {
             addNewAlarmData();
             registerAlarm();
