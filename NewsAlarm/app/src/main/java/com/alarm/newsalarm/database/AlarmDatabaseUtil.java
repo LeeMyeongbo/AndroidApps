@@ -20,8 +20,10 @@ public class AlarmDatabaseUtil {
         if (db != null) {
             return db;
         }
+        Context storageContext = context.createDeviceProtectedStorageContext();
         return db = Room
-            .databaseBuilder(context.getApplicationContext(), AlarmDatabase.class, "AlarmDB")
+            .databaseBuilder(storageContext, AlarmDatabase.class, "AlarmDB")
+            .fallbackToDestructiveMigrationOnDowngrade()
             .build();
     }
 
