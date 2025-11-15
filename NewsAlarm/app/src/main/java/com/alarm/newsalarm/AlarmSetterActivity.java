@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -505,11 +504,9 @@ public class AlarmSetterActivity extends BaseActivity {
         if (alarmData == null) {
             addNewAlarmData();
             registerAlarm();
-            Log.i(CLASS_NAME, "saveSetting$adding new alarm data completed!");
         } else {
             updateAlarmData();
             modifyAlarm();
-            Log.i(CLASS_NAME, "saveSetting$updating existing alarm data completed!");
         }
         finish();
     }

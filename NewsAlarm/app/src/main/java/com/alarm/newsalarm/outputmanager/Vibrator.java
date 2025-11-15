@@ -7,9 +7,10 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.VibrationEffect;
 import android.os.VibratorManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
+
+import com.alarm.newsalarm.utils.LogUtil;
 
 public class Vibrator {
 
@@ -36,33 +37,34 @@ public class Vibrator {
 
     public Vibrator(Context context) {
         vibrator = (VibratorManager) context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE);
+        LogUtil.logI(CLASS_NAME, "constructor", "vibrator initialized completely!");
     }
 
     public void vibrateOnce(int amplitude) {
         if (amplitude == 0) {
-            Log.i(CLASS_NAME, "vibrateOnce$amplitude : 0");
+            LogUtil.logD(CLASS_NAME, "vibrateOnce", "amplitude : 0");
             return;
         }
-        Log.i(CLASS_NAME, "vibrateOnce$amplitude : " + amplitude);
+        LogUtil.logD(CLASS_NAME, "vibrateOnce", "amplitude : " + amplitude);
         VibrationEffect effect = VibrationEffect.createOneShot(500, amplitude);
         vibrator.vibrate(CombinedVibration.createParallel(effect));
     }
 
     public void vibrateRepeatedly(int amplitude) {
         if (amplitude == 0) {
-            Log.i(CLASS_NAME, "vibrateRepeatedly$amplitude : 0");
+            LogUtil.logD(CLASS_NAME, "vibrateRepeatedly", "amplitude : 0");
             return;
         }
         Message msg = handler.obtainMessage();
         msg.what = MSG_VIBRATE;
         msg.arg1 = amplitude;
         handler.sendMessageDelayed(msg, 1000);
-        Log.i(CLASS_NAME, "vibrateRepeatedly$amplitude : " + amplitude);
+        LogUtil.logD(CLASS_NAME, "vibrateRepeatedly", "amplitude : " + amplitude);
     }
 
     public void release() {
         handler.removeMessages(MSG_VIBRATE);
         vibrator.cancel();
-        Log.i(CLASS_NAME, "release$Vibrator released completely!");
+        LogUtil.logI(CLASS_NAME, "release", "vibrator released completely!");
     }
 }

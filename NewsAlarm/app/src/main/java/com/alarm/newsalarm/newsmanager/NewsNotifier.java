@@ -3,7 +3,6 @@ package com.alarm.newsalarm.newsmanager;
 import static com.android.volley.Request.Method.GET;
 
 import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
@@ -12,6 +11,7 @@ import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.outputmanager.SoundPlayer;
 import com.alarm.newsalarm.outputmanager.TtsManager;
 import com.alarm.newsalarm.outputmanager.Vibrator;
+import com.alarm.newsalarm.utils.LogUtil;
 import com.android.volley.RequestQueue;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
@@ -49,7 +49,7 @@ public class NewsNotifier {
 
     public void start() {
         ttsManager = new TtsManager(context, data, () -> {
-            Log.i(CLASS_NAME, "start$loading news data started!");
+            LogUtil.logI(CLASS_NAME, "start", "load news data started!");
             soundPlayer.playBgm();
             vibrator.vibrateRepeatedly(data.getVibIntensity());
 
@@ -92,12 +92,11 @@ public class NewsNotifier {
             notifyParseNewsDataFail();
             return true;
         }
-        Log.i(CLASS_NAME, "isParsingFailed$succeeded -> loading news data completed!");
         return false;
     }
 
     private void notifyParseNewsDataFail() {
-        Log.e(CLASS_NAME, "notifyParseNewsDataFail$parsing news data failed!");
+        LogUtil.logE(CLASS_NAME, "notifyParseNewsDataFail", "parse news data failed!");
         ttsManager.speak("조건에 맞는 뉴스를 찾을 수 없습니다. 다른 키워드로 부탁드립니다.", 1);
     }
 
@@ -106,22 +105,21 @@ public class NewsNotifier {
             notifyCrawlNewsDataFail();
             return true;
         }
-        Log.i(CLASS_NAME, "isCrawlingFailed$succeeded -> crawling news article completed!");
         return false;
     }
 
     private void notifyCrawlNewsDataFail() {
-        Log.e(CLASS_NAME, "notifyCrawlNewsDataFail$crawl news article failed!");
+        LogUtil.logE(CLASS_NAME, "notifyCrawlNewsDataFail", "crawl news article failed!");
         ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스 본문에 연결하지 못했습니다. 연결이 원활한 환경에서 시도바랍니다.", 1);
     }
 
     private void notifyNewsContents(ArrayList<String> titleList, ArrayList<String> bodyList) {
-        Log.i(CLASS_NAME, "notifyNewsContents$speaking news articles just started!");
+        LogUtil.logI(CLASS_NAME, "notifyNewsContents", "speak news articles started!");
         ttsManager.speakArticles(titleList, bodyList);
     }
 
     private void notifyVolleyError(VolleyError error) {
-        Log.e(CLASS_NAME, "notifyVolleyError$loading news data failed! : " + error);
+        LogUtil.logE(CLASS_NAME, "notifyVolleyError", "loading news data failed! : " + error);
         ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 보시거나, 다른 키워드로 부탁드립니다.", 1);
     }
 

@@ -1,8 +1,7 @@
-package com.alarm.newsalarm.alarmmanager;
+package com.alarm.newsalarm.utils;
 
 import android.content.Context;
 import android.os.PowerManager;
-import android.util.Log;
 
 public class WakeLockUtil {
 
@@ -14,13 +13,13 @@ public class WakeLockUtil {
 
     public synchronized static boolean acquireWakeLock(Context context) {
         if (wakeLock != null) {
-            Log.i(CLASS_NAME, "acquireWakeLock$already acquired -> starting notifier dismissed");
             return false;
         }
+
         PowerManager powerManager = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
         wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "newAlarm:tag");
         wakeLock.acquire(1000L * 60 * 30);
-        Log.i(CLASS_NAME, "acquireWakeLock$wake lock acquired(max time 30m)!");
+        LogUtil.logI(CLASS_NAME, "acquireWakeLock", "wake lock acquired! (max 30m)");
         return true;
     }
 
@@ -29,6 +28,6 @@ public class WakeLockUtil {
             wakeLock.release();
             wakeLock = null;
         }
-        Log.i(CLASS_NAME, "releaseWakeLock$wake lock released completely!");
+        LogUtil.logI(CLASS_NAME, "releaseWakeLock", "wake lock released!");
     }
 }

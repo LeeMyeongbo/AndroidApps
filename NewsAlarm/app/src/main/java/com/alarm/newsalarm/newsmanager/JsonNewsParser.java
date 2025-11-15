@@ -1,8 +1,8 @@
 package com.alarm.newsalarm.newsmanager;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
+
+import com.alarm.newsalarm.utils.LogUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,11 +19,11 @@ class JsonNewsParser {
         try {
             JSONObject jsonArticles = new JSONObject(response);
             JSONArray jsonArticleArray = jsonArticles.getJSONArray("items");
-            Log.i(CLASS_NAME, "parseNaverNewsToJSONSet$json articles ready");
+            LogUtil.logD(CLASS_NAME, "parseNaverNewsToJSONSet", "json articles ready");
 
             return selectOnlyNaverNews(jsonArticleArray);
         } catch (JSONException e) {
-            Log.e(CLASS_NAME, "parseNaverNewsToJSONSet$" + e);
+            LogUtil.logE(CLASS_NAME, "parseNaverNewsToJSONSet", e);
         }
         return new HashSet<>();
     }
@@ -40,7 +40,8 @@ class JsonNewsParser {
                 break;
             }
         }
-        Log.i(CLASS_NAME, "selectOnlyNaverNews$num of news selected : " + jsonArticleSet.size());
+        LogUtil.logI(CLASS_NAME, "selectOnlyNaverNews",
+            "count of naver news article : " + jsonArticleSet.size());
 
         return jsonArticleSet;
     }

@@ -3,16 +3,15 @@ package com.alarm.newsalarm;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
-import com.alarm.newsalarm.alarmmanager.AlarmHelperUtil;
+import com.alarm.newsalarm.utils.AlarmHelperUtil;
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
-import com.alarm.newsalarm.alarmmanager.WakeLockUtil;
+import com.alarm.newsalarm.utils.LogUtil;
+import com.alarm.newsalarm.utils.WakeLockUtil;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 
 import java.util.List;
-import java.util.Objects;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
@@ -26,9 +25,13 @@ public class AlarmReceiver extends BroadcastReceiver {
         this.context = context;
         alarmSetter = new AlarmSetter(context);
 
-        String action = Objects.requireNonNull(intent.getAction());
-        Log.i(CLASS_NAME, "onReceive$action : " + action);
+        String action = intent.getAction();
+        if (action == null) {
+            LogUtil.logE(CLASS_NAME, "onReceive", "action is null");
+            return;
+        }
 
+        LogUtil.logI(CLASS_NAME, "onReceive", "action : " + action);
         switch (action) {
             case Intent.ACTION_LOCKED_BOOT_COMPLETED -> manageAlarms();
             case "com.alarm.newsalarm.ACTION_ALARM_GOES_OFF" -> processAlarm(intent);
@@ -62,18 +65,18 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void deactivateInvalidAlarm(AlarmData data) {
-        Log.i(CLASS_NAME, "deactivateInvalidAlarm$one-time alarm " + data.getId());
+        LogUtil.logI(CLASS_NAME, "deactivateInvalidAlarm", "deactivate alarm " + data.getId());
         data.setActive(false);
         AlarmDatabaseUtil.update(context, data);
     }
 
     private void registerOneTimeAlarmAgain(AlarmData data) {
-        Log.i(CLASS_NAME, "registerOneTimeAlarmAgain$register one-time alarm " + data.getId());
+        LogUtil.logI(CLASS_NAME, "registerOneTimeAlarmAgain", "register alarm " + data.getId());
         alarmSetter.registerAlarm(data);
     }
 
     private void registerPeriodicAlarmAgain(AlarmData data) {
-        Log.i(CLASS_NAME, "registerPeriodicAlarmAgain$register periodic alarm " + data.getId());
+        LogUtil.logI(CLASS_NAME, "registerPeriodicAlarmAgain", "register alarm " + data.getId());
         long properDateTime = AlarmHelperUtil.getProperAlarmDate(data.getSpecificDateInMillis());
         data.setSpecificDateInMillis(properDateTime);
         alarmSetter.registerAlarm(data);
@@ -81,9 +84,11 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void processAlarm(Intent intent) {
-        AlarmData data = Objects.requireNonNull(
-            intent.getParcelableExtra("alarmData", AlarmData.class));
-        Log.i(CLASS_NAME, "processAlarm$alarm " + data.getId() + " arrived!");
+        AlarmData data = intent.getParcelableExtra("alarmData", AlarmData.class);
+        if (data == null) {
+            LogUtil.logE(CLASS_NAME, "processAlarm", "alarm data is null");
+            return;
+        }
         if (data.getPeriodicWeekBit() == 0) {
             processOneTimeAlarm(data);
         } else {
@@ -92,7 +97,7 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void processOneTimeAlarm(AlarmData data) {
-        Log.i(CLASS_NAME, "processOneTimeAlarm$start one-time alarm " + data.getId());
+        LogUtil.logI(CLASS_NAME, "processOneTimeAlarm", "start one-time alarm " + data.getId());
         startNotifierActivity(data);
         data.setActive(false);
         AlarmDatabaseUtil.update(context, data);
@@ -100,10 +105,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     private void processPeriodicAlarm(AlarmData data) {
         if (AlarmHelperUtil.isProperWeekdayInPeriodic(data)) {
-            Log.i(CLASS_NAME, "processPeriodicAlarm$start periodic alarm " + data.getId());
+            LogUtil.logI(CLASS_NAME, "processPeriodicAlarm",
+                "start periodic alarm " + data.getId());
             startNotifierActivity(data);
         } else {
-            Log.i(CLASS_NAME, "processPeriodicAlarm$alarm " + data.getId() + " is not today");
+            LogUtil.logW(CLASS_NAME, "processPeriodicAlarm",
+                "alarm " + data.getId() + " is not today");
         }
         registerPeriodicAlarmAgain(data);
     }
@@ -116,7 +123,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             context.startActivity(intent);
             return;
         }
-        Log.i(CLASS_NAME, "startNotifierActivity$another alarm already acquired wakelock "
-            + "and started notifier.. so alarm " + data.getId() + " dismissed");
+        LogUtil.logI(CLASS_NAME, "startNotifierActivity", "another alarm already arrived "
+            + "and started notifier -> alarm " + data.getId() + " dismissed");
     }
 }

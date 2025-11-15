@@ -1,7 +1,8 @@
 package com.alarm.newsalarm.newsmanager;
 
-import android.util.Log;
 import android.util.Pair;
+
+import com.alarm.newsalarm.utils.LogUtil;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -42,7 +43,7 @@ class NewsArticleCrawler {
             futureList = service.invokeAll(excutorList, 2, TimeUnit.SECONDS);
             return getCompletedArticleList();
         } catch (InterruptedException | RejectedExecutionException | NullPointerException e) {
-            Log.e(CLASS_NAME, "crawlAsync$" + e);
+            LogUtil.logE(CLASS_NAME, "crawlAsync", e);
         }
         return new Pair<>(new ArrayList<>(), new ArrayList<>());
     }
@@ -59,7 +60,7 @@ class NewsArticleCrawler {
                 titleList.add(article.first);
                 bodyList.add(article.second);
             } catch (ExecutionException | InterruptedException | CancellationException e) {
-                Log.e(CLASS_NAME, "getCompletedArticleList$" + e);
+                LogUtil.logE(CLASS_NAME, "getCompletedArticleList", e);
             }
         }
         return new Pair<>(titleList, bodyList);
@@ -69,13 +70,7 @@ class NewsArticleCrawler {
         service.shutdown();
     }
 
-    static class CrawlingExecutor implements Callable<Pair<String, String>> {
-
-        private final JSONObject jsonArticle;
-
-        private CrawlingExecutor(JSONObject jsonArticle) {
-            this.jsonArticle = jsonArticle;
-        }
+    record CrawlingExecutor(JSONObject jsonArticle) implements Callable<Pair<String, String>> {
 
         @Override
         public Pair<String, String> call() {
@@ -86,7 +81,7 @@ class NewsArticleCrawler {
             try {
                 return jsonArticle.getString("title").replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
             } catch (JSONException | NullPointerException e) {
-                Log.e(CLASS_NAME, "getArticleTitle$" + e);
+                LogUtil.logE(CLASS_NAME, "getArticleTitle", e);
             }
 
             return "";
@@ -96,7 +91,7 @@ class NewsArticleCrawler {
             try {
                 return modifyContent(crawlPassage(jsonArticle.getString("link")));
             } catch (JSONException | NullPointerException e) {
-                Log.e(CLASS_NAME, "getArticleBody$" + e);
+                LogUtil.logE(CLASS_NAME, "getArticleBody", e);
             }
 
             return "";
@@ -106,6 +101,7 @@ class NewsArticleCrawler {
             if (e == null) {
                 return "";
             }
+
             String content = e.text().replaceAll("([\\[(<&](.*?)[;>)\\]])", "");
             final char[] exceptChars = {'#', '※', '▶', 'ⓒ'};
             for (char exceptChar : exceptChars) {
@@ -137,11 +133,11 @@ class NewsArticleCrawler {
                         e.child(i).remove();
                     }
                 }
-                Log.i(CLASS_NAME, "crawlPassage$crawling completed!");
+                LogUtil.logI(CLASS_NAME, "crawlPassage", "crawling completed!");
 
                 return e;
             } catch (IOException | NullPointerException e) {
-                Log.e(CLASS_NAME, "crawlPassage$" + e);
+                LogUtil.logE(CLASS_NAME, "crawlPassage", e);
             }
 
             return null;

@@ -7,7 +7,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -61,7 +60,6 @@ public class MainActivity extends BaseActivity {
         }
         adapter.addItem(data);
         lvAlarmList.scrollToPosition(0);
-        Log.i(CLASS_NAME, "appendNewAlarmData$list view updated in MainActivity!");
     }
 
     private void updateExistingAlarmData(ActivityResult result) {
@@ -72,7 +70,6 @@ public class MainActivity extends BaseActivity {
         }
         adapter.updateItem(clickedPos, data);
         lvAlarmList.scrollToPosition(clickedPos);
-        Log.i(CLASS_NAME, "updateExistingAlarmData$list view updated in MainActivity!");
     }
 
     public MainActivity() {
@@ -107,7 +104,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void executeAlarmSetterActivity(Intent intent) {
-        Log.i(CLASS_NAME, "executeAlarmSetterActivity$start AlarmSetterActivity..");
         intent.setClass(this, AlarmSetterActivity.class);
         launcher.launch(intent);
     }
@@ -130,7 +126,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void prepareAlarmData() {
-        Log.i(CLASS_NAME, "prepareAlarmData");
         String[] ids = sharedPref.getString("id_order", "").split(",");
         ArrayList<AlarmData> loadedData = new ArrayList<>(AlarmDatabaseUtil.getAll(this));
         for (int i = 0; i < loadedData.size(); i++) {
@@ -152,7 +147,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initAlarmListView() {
-        Log.i(CLASS_NAME, "initAlarmListView");
         adapter = new AlarmListAdapter(
             alarmDataList,
             (view, position) -> executeAlarmSetterActivityWithData(position),
@@ -166,7 +160,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void executeAlarmSetterActivityWithData(int pos) {
-        Log.i(CLASS_NAME, "executeAlarmSetterActivityWithData$clicked alarm list index : " + pos);
         clickedPos = pos;
         Intent intent = new Intent();
         intent.putExtra("alarmData", alarmDataList.get(pos));
@@ -184,7 +177,6 @@ public class MainActivity extends BaseActivity {
             AlarmData curData = alarmDataList.get(i);
             if (curData.isActive() && curData.getPeriodicWeekBit() == 0
                     && curData.getSpecificDateInMillis() <= System.currentTimeMillis()) {
-                Log.i(CLASS_NAME, "removeInvalidAlarms$delete expired alarm index : " + i);
                 curData.setActive(false);
                 adapter.notifyItemChanged(i);
             }
@@ -234,7 +226,7 @@ public class MainActivity extends BaseActivity {
         for (AlarmData data : alarmDataList) {
             idOrder.append(data.getId()).append(",");
         }
-        if (idOrder.length() > 0) {
+        if (!idOrder.isEmpty()) {
             idOrder.deleteCharAt(idOrder.lastIndexOf(","));
         }
         sharedPref.edit().putString("id_order", idOrder.toString()).apply();

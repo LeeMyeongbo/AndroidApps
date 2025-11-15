@@ -5,11 +5,11 @@ import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
 import com.alarm.newsalarm.database.AlarmData;
+import com.alarm.newsalarm.utils.LogUtil;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -57,16 +57,18 @@ public class TtsManager {
     private void initTts(Context context, int idx, int volumeSize, float tempo, float pitch) {
         tts = new TextToSpeech(context, status -> {
             if (status == TextToSpeech.ERROR) {
+                LogUtil.logE(CLASS_NAME, "OnInitListener.onInit",
+                    "tts initialization failed - status " + status);
                 return;
             }
-            setTts(idx, volumeSize, tempo, pitch);
-            speakList.forEach(Runnable::run);
-            isTtsInitialized = true;
-            Log.i(CLASS_NAME, "initTts$tts initialized successfully");
 
+            setTts(idx, volumeSize, tempo, pitch);
             if (listener != null) {
                 listener.onInitialized();
             }
+            speakList.forEach(Runnable::run);
+            isTtsInitialized = true;
+            LogUtil.logI(CLASS_NAME, "OnInitListener.onInit", "tts initialized successfully!");
         });
     }
 
@@ -85,40 +87,42 @@ public class TtsManager {
             String name = voice.getName().toLowerCase(Locale.ROOT);
             if (name.contains("ko-kr") && name.contains("local")) {
                 voiceList.add(voice);
-                Log.i(CLASS_NAME, "prepareVoices$found voice : " + voice.getName());
+                LogUtil.logD(CLASS_NAME, "prepareVoices", "found voice : " + voice.getName());
             }
         }
         if (voiceList.isEmpty()) {
             tts.setVoice(tts.getDefaultVoice());
-            Log.i(CLASS_NAME, "prepareVoices$no local voice found - add default voice " +
-                tts.getDefaultVoice().getName());
+            LogUtil.logD(CLASS_NAME, "prepareVoices", "no local voice found - add default voice "
+                + tts.getDefaultVoice().getName());
         }
     }
 
     public void setSpecificVoice(int idx) {
         if (idx < 0 || idx >= voiceList.size()) {
-            Log.e(CLASS_NAME, "setSpecificVoice$invalid voice index : " + idx);
+            LogUtil.logE(CLASS_NAME, "setSpecificVoice", "invalid voice index : " + idx);
             tts.setVoice(tts.getDefaultVoice());
             return;
         }
-        tts.setVoice(voiceList.get(idx));
-        Log.i(CLASS_NAME, "setSpecificVoice$voice index : " + idx);
-        Log.i(CLASS_NAME, "setSpecificVoice$voice name : " + voiceList.get(idx).getName());
+
+        Voice voice = voiceList.get(idx);
+        tts.setVoice(voice);
+        LogUtil.logD(CLASS_NAME, "setSpecificVoice", "voice index : " + idx);
+        LogUtil.logD(CLASS_NAME, "setSpecificVoice", "voice info : " + voice);
     }
 
     public void setVolumeSize(int volumeSize) {
         manager.setStreamVolume(AudioManager.STREAM_ALARM, volumeSize, 0);
-        Log.i(CLASS_NAME, "setVolumeSize$set volume : " + volumeSize);
+        LogUtil.logD(CLASS_NAME, "setVolumeSize", "set volume : " + volumeSize);
     }
 
     public void setVoicePitch(float pitch) {
         tts.setPitch(pitch);
-        Log.i(CLASS_NAME, "setVoicePitch$voice pitch : " + pitch);
+        LogUtil.logD(CLASS_NAME, "setVoicePitch", "set pitch : " + pitch);
     }
 
     public void setVoiceTempo(float tempo) {
         tts.setSpeechRate(tempo);
-        Log.i(CLASS_NAME, "setVoiceTempo$voice tempo : " + tempo);
+        LogUtil.logD(CLASS_NAME, "setVoiceTempo", "set tempo : " + tempo);
     }
 
     public int getAvailableVoiceNum() {
@@ -128,7 +132,6 @@ public class TtsManager {
     public void speakArticles(ArrayList<String> titleList, ArrayList<String> bodyList) {
         speak("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
         for (int i = 0; i < titleList.size(); i++) {
-            Log.i(CLASS_NAME, "speakArticles$queuing article title index : " + i);
             speak((i + 1) + "번 뉴스입니다.", 1);
             speak(titleList.get(i), 1);
             speak("기사 내용입니다.", 1);
@@ -144,7 +147,6 @@ public class TtsManager {
             int l = Integer.min(maxLenPerSpeech * i + maxLenPerSpeech, body.length());
             speak(body.substring(i * maxLenPerSpeech, l), 0);
         }
-        Log.i(CLASS_NAME, "speakArticleBody$queuing article body index : " + cur);
     }
 
     public void speak(String txt, int mode) {
@@ -173,6 +175,6 @@ public class TtsManager {
             tts.shutdown();
             tts = null;
         }
-        Log.i(CLASS_NAME, "release$TtsManager released completely!");
+        LogUtil.logI(CLASS_NAME, "release", "tts released completely!");
     }
 }

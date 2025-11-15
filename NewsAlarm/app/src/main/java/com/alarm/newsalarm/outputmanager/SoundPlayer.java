@@ -3,9 +3,9 @@ package com.alarm.newsalarm.outputmanager;
 import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.MediaPlayer;
-import android.util.Log;
 
 import com.alarm.newsalarm.R;
+import com.alarm.newsalarm.utils.LogUtil;
 
 public class SoundPlayer {
 
@@ -39,7 +39,7 @@ public class SoundPlayer {
 
     public void playBgm() {
         player.start();
-        Log.i(CLASS_NAME, "playBgm$SoundPlayer started to play!");
+        LogUtil.logD(CLASS_NAME, "playBgm", "sound player started to play!");
     }
 
     public void release() {
@@ -48,6 +48,6 @@ public class SoundPlayer {
             player.release();
             player = null;
         }
-        Log.i(CLASS_NAME, "release$SoundPlayer released completely!");
+        LogUtil.logD(CLASS_NAME, "release", "sound player released completely!");
     }
 }

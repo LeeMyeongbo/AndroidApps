@@ -1,12 +1,12 @@
 package com.alarm.newsalarm;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
-import com.alarm.newsalarm.alarmmanager.WakeLockUtil;
+import com.alarm.newsalarm.utils.LogUtil;
+import com.alarm.newsalarm.utils.WakeLockUtil;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.newsmanager.NewsNotifier;
 import com.google.android.material.button.MaterialButton;
@@ -48,7 +48,7 @@ public class AlarmNotifierActivity extends BaseActivity {
             centerY = btnReleaseAlarm.getY() + btnRadius;
             finishRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, FINISH_DIST,
                 getResources().getDisplayMetrics());
-            Log.i(CLASS_NAME, "initBtnRelease$finishRadius length : " + finishRadius);
+            LogUtil.logD(CLASS_NAME, "initBtnRelease", "radius length : " + finishRadius);
             setBtnReleaseListener();
         });
     }

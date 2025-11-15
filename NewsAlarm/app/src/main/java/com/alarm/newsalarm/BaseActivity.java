@@ -2,11 +2,12 @@ package com.alarm.newsalarm;
 
 import android.graphics.Insets;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.alarm.newsalarm.utils.LogUtil;
 
 public class BaseActivity extends AppCompatActivity {
 
@@ -18,13 +19,13 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Log.i(CLASS_NAME, "onCreate");
+        LogUtil.logI(CLASS_NAME, "onCreate", "");
         super.onCreate(savedInstanceState);
     }
 
     @Override
     protected void onStart() {
-        Log.i(CLASS_NAME, "onStart");
+        LogUtil.logI(CLASS_NAME, "onStart", "");
         ViewCompat.setOnApplyWindowInsetsListener(getWindow().getDecorView(), (v, insets) -> {
             Insets systemBarInsets = insets
                 .getInsets(WindowInsetsCompat.Type.systemBars())
@@ -38,25 +39,25 @@ public class BaseActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.i(CLASS_NAME, "onResume");
+        LogUtil.logI(CLASS_NAME, "onResume", "");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        Log.i(CLASS_NAME, "onPause");
+        LogUtil.logI(CLASS_NAME, "onPause", "");
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-        Log.i(CLASS_NAME, "onStop");
+        LogUtil.logI(CLASS_NAME, "onStop", "");
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        Log.i(CLASS_NAME, "onDestroy");
+        LogUtil.logI(CLASS_NAME, "onDestroy", "");
         super.onDestroy();
     }
 }

@@ -1,7 +1,6 @@
 package com.alarm.newsalarm.alarmlist;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +13,13 @@ import androidx.recyclerview.widget.RecyclerView.Adapter;
 import androidx.recyclerview.widget.RecyclerView.ViewHolder;
 
 import com.alarm.newsalarm.R;
-import com.alarm.newsalarm.alarmmanager.AlarmHelperUtil;
+import com.alarm.newsalarm.utils.AlarmHelperUtil;
 import com.alarm.newsalarm.alarmmanager.AlarmSetter;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.database.AlarmDatabaseUtil;
 import com.alarm.newsalarm.alarmlist.AlarmListAdapter.AlarmListViewHolder;
 
+import com.alarm.newsalarm.utils.LogUtil;
 import com.google.android.material.switchmaterial.SwitchMaterial;
 
 import java.text.SimpleDateFormat;
@@ -148,11 +148,11 @@ public class AlarmListAdapter extends Adapter<AlarmListViewHolder> implements It
         private void setAlarmBySwitch(Context context, boolean isChecked) {
             AlarmSetter setter = new AlarmSetter(context);
             if (isChecked) {
-                Log.i(CLASS_NAME, "setAlarmBySwitch$turned alarm " + curData.getId() + " on");
+                LogUtil.logD(CLASS_NAME, "setAlarmBySwitch", "alarm " + curData.getId() + " on");
                 setProperAlarmDate(context);
                 setter.registerAlarm(curData);
             } else {
-                Log.i(CLASS_NAME, "setAlarmBySwitch$turned alarm " + curData.getId() + " off");
+                LogUtil.logD(CLASS_NAME, "setAlarmBySwitch", "alarm " + curData.getId() + " off");
                 setter.cancelAlarm(curData);
             }
         }
@@ -250,7 +250,6 @@ public class AlarmListAdapter extends Adapter<AlarmListViewHolder> implements It
     @NonNull
     @Override
     public AlarmListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.i(CLASS_NAME, "onCreateViewHolder");
         context = parent.getContext();
         View view = LayoutInflater
             .from(context)
@@ -274,10 +273,12 @@ public class AlarmListAdapter extends Adapter<AlarmListViewHolder> implements It
         if (from == to) {
             return;
         }
+
         AlarmData data = alarmList.remove(from);
         alarmList.add(to, data);
         notifyItemMoved(from, to);
-        Log.i(CLASS_NAME, "onItemMoved$alarm " + data.getId() + " moved " + from + " to " + to);
+        LogUtil.logD(CLASS_NAME, "onItemMoved",
+            "alarm " + data.getId() + " moved " + from + " to " + to);
     }
 
     @Override
@@ -286,18 +287,20 @@ public class AlarmListAdapter extends Adapter<AlarmListViewHolder> implements It
         AlarmDatabaseUtil.delete(context, data);
         new AlarmSetter(context).cancelAlarm(data);
         notifyItemRemoved(position);
-        Log.i(CLASS_NAME, "onItemSwiped$alarm " + data.getId() + " was deleted from alarm list");
+        LogUtil.logI(CLASS_NAME, "onItemSwiped",
+            "alarm " + data.getId() + " is removed from alarm list");
     }
 
     public void addItem(AlarmData data) {
         ((LinkedList<AlarmData>) alarmList).push(data);
         notifyItemInserted(0);
-        Log.i(CLASS_NAME, "addItem$new alarm " + data.getId() + " was inserted front of list");
+        LogUtil.logI(CLASS_NAME, "addItem",
+            "new alarm " + data.getId() + " is added to alarm list");
     }
 
     public void updateItem(int position, AlarmData data) {
         alarmList.set(position, data);
         notifyItemChanged(position);
-        Log.i(CLASS_NAME, "updateItem$alarm " + data.getId() + " was updated");
+        LogUtil.logD(CLASS_NAME, "updateItem", "alarm " + data.getId() + " is updated");
     }
 }

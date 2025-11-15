@@ -1,6 +1,4 @@
-package com.alarm.newsalarm.alarmmanager;
-
-import android.util.Log;
+package com.alarm.newsalarm.utils;
 
 import com.alarm.newsalarm.database.AlarmData;
 
@@ -30,7 +28,6 @@ public class AlarmHelperUtil {
     }
 
     private static void setCalendarDateToToday() {
-        Log.i(CLASS_NAME, "setCalendarDateToToday$load today's date");
         LocalDate localDate = LocalDate.now();
         calendar.set(Calendar.YEAR, localDate.getYear());
         calendar.set(Calendar.MONTH, localDate.getMonthValue() - 1);
@@ -39,10 +36,8 @@ public class AlarmHelperUtil {
 
     private static void addOneDayIfTimePassed() {
         if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
-            Log.i(CLASS_NAME, "addOneDayIfTimePassed$former than current time -> add 1 day");
+            LogUtil.logD(CLASS_NAME, "addOneDayIfTimePassed", "date expired -> add 1 day");
             calendar.add(Calendar.DAY_OF_MONTH, 1);
-        } else {
-            Log.i(CLASS_NAME, "addOneDayIfTimePassed$later than current time -> stay as is");
         }
     }
 }
