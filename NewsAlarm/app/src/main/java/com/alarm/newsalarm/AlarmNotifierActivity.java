@@ -1,6 +1,5 @@
 package com.alarm.newsalarm;
 
-import android.app.KeyguardManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -32,22 +31,13 @@ public class AlarmNotifierActivity extends BaseActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         startNotifier();
-        init();
+        initBtnRelease();
     }
 
     private void startNotifier() {
         AlarmData data = getIntent().getParcelableExtra("alarmData", AlarmData.class);
         notifier = new NewsNotifier(this, data);
         notifier.start();
-    }
-
-    private void init() {
-        initBtnRelease();
-
-        setShowWhenLocked(true);
-        setTurnScreenOn(true);
-        KeyguardManager manager = (KeyguardManager) getSystemService(KEYGUARD_SERVICE);
-        manager.requestDismissKeyguard(this, null);
     }
 
     private void initBtnRelease() {

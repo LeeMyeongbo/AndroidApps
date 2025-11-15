@@ -30,7 +30,7 @@ public class AlarmReceiver extends BroadcastReceiver {
         Log.i(CLASS_NAME, "onReceive$action : " + action);
 
         switch (action) {
-            case Intent.ACTION_BOOT_COMPLETED -> manageAlarms();
+            case Intent.ACTION_LOCKED_BOOT_COMPLETED -> manageAlarms();
             case "com.alarm.newsalarm.ACTION_ALARM_GOES_OFF" -> processAlarm(intent);
         }
     }
@@ -38,8 +38,13 @@ public class AlarmReceiver extends BroadcastReceiver {
     private void manageAlarms() {
         List<AlarmData> alarmDataList = AlarmDatabaseUtil.getAll(context);
         for (AlarmData data : alarmDataList) {
-            if (isAlarmReregisterable(data)) {
-                registerAlarmAgain(data);
+            if (!isAlarmReregisterable(data)) {
+                continue;
+            }
+            if (data.getPeriodicWeekBit() == 0) {
+                registerOneTimeAlarmAgain(data);
+            } else {
+                registerPeriodicAlarmAgain(data);
             }
         }
     }
@@ -57,18 +62,14 @@ public class AlarmReceiver extends BroadcastReceiver {
     }
 
     private void deactivateInvalidAlarm(AlarmData data) {
-        Log.i(CLASS_NAME, "deactivateInvalidAlarm$specific alarm " + data.getId());
+        Log.i(CLASS_NAME, "deactivateInvalidAlarm$one-time alarm " + data.getId());
         data.setActive(false);
         AlarmDatabaseUtil.update(context, data);
     }
 
-    private void registerAlarmAgain(AlarmData data) {
-        if (data.getPeriodicWeekBit() == 0) {
-            Log.i(CLASS_NAME, "registerAlarmAgain$register specific date alarm " + data.getId());
-            alarmSetter.registerAlarm(data);
-            return;
-        }
-        registerPeriodicAlarmAgain(data);
+    private void registerOneTimeAlarmAgain(AlarmData data) {
+        Log.i(CLASS_NAME, "registerOneTimeAlarmAgain$register one-time alarm " + data.getId());
+        alarmSetter.registerAlarm(data);
     }
 
     private void registerPeriodicAlarmAgain(AlarmData data) {
@@ -84,14 +85,14 @@ public class AlarmReceiver extends BroadcastReceiver {
             intent.getParcelableExtra("alarmData", AlarmData.class));
         Log.i(CLASS_NAME, "processAlarm$alarm " + data.getId() + " arrived!");
         if (data.getPeriodicWeekBit() == 0) {
-            processSpecificAlarm(data);
+            processOneTimeAlarm(data);
         } else {
             processPeriodicAlarm(data);
         }
     }
 
-    private void processSpecificAlarm(AlarmData data) {
-        Log.i(CLASS_NAME, "processSpecificAlarm$start specific alarm " + data.getId());
+    private void processOneTimeAlarm(AlarmData data) {
+        Log.i(CLASS_NAME, "processOneTimeAlarm$start one-time alarm " + data.getId());
         startNotifierActivity(data);
         data.setActive(false);
         AlarmDatabaseUtil.update(context, data);
