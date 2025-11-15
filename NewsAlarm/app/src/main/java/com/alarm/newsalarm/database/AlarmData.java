@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -168,5 +169,27 @@ public class AlarmData implements Parcelable {
         dest.writeLong(specificDateInMillis);
         dest.writeInt(periodicWeekBit);
         dest.writeBoolean(isActive);
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (!(obj instanceof AlarmData other)) {
+            return false;
+        }
+        return id == other.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
+    @NonNull
+    @Override
+    public String toString() {
+        return "AlarmData(id=" + id + ", alarmTopic=" + alarmTopic + ", voiceIdx=" + voiceIdx
+            + ", pitch=" + pitch + ", tempo=" + tempo + ", volumeSize=" + volumeSize
+            + ", vibIntensity=" + vibIntensity + ", specificDateInMillis=" + specificDateInMillis
+            + ", periodicWeekBit=" + periodicWeekBit + ", isActive=" + isActive + ")";
     }
 }

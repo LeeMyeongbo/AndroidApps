@@ -23,14 +23,20 @@
         android:theme="@style/Theme.NewsAlarm">
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".AlarmSetterActivity" />
-        <activity android:name=".AlarmNotifierActivity"
+        <activity
+            android:name=".AlarmSetterActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize|keyboardHidden" />
+        <activity
+            android:name=".AlarmNotifierActivity"
             android:turnScreenOn="true"
             android:showWhenLocked="true"
             android:directBootAware="true"

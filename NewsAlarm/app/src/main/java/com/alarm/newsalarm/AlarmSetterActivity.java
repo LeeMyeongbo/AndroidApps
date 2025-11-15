@@ -373,7 +373,7 @@ public class AlarmSetterActivity extends BaseActivity {
         for (int i = 0; i < 7; i++) {
             final int idx = i;
             cbWeekdays[i].setOnCheckedChangeListener((buttonView, isChecked) -> {
-                curWeekBit = isChecked ? curWeekBit + (1 << idx) : curWeekBit - (1 << idx);
+                curWeekBit ^= (1 << idx);
                 setDateAsTodayWhenDeselectAll();
                 setTvInfo();
             });
