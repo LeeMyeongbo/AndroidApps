@@ -1,12 +1,16 @@
 package com.alarm.newsalarm.newsmanager;
 
 import static com.android.volley.Request.Method.GET;
+import static com.alarm.newsalarm.outputmanager.TtsManager.Mode.*;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
+import com.alarm.newsalarm.BaseActivity;
 import com.alarm.newsalarm.database.AlarmData;
 import com.alarm.newsalarm.outputmanager.SoundPlayer;
 import com.alarm.newsalarm.outputmanager.TtsManager;
@@ -56,6 +60,8 @@ public class NewsNotifier {
             StringRequest newsApiRequest = getRequest(data.getAlarmTopic());
             newsApiRequest.setShouldCache(false);
             queue.add(newsApiRequest);
+            ttsManager.setTtsDoneListener(() -> new Handler(Looper.getMainLooper())
+                .postDelayed(() -> ((BaseActivity) context).finish(), 5000));
         });
     }
 
@@ -97,7 +103,7 @@ public class NewsNotifier {
 
     private void notifyParseNewsDataFail() {
         LogUtil.logE(CLASS_NAME, "notifyParseNewsDataFail", "parse news data failed!");
-        ttsManager.speak("조건에 맞는 뉴스를 찾을 수 없습니다. 다른 키워드로 부탁드립니다.", 1);
+        ttsManager.speak("조건에 맞는 뉴스를 찾을 수 없습니다. 다른 키워드로 부탁드립니다.", ADD_SILENCE);
     }
 
     private boolean isCrawlingFailed(Pair<ArrayList<String>, ArrayList<String>> articles) {
@@ -110,7 +116,7 @@ public class NewsNotifier {
 
     private void notifyCrawlNewsDataFail() {
         LogUtil.logE(CLASS_NAME, "notifyCrawlNewsDataFail", "crawl news article failed!");
-        ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스 본문에 연결하지 못했습니다. 연결이 원활한 환경에서 시도바랍니다.", 1);
+        ttsManager.speak("서버 오류 혹은 다른 문제로 인해 뉴스 연결하지 못했습니다. 연결이 원활한 환경에서 시도바랍니다.", ADD_SILENCE);
     }
 
     private void notifyNewsContents(ArrayList<String> titleList, ArrayList<String> bodyList) {
@@ -120,7 +126,7 @@ public class NewsNotifier {
 
     private void notifyVolleyError(VolleyError error) {
         LogUtil.logE(CLASS_NAME, "notifyVolleyError", "loading news data failed! : " + error);
-        ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 보시거나, 다른 키워드로 부탁드립니다.", 1);
+        ttsManager.speak("뉴스를 검색하지 못했습니다. 연결을 확인해 보시거나, 다른 키워드로 부탁드립니다.", ADD_SILENCE);
     }
 
     public void finish() {

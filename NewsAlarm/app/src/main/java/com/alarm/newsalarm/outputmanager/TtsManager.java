@@ -4,6 +4,7 @@ import android.content.Context;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.speech.tts.Voice;
 
 import androidx.annotation.NonNull;
@@ -16,23 +17,33 @@ import java.util.Locale;
 
 public class TtsManager {
 
+    public enum Mode {
+        DEFAULT, ADD_SILENCE
+    }
+
     public interface OnInitListener {
         void onInitialized();
     }
 
+    public interface OnTtsAllDoneListener {
+        void onSpeechAllDone();
+    }
+
     private static final String CLASS_NAME = "TtsManager";
 
-    private final OnInitListener listener;
+    private final OnInitListener initListener;
     private final ArrayList<Runnable> speakList = new ArrayList<>();
     private final ArrayList<Voice> voiceList = new ArrayList<>();
     private AudioManager manager;
     private AudioAttributes attr;
     private TextToSpeech tts;
+    private OnTtsAllDoneListener doneListener;
     private boolean isTtsInitialized;
     private int originalVolume;
+    private int pendingSpeechCnt;
 
-    public TtsManager(@NonNull Context context, AlarmData data, OnInitListener listener) {
-        this.listener = listener;
+    public TtsManager(@NonNull Context context, AlarmData data, OnInitListener initListener) {
+        this.initListener = initListener;
         storeOriginalVolume(context);
         initAudioAttributes();
         if (data == null) {
@@ -63,8 +74,8 @@ public class TtsManager {
             }
 
             setTts(idx, volumeSize, tempo, pitch);
-            if (listener != null) {
-                listener.onInitialized();
+            if (initListener != null) {
+                initListener.onInitialized();
             }
             speakList.forEach(Runnable::run);
             isTtsInitialized = true;
@@ -78,6 +89,27 @@ public class TtsManager {
         setVolumeSize(volumeSize);
         setVoicePitch(pitch);
         setVoiceTempo(tempo);
+        tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+
+            private int speechCnt = 0;
+
+            @Override
+            public void onStart(String s) {
+            }
+
+            @Override
+            public void onDone(String s) {
+                speechCnt++;
+                if (speechCnt == pendingSpeechCnt && doneListener != null) {
+                    LogUtil.logD(CLASS_NAME, "onDone", "all speech done");
+                    doneListener.onSpeechAllDone();
+                }
+            }
+
+            @Override
+            public void onError(String s) {
+            }
+        });
     }
 
     private void prepareVoices() {
@@ -129,12 +161,16 @@ public class TtsManager {
         return voiceList.size();
     }
 
+    public void setTtsDoneListener(OnTtsAllDoneListener listener) {
+        doneListener = listener;
+    }
+
     public void speakArticles(ArrayList<String> titleList, ArrayList<String> bodyList) {
-        speak("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", 1);
+        speak("안녕하세요? 오늘의 뉴스를 알려드리겠습니다.", Mode.ADD_SILENCE);
         for (int i = 0; i < titleList.size(); i++) {
-            speak((i + 1) + "번 뉴스입니다.", 1);
-            speak(titleList.get(i), 1);
-            speak("기사 내용입니다.", 1);
+            speak((i + 1) + "번 뉴스입니다.", Mode.ADD_SILENCE);
+            speak(titleList.get(i), Mode.ADD_SILENCE);
+            speak("기사 내용입니다.", Mode.ADD_SILENCE);
             speakArticleBody(bodyList, i);
         }
     }
@@ -145,15 +181,15 @@ public class TtsManager {
         int num = body.length() / maxLenPerSpeech;
         for (int i = 0; i <= num; i++) {
             int l = Integer.min(maxLenPerSpeech * i + maxLenPerSpeech, body.length());
-            speak(body.substring(i * maxLenPerSpeech, l), 0);
+            speak(body.substring(i * maxLenPerSpeech, l), Mode.DEFAULT);
         }
     }
 
-    public void speak(String txt, int mode) {
+    public void speak(String txt, Mode mode) {
         speak(txt, mode, TextToSpeech.QUEUE_ADD);
     }
 
-    public void speak(String txt, int mode, int queueMode) {
+    public void speak(String txt, Mode mode, int queueMode) {
         if (isTtsInitialized) {
             speakWithTts(txt, mode, queueMode);
         } else {
@@ -161,11 +197,13 @@ public class TtsManager {
         }
     }
 
-    private void speakWithTts(String txt, int mode, int queueMode) {
-        if (mode == 1) {
+    private void speakWithTts(String txt, Mode mode, int queueMode) {
+        if (mode.equals(Mode.ADD_SILENCE)) {
             tts.playSilentUtterance(800L, queueMode, "silence");
+            pendingSpeechCnt++;
         }
         tts.speak(txt, queueMode, null, "speak");
+        pendingSpeechCnt++;
     }
 
     public void release() {

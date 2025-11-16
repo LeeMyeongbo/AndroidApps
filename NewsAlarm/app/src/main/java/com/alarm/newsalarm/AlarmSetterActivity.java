@@ -1,6 +1,7 @@
 package com.alarm.newsalarm;
 
 import static androidx.core.view.WindowInsetsAnimationCompat.Callback.DISPATCH_MODE_STOP;
+import static com.alarm.newsalarm.outputmanager.TtsManager.Mode.*;
 
 import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
@@ -410,17 +411,17 @@ public class AlarmSetterActivity extends BaseActivity {
 
     private void playSampleTextByVolumeSize(int value) {
         ttsManager.setVolumeSize(value);
-        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
+        ttsManager.speak("안녕하세요?", DEFAULT, TextToSpeech.QUEUE_FLUSH);
     }
 
     private void playSampleTextByTempo(float value) {
         ttsManager.setVoiceTempo(value);
-        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
+        ttsManager.speak("안녕하세요?", DEFAULT, TextToSpeech.QUEUE_FLUSH);
     }
 
     private void playSampleTestByPitch(float value) {
         ttsManager.setVoicePitch(value);
-        ttsManager.speak("안녕하세요?", 0, TextToSpeech.QUEUE_FLUSH);
+        ttsManager.speak("안녕하세요?", DEFAULT, TextToSpeech.QUEUE_FLUSH);
     }
 
     private void vibrateByValue(float value) {
