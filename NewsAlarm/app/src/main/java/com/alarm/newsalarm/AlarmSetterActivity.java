@@ -54,7 +54,7 @@ public class AlarmSetterActivity extends BaseActivity {
         R.id.cbThursday, R.id.cbFriday, R.id.cbSaturday
     };
     private static final int DROPDOWN_LAYOUT =
-        com.google.android.material.R.layout.support_simple_spinner_dropdown_item;
+        android.R.layout.simple_spinner_dropdown_item;
 
     private final Calendar calendar = Calendar.getInstance();
     private final Locale locale = new Locale("ko", "KR");

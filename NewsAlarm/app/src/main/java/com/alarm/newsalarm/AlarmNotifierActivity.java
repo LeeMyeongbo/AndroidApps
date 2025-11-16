@@ -1,10 +1,14 @@
 package com.alarm.newsalarm;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -21,7 +25,7 @@ public class AlarmNotifierActivity extends BaseActivity {
 
     private MaterialButton btnReleaseAlarm;
     private NewsNotifier notifier;
-    private float finishRadius;
+    private float outLineRadius;
     private float btnRadius, centerX, centerY, dx, dy;
 
     public AlarmNotifierActivity() {
@@ -57,9 +61,10 @@ public class AlarmNotifierActivity extends BaseActivity {
             btnRadius = btnReleaseAlarm.getWidth() / 2f;
             centerX = btnReleaseAlarm.getX() + btnRadius;
             centerY = btnReleaseAlarm.getY() + btnRadius;
-            finishRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, FINISH_DIST,
+            outLineRadius = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, FINISH_DIST,
                 getResources().getDisplayMetrics());
-            LogUtil.logD(CLASS_NAME, "initBtnRelease", "radius length : " + finishRadius);
+            LogUtil.logD(CLASS_NAME, "initBtnRelease", "x : " + centerX + ", y : " + centerY);
+            LogUtil.logD(CLASS_NAME, "initBtnRelease", "radius length : " + outLineRadius);
             setBtnReleaseListener();
         });
     }
@@ -91,13 +96,20 @@ public class AlarmNotifierActivity extends BaseActivity {
     private void finishWhenBtnOutOfBoundary(float x, float y) {
         double distance = Math.pow((x + btnRadius - centerX) * (x + btnRadius - centerX)
             + (y + btnRadius - centerY) * (y + btnRadius - centerY), 0.5);
-        if (distance >= finishRadius) {
+        if (distance >= outLineRadius) {
             finish();
         }
     }
 
     private void resetBtnWithDetach() {
         btnReleaseAlarm.animate().x(centerX - btnRadius).y(centerY - btnRadius).start();
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+
+        new Handler(Looper.getMainLooper()).post(this::initBtnRelease);
     }
 
     @Override
