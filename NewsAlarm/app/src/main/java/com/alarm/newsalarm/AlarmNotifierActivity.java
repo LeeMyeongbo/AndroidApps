@@ -5,6 +5,10 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
+
 import com.alarm.newsalarm.utils.LogUtil;
 import com.alarm.newsalarm.utils.WakeLockUtil;
 import com.alarm.newsalarm.database.AlarmData;
@@ -30,8 +34,15 @@ public class AlarmNotifierActivity extends BaseActivity {
         setContentView(R.layout.activity_alarm_notifier);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        hideNaviBar();
         startNotifier();
         initBtnRelease();
+    }
+
+    private void hideNaviBar() {
+        WindowInsetsControllerCompat controllerCompat = WindowCompat
+            .getInsetsController(getWindow(), getWindow().getDecorView());
+        controllerCompat.hide(WindowInsetsCompat.Type.navigationBars());
     }
 
     private void startNotifier() {
