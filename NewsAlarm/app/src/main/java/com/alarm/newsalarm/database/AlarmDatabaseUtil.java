@@ -25,7 +25,6 @@ public class AlarmDatabaseUtil {
         Context storageContext = context.createDeviceProtectedStorageContext();
         return db = Room
             .databaseBuilder(storageContext, AlarmDatabase.class, "AlarmDB")
-            .fallbackToDestructiveMigrationOnDowngrade()
             .build();
     }
 
