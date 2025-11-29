@@ -47,6 +47,9 @@ android {
         unitTests {
             isIncludeAndroidResources = true
             isReturnDefaultValues = true
+            all {
+                it.maxParallelForks = (Runtime.getRuntime().availableProcessors()).coerceAtLeast(1)
+            }
         }
     }
 
@@ -56,9 +59,9 @@ android {
 
     applicationVariants.all {
         outputs.forEach { output ->
-            (output as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.let { apkOutput ->
+            (output as? com.android.build.gradle.internal.api.ApkVariantOutputImpl)?.let { apk ->
                 val newName = "${parent?.project?.name}_${versionName}-${buildType.name}.apk"
-                apkOutput.outputFileName = newName
+                apk.outputFileName = newName
             }
         }
     }
