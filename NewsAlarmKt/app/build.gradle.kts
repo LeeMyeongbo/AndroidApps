@@ -73,6 +73,7 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.room.testing)
 
     androidTestImplementation(libs.androidx.junit)
