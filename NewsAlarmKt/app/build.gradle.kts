@@ -43,6 +43,13 @@ android {
         targetCompatibility = JavaVersion.current()
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+            isReturnDefaultValues = true
+        }
+    }
+
     buildFeatures {
         compose = true
     }
@@ -71,9 +78,11 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.compose.material.icons.extended.android)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.core.ktx)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
     testImplementation(libs.androidx.room.testing)
 
     androidTestImplementation(libs.androidx.junit)
