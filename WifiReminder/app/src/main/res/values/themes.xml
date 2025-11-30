@@ -1,0 +1,148 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.wifireminder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#53367E</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Customize your theme here. -->
+        <item name="bottomSheetDialogTheme">@style/CustomBottomSheetDialogTheme</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:ignore="NewApi">true</item>
+    </style>
+
+    <!-- BackGround Theme -->
+    <style name="DayTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="rippleColor">#434242</item>
+        <item name="android:windowBackground">@color/bg_bright</item>
+        <item name="android:navigationBarColor">@color/bg_bright</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+
+    <style name="NightTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="rippleColor">@color/grey</item>
+        <item name="android:windowBackground">@color/bg_night</item>
+        <item name="android:navigationBarColor">@color/bg_night</item>
+        <item name="android:windowActivityTransitions">true</item>
+    </style>
+    <!-- BackGround Theme -->
+
+    <!-- View Customizing -->
+    <style name="Custom_TextInput">
+        <item name="boxStrokeColor">@color/textInput_clicked</item>             <!-- focused 상태일 때 밑줄 색-->
+        <item name="counterTextColor">@color/textInput_clicked</item>           <!-- counter text 색 -->
+        <item name="android:textColorHint">@color/black</item>                  <!-- hint 색-->
+        <item name="hintTextColor">@color/textInput_clicked</item>              <!-- floating hint 색-->
+    </style>
+
+    <style name="Custom_TextInput_night">
+        <item name="boxStrokeColor">@color/textInput_clicked_night</item>             <!-- focused 상태일 때 밑줄 색-->
+        <item name="android:textColorHint">@color/white</item>                        <!-- hint 색-->
+        <item name="counterTextColor">@color/textInput_clicked_night</item>           <!-- counter text 색 -->
+        <item name="hintTextColor">@color/textInput_clicked_night</item>              <!-- floating hint 색-->
+    </style>
+
+    <style name="Custom_unTouchTextInput">
+        <item name="colorOnSurface">#353535</item>
+    </style>
+
+    <style name="Custom_unTouchTextInput_night">
+        <item name="colorOnSurface">#D3D3D3</item>
+    </style>
+
+    <style name="Custom_CheckBox" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorControlNormal">#391F67</item>
+        <item name="colorSecondary">#391F67</item>
+        <item name="colorAccent">#391F67</item>
+    </style>
+
+    <style name="Custom_CheckBox_night" parent="Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="colorControlNormal">#A174F1</item>
+        <item name="colorSecondary">#A174F1</item>
+        <item name="colorAccent">#A174F1</item>
+    </style>
+
+    <style name="Custom_RadioButton" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#9A0B00</item>
+        <item name="colorControlActivated">#9A0B00</item>
+    </style>
+
+    <style name="Custom_RadioButton_night" parent="Theme.AppCompat.Light">
+        <item name="colorControlNormal">#F3574C</item>
+        <item name="colorControlActivated">#F3574C</item>
+    </style>
+
+    <style name="Custom_SeekBar">
+        <item name="android:progressTint">#BC7103</item>
+        <item name="colorControlActivated">#BC7103</item>
+        <item name="android:progressBackgroundTint">@color/grey</item>
+    </style>
+
+    <style name="Custom_SeekBar_night">
+        <item name="android:progressTint">#E8AF05</item>
+        <item name="colorControlActivated">#E8AF05</item>
+        <item name="android:progressBackgroundTint">@color/grey</item>
+    </style>
+
+    <style name="Custom_Button">
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorSecondary">@color/grey</item>
+    </style>
+
+    <style name="Custom_Button_night">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorSecondary">@color/grey</item>
+        <item name="android:shadowColor">#00000000</item>
+    </style>
+
+    <style name="service_button">
+        <item name="colorPrimary">#021881</item>
+        <item name="colorAccent">#00F1F1</item>
+    </style>
+
+    <style name="service_button_night">
+        <item name="colorPrimary">#4E6AF4</item>
+        <item name="colorAccent">#087373</item>
+    </style>
+
+    <!-- BottomSheetDialog 커스텀 -->
+    <style name="CustomBottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/CustomBottomSheet</item>
+    </style>
+
+    <style name="CustomBottomSheet" parent="Widget.MaterialComponents.BottomSheet">
+        <item name="shapeAppearanceOverlay">@style/CustomShapeAppearanceBottomSheetDialog</item>
+    </style>
+
+    <style name="CustomShapeAppearanceBottomSheetDialog" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSizeTopRight">25dp</item>
+        <item name="cornerSizeTopLeft">25dp</item>
+        <item name="cornerSizeBottomRight">25dp</item>
+        <item name="cornerSizeBottomLeft">25dp</item>
+    </style>
+
+    <!-- 투명 액티비티 커스텀 -->
+    <style name="Transparent_Activity" parent="@style/Theme.AppCompat">
+        <!--TitleBar 없애는 옵션 -->
+        <item name="windowNoTitle">true</item>
+        <!-- 투명정도를 나타내는 색-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:ignore="NewApi">true</item>
+    </style>
+
+    <style name="myDialogTheme" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="android:background">#272626</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:paddingBottom">-5dp</item>
+    </style>
+
+</resources>
