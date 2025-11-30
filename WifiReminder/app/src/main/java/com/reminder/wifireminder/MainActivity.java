@@ -10,6 +10,7 @@ import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
