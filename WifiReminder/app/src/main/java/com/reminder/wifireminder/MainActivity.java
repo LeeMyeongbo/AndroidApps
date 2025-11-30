@@ -37,6 +37,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -142,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     routine_list.sort((o1, o2) -> o2.m_date.compareTo(o1.m_date));
             }
         } catch (ExecutionException | InterruptedException e) {
-            Log.e("MainActivity", e.getMessage());
+            Log.e("MainActivity", Objects.requireNonNull(e.getMessage()));
         }
         listview = findViewById(R.id.checkable_list);
         adapter = new CheckableListViewAdapter(is_night, check_mode);
@@ -274,33 +275,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             overridePendingTransition(R.anim.enter_from_left, R.anim.exit_to_right);
         });
 
-        edit.setOnClickListener(v -> {
-            Animation anim = AnimationUtils.loadAnimation(this, R.anim.from_up_to_down);
-            Register.setVisibility(View.GONE);
-            Search.setVisibility(View.GONE);
-            Setting.setVisibility(View.GONE);
-            if (sp.getBoolean("notify", false)) {
-                stop_service.startAnimation(anim);
-                stop_service.setVisibility(View.GONE);
-            } else {
-                start_service.startAnimation(anim);
-                start_service.setVisibility(View.GONE);
-            }
-            anim = AnimationUtils.loadAnimation(this, R.anim.from_down_to_up);
-            Delete.setVisibility(View.VISIBLE);
-            Delete.startAnimation(anim);
-
-            select_all.setVisibility(View.VISIBLE);
-            check_mode = true;
-            adapter.toggleCheckBox(true);
-            popupmenu.dismiss();
-        });
-        
+        edit.setOnClickListener(v -> activateCheckMode());
         sort.setOnClickListener(v -> {
             popupmenu.dismiss();
             new BottomSheetDialog(is_night, routine_list, adapter)
                 .show(getSupportFragmentManager(), "bottomSheet");
         });
+    }
+
+    private void activateCheckMode() {
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.from_up_to_down);
+        Register.setVisibility(View.GONE);
+        Search.setVisibility(View.GONE);
+        Setting.setVisibility(View.GONE);
+        if (sp.getBoolean("notify", false)) {
+            stop_service.startAnimation(anim);
+            stop_service.setVisibility(View.GONE);
+        } else {
+            start_service.startAnimation(anim);
+            start_service.setVisibility(View.GONE);
+        }
+        anim = AnimationUtils.loadAnimation(this, R.anim.from_down_to_up);
+        Delete.setVisibility(View.VISIBLE);
+        Delete.startAnimation(anim);
+
+        select_all.setVisibility(View.VISIBLE);
+        adapter.toggleCheckBox(true);
+        popupmenu.dismiss();
+        check_mode = true;
     }
 
     @Override
@@ -362,41 +364,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 routine_list.remove(i);
             }
         }
-        onBackPressed();
-        Toast.makeText(this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+        deactivateCheckMode();
+    }
+
+    private void deactivateCheckMode() {
+        check_mode = false;
+        listview.clearChoices();
+        select_all.setChecked(false);
+        select_all.setVisibility(View.GONE);
+        adapter.toggleCheckBox(false);
+
+        Animation anim = AnimationUtils.loadAnimation(this, R.anim.from_up_to_down);
+        anim.setInterpolator(new AccelerateInterpolator());
+        Delete.startAnimation(anim);
+        Delete.setVisibility(View.GONE);
+
+        Register.setVisibility(View.VISIBLE);
+        Search.setVisibility(View.VISIBLE);
+        Setting.setVisibility(View.VISIBLE);
+
+        anim = AnimationUtils.loadAnimation(this, R.anim.from_down_to_up);
+        if (sp.getBoolean("notify", false)) {
+            stop_service.startAnimation(anim);
+            stop_service.setVisibility(View.VISIBLE);
+        } else {
+            start_service.startAnimation(anim);
+            start_service.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        if (check_mode) {
-            listview.clearChoices();
-            check_mode = false;
-            select_all.setChecked(false);
-            select_all.setVisibility(View.GONE);
-            adapter.toggleCheckBox(false);
-
-            Animation anim = AnimationUtils.loadAnimation(this, R.anim.from_up_to_down);
-            anim.setInterpolator(new AccelerateInterpolator());
-            Delete.startAnimation(anim);
-            Delete.setVisibility(View.GONE);
-
-            Register.setVisibility(View.VISIBLE);
-            Search.setVisibility(View.VISIBLE);
-            Setting.setVisibility(View.VISIBLE);
-
-            anim = AnimationUtils.loadAnimation(this, R.anim.from_down_to_up);
-            if (sp.getBoolean("notify", false)) {
-                stop_service.startAnimation(anim);
-                stop_service.setVisibility(View.VISIBLE);
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if (check_mode) {
+                deactivateCheckMode();
+            } else if (popupmenu.isShowing()) {
+                popupmenu.dismiss();
             } else {
-                start_service.startAnimation(anim);
-                start_service.setVisibility(View.VISIBLE);
+                finish();
             }
-        } else if (popupmenu.isShowing())
-            popupmenu.dismiss();
-        else
-            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
