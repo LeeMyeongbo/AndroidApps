@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.reminder.wifireminder">
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission
+        android:name="android.permission.WRITE_SETTINGS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission
+        android:name="android.permission.UPDATE_DEVICE_STATS"
+        tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <application
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.wifireminder"
+        tools:ignore="AllowBackup">
+        <service
+            android:name="com.reminder.wifireminder.MyService"
+            android:foregroundServiceType="specialUse"
+            android:enabled="true" />
+        <activity android:name="com.reminder.wifireminder.Preview"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="com.reminder.wifireminder.MainActivity" />
+        <activity android:name="com.reminder.wifireminder.Routine"
+            android:windowSoftInputMode="stateHidden" />
+        <activity android:name="com.reminder.wifireminder.Setting" />
+        <activity android:name="com.reminder.wifireminder.Search"
+            android:windowSoftInputMode="stateAlwaysVisible" />
+        <activity android:name="com.reminder.wifireminder.Notify_ToDo"
+            android:screenOrientation="portrait"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:theme="@style/Transparent_Activity"
+            tools:ignore="LockedOrientationActivity" />
+        <activity android:name="com.reminder.wifireminder.HowToUse"
+            android:theme="@style/Transparent_Activity"
+            android:excludeFromRecents="true" />
+        <activity android:name="com.reminder.wifireminder.Permission_Viewpager" />
+    </application>
+
+</manifest>
